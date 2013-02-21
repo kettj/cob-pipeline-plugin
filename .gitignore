@@ -1,0 +1,14 @@
+*.class
+
+target
+work
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# eclim / vim files 
+.classpath
+.project
+.settings

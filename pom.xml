@@ -1,0 +1,87 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>1.466</version><!-- which version of Jenkins is this plugin built against? -->
+  </parent>
+
+  <groupId>de.fraunhofer.ipa</groupId>
+  <artifactId>cob-pipeline</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <packaging>hpi</packaging>
+  
+  <scm>
+    <connection>scm:git:git://github.com/fmw-jk/cob-pipeline-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:fmw-jk/cob-pipeline-plugin.git</developerConnection>
+    <url>https://github.com/fmw-jk/cob-pipeline-plugin</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>fmw-jk</id>
+      <name>Jannik Kett</name>
+      <email>jannik.kett@gmail.com</email>
+      <organization>Fraunhofer IPA</organization>
+      <organizationUrl>http://ipa.fraunhofer.de</organizationUrl>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+  
+  <!-- get every artifact through repo.jenkins-ci.org, which proxies all the artifacts that we need -->
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <build>
+  	<pluginManagement>
+  		<plugins>
+  			<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+  			<plugin>
+  				<groupId>org.eclipse.m2e</groupId>
+  				<artifactId>lifecycle-mapping</artifactId>
+  				<version>1.0.0</version>
+  				<configuration>
+  					<lifecycleMappingMetadata>
+  						<pluginExecutions>
+  							<pluginExecution>
+  								<pluginExecutionFilter>
+  									<groupId>
+  										org.jenkins-ci.tools
+  									</groupId>
+  									<artifactId>
+  										maven-hpi-plugin
+  									</artifactId>
+  									<versionRange>
+  										[1.74,)
+  									</versionRange>
+  									<goals>
+  										<goal>insert-test</goal>
+  										<goal>
+  											resolve-test-dependencies
+  										</goal>
+  										<goal>test-hpl</goal>
+  										<goal>validate</goal>
+  									</goals>
+  								</pluginExecutionFilter>
+  								<action>
+  									<ignore></ignore>
+  								</action>
+  							</pluginExecution>
+  						</pluginExecutions>
+  					</lifecycleMappingMetadata>
+  				</configuration>
+  			</plugin>
+  		</plugins>
+  	</pluginManagement>
+  </build>
+</project>
