@@ -46,6 +46,17 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RepositoryProperty implements ReconfigurableDescribable<RepositoryProperty> {
+	
+	/*
+	 * name of repository
+	 */
+	private String name;
+	
+	/*
+	 * url address to repository
+	 */
+	private String url;
+	
 	@Override
     public  RepositoryPropertyDescriptor getDescriptor() {
 		return (RepositoryPropertyDescriptor) Jenkins.getInstance().getDescriptorOrDie(getClass());
@@ -62,7 +73,6 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
         public RepositoryProperty newInstance(Repository repository) {
             return new RepositoryProperty();
         }
-		
 	}
 	
     @Override
