@@ -53,9 +53,21 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 	private String name;
 	
 	/*
+	 * repository name suffix
+	 */
+	private String suffix;
+	
+	/*
+	 * full repository name
+	 * name + suffix
+	 */
+	private String fullName;
+	
+	/*
 	 * url address to repository
 	 */
 	private String url;
+	
 	
 	@Override
     public  RepositoryPropertyDescriptor getDescriptor() {
