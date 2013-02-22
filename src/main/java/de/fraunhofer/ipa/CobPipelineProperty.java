@@ -146,7 +146,7 @@ public class CobPipelineProperty extends UserProperty {
         }
         
         public FormValidation doCheckEmail(@QueryParameter String value) throws IOException, ServletException {
-        	if (value == "enter your email address here") {
+        	if (value.equals("enter your email address here")) {
         		return FormValidation.warning("email address not set yet");
         	}
     		try {
