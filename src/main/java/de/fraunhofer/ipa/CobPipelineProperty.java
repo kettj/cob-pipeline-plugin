@@ -58,6 +58,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 
+import org.eclipse.egit.github.core.service.*;
+
 /**
  * A UserProperty that can store a build pipeline
  * 
@@ -182,10 +184,16 @@ public class CobPipelineProperty extends UserProperty {
         public FormValidation doCheckGithubAdmin(@QueryParameter String value)
         		throws IOException, ServletException {
         	if (value.length() == 0) {
-        		return FormValidation.error("Please enter name");
+        		return FormValidation.error("Please enter login name");
+        	} 
+        	try {
+        		UserService githubUser = new UserService();
+        		org.eclipse.egit.github.core.User user = githubUser.getUser(value);
+        		return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
+        		user.getPublicRepos()+" public repositories");
+        	} catch (IOException ex) {
+        		return FormValidation.error("Invalid Github user login. User does not exist.");
         	}
-        	//TODO implement
-        	return FormValidation.ok();
         }
         
         @Override
