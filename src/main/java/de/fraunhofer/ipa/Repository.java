@@ -38,16 +38,10 @@ package de.fraunhofer.ipa;
 
 public class Repository {
 	
-	private String name;
-	
-	private String suffix;
-	
-	public String fullName;
+	public String name;
 	
 	public Repository() {
 		this.name = name;
-		this.suffix = suffix;
-		this.fullName = fullName;
 	}
 
 }

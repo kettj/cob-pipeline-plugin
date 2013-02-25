@@ -50,13 +50,11 @@ public class RepositoryList extends ArrayList<Repository>{
         this(Arrays.asList(c));
     }
 
-    public Repository find(String fullName) {
+    public Repository find(String name) {
         for (Repository r : this) {
-            if(r.fullName.equals(fullName))
+            if(r.name.equals(name))
                 return r;
         }
         return null;
     }
-
-	
 }

@@ -47,28 +47,33 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class RepositoryProperty implements ReconfigurableDescribable<RepositoryProperty> {
 	
+	protected transient Repository Repository;
+	
 	/*
 	 * name of repository
 	 */
 	private String name;
 	
 	/*
-	 * repository name suffix
-	 */
-	private String suffix;
-	
-	/*
-	 * full repository name
-	 * name + suffix
-	 */
-	private String fullName;
-	
-	/*
 	 * url address to repository
 	 */
 	private String url;
 	
+	/*package*/ final void setRepository(Repository repository) {
+		this.Repository = Repository;
+	}
+		
+	public void setName(String name) {
+		//TODO check if repo name exists
+		this.name = name;
+	}
 	
+	public void setUrl(String url) {
+		//TODO check if url is valid
+		// necessary? master url
+		this.url = url;
+	}
+		
 	@Override
     public  RepositoryPropertyDescriptor getDescriptor() {
 		return (RepositoryPropertyDescriptor) Jenkins.getInstance().getDescriptorOrDie(getClass());
