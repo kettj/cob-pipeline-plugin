@@ -59,15 +59,15 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
 
     /**
-     * Creates a default instance of {@link UserProperty} to be associated
-     * with {@link User} object that wasn't created from a persisted XML data.
+     * Creates a default instance of {@link RepositoryProperty} to be associated
+     * with {@link Repository} object that wasn't created from a persisted XML data.
      *
      * <p>
-     * See {@link User} class javadoc for more details about the life cycle
-     * of {@link User} and when this method is invoked.
+     * See {@link Repository} class javadoc for more details about the life cycle
+     * of {@link Repository} and when this method is invoked.
      *
      * @return null
-     *      if the implementation choose not to add any property object for such user.
+     *      if the implementation choose not to add any property object for such repository.
      */
     public abstract RepositoryProperty newInstance(Repository repository);
 
@@ -77,8 +77,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      *
      * <p>
      * Returning false from this method essentially has the same effect of
-     * making Hudson behaves as if this {@link UserPropertyDescriptor} is
-     * not a part of {@link UserProperty#all()}.
+     * making Hudson behaves as if this {@link RepositoryPropertyDescriptor} is
+     * not a part of {@link RepositoryProperty#all()}.
      *
      * <p>
      * This mechanism is useful if the availability of the property is
@@ -87,5 +87,4 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     public boolean isEnabled() {
         return true;
     }
-
 }
