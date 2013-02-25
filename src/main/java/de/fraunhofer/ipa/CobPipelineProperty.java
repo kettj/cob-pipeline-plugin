@@ -58,6 +58,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 
+import org.eclipse.egit.github.core.service.*;
+
 /**
  * A UserProperty that can store a build pipeline
  * 
@@ -65,17 +67,17 @@ import org.kohsuke.stapler.QueryParameter;
  */
 public class CobPipelineProperty extends UserProperty {
 	
-	/*
+	/**
 	 * user email address
 	 */
 	private String email = null;
 	
-	/*
+	/**
 	 * user name
 	 */
 	private String userName = null;
 	
-	/*
+	/**
 	 * Jenkins master name
 	 */
 	private String masterName = null;
@@ -135,6 +137,12 @@ public class CobPipelineProperty extends UserProperty {
 	@Extension
     public static class DescriptorImpl extends UserPropertyDescriptor {
 
+		private String githubAdmin;
+		
+		public DescriptorImpl() {
+			load();
+		}
+		
         @Override
         public String getDisplayName() {
             return "Pipeline Configurations";
@@ -145,7 +153,11 @@ public class CobPipelineProperty extends UserProperty {
             return new CobPipelineProperty(user.getId());
         }
         
-        public FormValidation doCheckEmail(@QueryParameter String value) throws IOException, ServletException {
+        /**
+         * Checks if the given String is a email address
+         */
+        public FormValidation doCheckEmail(@QueryParameter String value)
+        		throws IOException, ServletException {
         	if (value.equals("enter your email address here")) {
         		return FormValidation.warning("email address not set yet");
         	}
@@ -157,6 +169,39 @@ public class CobPipelineProperty extends UserProperty {
     			return FormValidation.error("invalid email address");
     		}
     	}
+        
+        public void setGithubAdmin(String githubAdmin) {
+        	this.githubAdmin = githubAdmin;
+        }
+        
+        public String getGithubAdmin() {
+        	return githubAdmin;
+        }
+        
+        /**
+         * Checks if given String is valid GitHub user
+         */
+        public FormValidation doCheckGithubAdmin(@QueryParameter String value)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.error("Please enter login name");
+        	} 
+        	try {
+        		UserService githubUser = new UserService();
+        		org.eclipse.egit.github.core.User user = githubUser.getUser(value);
+        		return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
+        		user.getPublicRepos()+" public repositories");
+        	} catch (IOException ex) {
+        		return FormValidation.error("Invalid Github user login. User does not exist.");
+        	}
+        }
+        
+        @Override
+        public boolean configure(StaplerRequest req, JSONObject form) throws FormException {
+        	req.bindJSON(this, form);
+        	super.save();
+        	return super.configure(req, form);
+        }
     }
     
     @Override
