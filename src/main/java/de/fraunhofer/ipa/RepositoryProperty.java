@@ -36,6 +36,7 @@
 
 package de.fraunhofer.ipa;
 
+import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.Descriptor.FormException;
 import hudson.model.ReconfigurableDescribable;
@@ -96,6 +97,13 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
     public RepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
+    }
+    
+    /**
+    * Returns all the registered {@link RepositoryPropertyDescriptor}s.
+    */
+    public static DescriptorExtensionList<RepositoryProperty, RepositoryPropertyDescriptor> all() {
+        return Jenkins.getInstance().<RepositoryProperty, RepositoryPropertyDescriptor>getDescriptorList(RepositoryProperty.class);
     }
 
 }

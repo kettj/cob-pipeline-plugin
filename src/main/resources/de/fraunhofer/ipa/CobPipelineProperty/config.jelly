@@ -3,4 +3,9 @@
 	<f:entry title="${%title}" help="/plugin/cob-pipeline/help-email.html">
         <f:textbox default="${instance.defaultEmail()}" field="email" description="${%test}"/>
 	</f:entry>
+	<f:block>
+	    <f:hetero-list name="repositories" hasHeader="true"
+	    			   descriptors="${descriptor.rootRepositoryDescriptors}"
+	    			   addCaption="${%Add repository}"/>
+	</f:block>
 </j:jelly>

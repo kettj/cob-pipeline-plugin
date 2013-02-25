@@ -47,6 +47,9 @@ import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.ArrayList;
+
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
@@ -201,6 +204,18 @@ public class CobPipelineProperty extends UserProperty {
         	req.bindJSON(this, form);
         	super.save();
         	return super.configure(req, form);
+        }
+        
+        /**
+         * All {@link RepositoryDescriptor}s
+         */
+        public List<RepositoryPropertyDescriptor> getRootRepositoryDescriptors() {
+        	List<RepositoryPropertyDescriptor> r = new ArrayList<RepositoryPropertyDescriptor>();
+        	for (RepositoryPropertyDescriptor d : RootRepositoryProperty.all()) {
+        		//TODO only add RootRepositoryDescriptors
+        		r.add(d);
+        	}
+        	return r;
         }
     }
     

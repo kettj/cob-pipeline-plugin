@@ -36,10 +36,15 @@
 
 package de.fraunhofer.ipa;
 
+import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.Descriptor.FormException;
 
+import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
+import java.util.List;
+import java.util.ArrayList;
 
 import org.kohsuke.stapler.StaplerRequest;
 
@@ -66,11 +71,31 @@ public class RootRepositoryProperty extends RepositoryProperty {
         public RepositoryProperty newInstance(Repository repository) {
             return new RootRepositoryProperty();
         }
+        
+        /**
+         * All {@link RepositoryDescriptor}s
+         */
+        public List<RepositoryPropertyDescriptor> getRepositoryDescriptors() {
+        	List<RepositoryPropertyDescriptor> r = new ArrayList<RepositoryPropertyDescriptor>();
+        	for (RepositoryPropertyDescriptor d : RepositoryProperty.all()) {
+        		//TODO only add RepositoryDescriptors not Root
+        		r.add(d);
+        	}
+        	return r;
+        }
 	}
 	
     @Override
     public RootRepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
+    }
+    
+    /**
+     * Returns all the registered {@link RepositoryPropertyDescriptor}s.
+     */
+    //return only Root
+    public static DescriptorExtensionList<RepositoryProperty, RepositoryPropertyDescriptor> all() {
+        return Jenkins.getInstance().<RepositoryProperty, RepositoryPropertyDescriptor>getDescriptorList(RepositoryProperty.class);
     }
 }
