@@ -1,0 +1,12 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+    This Jelly script is used to produce the global configuration option.
+  -->
+  <f:section title="Cob Pipeline Configuration">
+    <f:entry title="GitHub Admin" field="githubAdmin"
+      description="Enter name of GitHub User which has read/write access for all repositories">
+      <f:textbox />
+    </f:entry>
+  </f:section>
+</j:jelly>
+
