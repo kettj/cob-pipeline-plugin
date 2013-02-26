@@ -59,19 +59,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
 
     /**
-     * Creates a default instance of {@link RepositoryProperty} to be associated
-     * with {@link Repository} object that wasn't created from a persisted XML data.
-     *
-     * <p>
-     * See {@link Repository} class javadoc for more details about the life cycle
-     * of {@link Repository} and when this method is invoked.
-     *
-     * @return null
-     *      if the implementation choose not to add any property object for such repository.
-     */
-    public abstract RepositoryProperty newInstance(Repository repository);
-
-    /**
      * Whether or not the described property is enabled in the current context.
      * Defaults to true.  Over-ride in sub-classes as required.
      *
@@ -87,4 +74,15 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     public boolean isEnabled() {
         return true;
     }
+    
+    /**
+    * Return false if the user shouldn't be able to create this repository from the UI.
+    */
+    public boolean isInstantiable() {
+        return true;
+    }
+    
+    //TODO doCheckUrl
+    
+    //TODO 
 }

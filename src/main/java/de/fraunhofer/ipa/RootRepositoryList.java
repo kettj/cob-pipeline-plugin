@@ -41,20 +41,20 @@ import java.util.Arrays;
 import java.util.Collection;
 
 
-public class RootRepositoryList extends ArrayList<RootRepository> {
+public class RootRepositoryList extends ArrayList<RootRepositoryProperty> {
 	public RootRepositoryList() {
 	}
 	
-	public RootRepositoryList(Collection<? extends RootRepository> c) {
+	public RootRepositoryList(Collection<? extends RootRepositoryProperty> c) {
         super(c);
     }
 
-    public RootRepositoryList(RootRepository... c) {
+    public RootRepositoryList(RootRepositoryProperty... c) {
         this(Arrays.asList(c));
     }
 
-    public RootRepository find(String fullName) {
-        for (RootRepository r : this) {
+    public RootRepositoryProperty find(String fullName) {
+        for (RootRepositoryProperty r : this) {
             if(r.fullName.equals(fullName))
                 return r;
         }

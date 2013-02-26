@@ -39,10 +39,12 @@ package de.fraunhofer.ipa;
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.Descriptor.FormException;
+import hudson.model.User;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -51,20 +53,31 @@ import org.kohsuke.stapler.StaplerRequest;
 
 public class RootRepositoryProperty extends RepositoryProperty {
 
-	protected transient RootRepository rootRepository;
-	
 	private String suffix;
 	
-	private String fullName;
+	protected String fullName;
+	
+	/**
+	 * Repository dependencies
+	 */
+	private volatile RepositoryList repoDeps = new RepositoryList();
 	
 	@DataBoundConstructor
 	public RootRepositoryProperty(String name) {
 		super(name);
 		this.fullName = fullName;
+		this.suffix = suffix;
+		this.repoDeps = repoDeps;
 	}
 	
-	/*package*/ final void setRootRepository(RootRepository rootRepository) {
-		this.rootRepository = rootRepository;
+	public void setSuffix(String suffix) {
+		this.suffix = suffix;
+		this.fullName = this.name+suffix;
+	}
+	
+	public void setRepoDeps(RepositoryList repoDeps) throws IOException {
+		this.repoDeps = new RepositoryList(repoDeps);
+		//User.current().save(); TODO save deps
 	}
 	
 	@Override
@@ -77,10 +90,6 @@ public class RootRepositoryProperty extends RepositoryProperty {
 		@Override
         public String getDisplayName() {
             return "Root Repository Configurations";
-        }
-		
-        public RepositoryProperty newInstance(Repository repository) {
-            return new RootRepositoryProperty(repository.name);
         }
         
         /**

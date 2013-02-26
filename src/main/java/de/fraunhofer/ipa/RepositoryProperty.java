@@ -38,17 +38,16 @@ package de.fraunhofer.ipa;
 
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
+import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
-import hudson.model.ReconfigurableDescribable;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class RepositoryProperty implements ReconfigurableDescribable<RepositoryProperty> {
-	
-	protected transient Repository Repository;
+public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProperty> {
 	
 	/*
 	 * name of repository
@@ -60,18 +59,15 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 	 */
 	protected String url;
 	
+	@DataBoundConstructor
 	public RepositoryProperty(String name) {
 		this.name = name;
 	}
 	
-	/*package*/ final void setRepository(Repository repository) {
-		this.Repository = Repository;
-	}
-		
-	public void setName(String name) {
+	/*public void setName(String name) {
 		//TODO check if repo name exists
 		this.name = name;
-	}
+	}*/
 	
 	public void setUrl(String url) {
 		//TODO check if url is valid
@@ -81,7 +77,7 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 		
 	@Override
     public RepositoryPropertyDescriptor getDescriptor() {
-		return (RepositoryPropertyDescriptor) Jenkins.getInstance().getDescriptorOrDie(getClass());
+		return (RepositoryPropertyDescriptor)super.getDescriptor();
     }
 	
 	@Extension
@@ -90,14 +86,8 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
         public String getDisplayName() {
             return "Repository Configurations";
         }
-		
-		@Override
-        public RepositoryProperty newInstance(Repository repository) {
-            return new RepositoryProperty(repository.name);
-        }
 	}
 	
-    @Override
     public RepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
