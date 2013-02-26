@@ -64,6 +64,10 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 		this.name = name;
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
 	/*public void setName(String name) {
 		//TODO check if repo name exists
 		this.name = name;
