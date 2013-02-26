@@ -61,6 +61,8 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 
+import org.eclipse.egit.github.core.*;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 
 /**
@@ -155,7 +157,13 @@ public class CobPipelineProperty extends UserProperty {
 	@Extension
     public static class DescriptorImpl extends UserPropertyDescriptor {
 
-		private static String githubAdmin;
+		private String githubOrg;
+		
+		private String githubTeam;
+		
+		private String githubLogin;
+		
+		private String githubPassword;
 		
 		public DescriptorImpl() {
 			load();
@@ -188,29 +196,118 @@ public class CobPipelineProperty extends UserProperty {
     		}
     	}
         
-        public void setGithubAdmin(String githubAdmin) {
-        	this.githubAdmin = githubAdmin;
+        public void setGithubOrg(String githubOrg) {
+        	this.githubOrg = githubOrg;
         }
         
-        public static String getGithubAdmin() {
-        	return githubAdmin;
+        public String getGithubOrg() {
+        	return githubOrg;
         }
         
+        public void setGithubTeam(String githubTeam) {
+        	this.githubTeam = githubTeam;
+        }
+        
+        public String getGithubTeam() {
+        	return githubTeam;
+        }
+        
+        public void setGithubLogin(String githubLogin) {
+        	this.githubLogin = githubLogin;
+        }
+        
+        public String getGithubLogin() {
+        	return githubLogin;
+        }
+        
+        //TODO save password encrypted
+        public void setGithubPassword(String githubPassword) {
+        	this.githubPassword = githubPassword;
+        }
+        
+        public String getGithubPassword() {
+        	return githubPassword;
+        }
+        
+        //TODO enhance output and order
+        /**
+         * Checks if organization exists
+         */
+        public FormValidation doCheckGithubOrg(@QueryParameter String value)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.error("Please enter organization name");
+        	}
+        	try {
+        		OrganizationService githubOrgSrv = new OrganizationService();
+        		org.eclipse.egit.github.core.User org = githubOrgSrv.getOrganization(value);
+        		return FormValidation.ok("Organization ownes "+
+                		org.getPublicRepos()+" public and "+org.getTotalPrivateRepos()+" private repositories");
+        	} catch (IOException ex) {
+        		return FormValidation.error("Invalid Github organization. Organization does not exist.\n"+ex.getMessage());
+        	}
+        }
+              
         /**
          * Checks if given String is valid GitHub user
          */
-        public FormValidation doCheckGithubAdmin(@QueryParameter String value)
+        public FormValidation doCheckGithubLogin(@QueryParameter String value)
         		throws IOException, ServletException {
         	if (value.length() == 0) {
         		return FormValidation.error("Please enter login name");
         	} 
         	try {
-        		UserService githubUser = new UserService();
-        		org.eclipse.egit.github.core.User user = githubUser.getUser(value);
-        		return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
-        		user.getPublicRepos()+" public repositories");
+        		UserService githubUserSrv = new UserService();
+        		githubUserSrv.getUser(value);
+        		return FormValidation.ok();
         	} catch (IOException ex) {
-        		return FormValidation.error("Invalid Github user login. User does not exist.");
+        		return FormValidation.error("Invalid Github user login. User does not exist.\n"+ex.getMessage());
+        	}
+        }
+        
+        /**
+         * Checks if given password String is fits to GitHub user
+         */
+        public FormValidation doCheckGithubPassword(@QueryParameter String value, @QueryParameter String githubLogin)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.error("Please enter password");
+        	}
+        	try {
+				GitHubClient client = new GitHubClient();
+				client.setCredentials(githubLogin, value);
+				UserService githubUserSrv = new UserService(client);
+				org.eclipse.egit.github.core.User user = githubUserSrv.getUser(githubLogin);
+				return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
+        		user.getPublicRepos()+" public and "+user.getTotalPrivateRepos()+" private repositories");
+			} catch (Exception ex) {
+				return FormValidation.error("Incorrect Password\n"+ex.getMessage());
+			}
+        }
+        
+        /**
+         * Checks if team exists in given organization
+         * and given user belongs to team
+         */
+        public FormValidation doCheckGithubTeam(@QueryParameter String value, @QueryParameter String githubLogin,
+        		@QueryParameter String githubPassword, @QueryParameter String githubOrg)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.error("Please enter team name");
+        	}
+        	try {
+        		GitHubClient client = new GitHubClient();
+        		client.setCredentials(githubLogin, githubPassword);
+        		TeamService githubTeamSrv = new TeamService(client);
+        		List<Team> teams = githubTeamSrv.getTeams(githubOrg);
+        		for (Team team : teams) {
+        			if (value.equals(team.getName())) {
+        				return FormValidation.ok("Team ownes "+Integer.toString(team.getReposCount())+" repositories.");
+        			}
+        		}
+        		return FormValidation.error("Invalid Github team. Team not found. Make sure the given user is a member of this team");
+        	} catch (IOException ex) {
+        		return FormValidation.error("Error occured while checking team existenz: "+ex.getMessage());
         	}
         }
         

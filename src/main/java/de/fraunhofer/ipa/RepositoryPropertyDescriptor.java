@@ -37,6 +37,7 @@
 package de.fraunhofer.ipa;
 
 import hudson.model.Descriptor;
+import hudson.model.User;
 import hudson.util.ListBoxModel;
 
 import java.io.IOException;
@@ -91,9 +92,9 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     //TODO doCheckUrl
     
     //TODO 
-    public ListBoxModel doFillAdminReposItems() {
+    /*public ListBoxModel doFillAdminReposItems() {
     	ListBoxModel items = new ListBoxModel();
-    	String githubLogin = CobPipelineProperty.DescriptorImpl.getGithubAdmin();
+    	String githubLogin = CobPipelineProperty.this.getDescriptor().getGithubLogin();
     	
     	try {
 			RepositoryService adminRepoSrv = new RepositoryService();
@@ -107,5 +108,5 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	
 		
     	return items;
-    }
+    }*/
 }
