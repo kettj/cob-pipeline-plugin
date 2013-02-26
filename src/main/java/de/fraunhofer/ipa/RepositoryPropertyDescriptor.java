@@ -95,7 +95,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     //TODO doCheckUrl
     
     //TODO 
-    public ListBoxModel doFillAdminReposItems() {
+    public ListBoxModel doFillNameItems() {
     	ListBoxModel items = new ListBoxModel();    	
     	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
     	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
@@ -125,8 +125,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		}
 		} catch (IOException ex) {
 			// TODO: handle exception
-		}
-    	
+		}  	
 		
     	return items;
     }

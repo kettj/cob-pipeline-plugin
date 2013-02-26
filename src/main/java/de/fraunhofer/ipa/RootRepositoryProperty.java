@@ -40,6 +40,7 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.Descriptor.FormException;
 import hudson.model.User;
+import hudson.util.FormValidation;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -48,8 +49,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
+import javax.servlet.ServletException;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.QueryParameter;
 
 public class RootRepositoryProperty extends RepositoryProperty {
 
@@ -91,6 +95,18 @@ public class RootRepositoryProperty extends RepositoryProperty {
         public String getDisplayName() {
             return "Root Repository Configurations";
         }
+		
+		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String name)
+				throws IOException, ServletException {
+			//TODO check if other repo with the same name exists
+			
+			if (value.length() != 0) { 
+				return FormValidation.ok("Full name: "+name+"__"+value);
+			} else {
+				return FormValidation.ok("Full name: "+name);
+			}
+				
+		}
         
         /**
          * All {@link RepositoryDescriptor}s

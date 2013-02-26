@@ -1,10 +1,13 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-  	<f:entry title="${%name}" field="name">
+  	<!--f:entry title="${%name}" field="name">
     	<f:textbox default="repository name" />
-  	</f:entry>
-  	<f:entry field="adminRepos" title="${%Choose repository}">
+  	</f:entry-->
+  	<f:entry field="name" title="${%Choose repository}">
    		<f:select />
+	</f:entry>
+	<f:entry field="suffix" title="${%Name suffix}">
+   		<f:textbox />
 	</f:entry>
     <f:block>
 	    <f:hetero-list name="repositories" hasHeader="true"
