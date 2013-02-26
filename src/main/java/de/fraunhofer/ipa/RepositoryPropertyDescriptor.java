@@ -37,12 +37,15 @@
 package de.fraunhofer.ipa;
 
 import hudson.model.Descriptor;
-import hudson.model.User;
+import hudson.model.Hudson;
 import hudson.util.ListBoxModel;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.egit.github.core.Team;
+import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 
 /**
@@ -92,21 +95,39 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     //TODO doCheckUrl
     
     //TODO 
-    /*public ListBoxModel doFillAdminReposItems() {
-    	ListBoxModel items = new ListBoxModel();
-    	String githubLogin = CobPipelineProperty.this.getDescriptor().getGithubLogin();
+    public ListBoxModel doFillAdminReposItems() {
+    	ListBoxModel items = new ListBoxModel();    	
+    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	String githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+    	String githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
     	
     	try {
-			RepositoryService adminRepoSrv = new RepositoryService();
-			List<org.eclipse.egit.github.core.Repository> adminRepos = adminRepoSrv.getRepositories(githubLogin);
-			for (org.eclipse.egit.github.core.Repository repo : adminRepos) {
-				items.add(repo.getName());
-			}
+			GitHubClient client = new GitHubClient();
+    		client.setCredentials(githubLogin, githubPassword);
+    		TeamService githubTeamSrv = new TeamService(client);
+    		Team team = new Team();
+    		List<Team> teams = githubTeamSrv.getTeams(githubOrg);
+    		for (Team t : teams) {
+    			if (githubTeam.equals(t.getName())) {
+    				team = t;
+    			}
+    		}    	
+    		try {
+    			List<org.eclipse.egit.github.core.Repository> teamRepos = githubTeamSrv.getRepositories(team.getId());
+    			for (org.eclipse.egit.github.core.Repository repo : teamRepos) {
+    				if (!items.contains(repo.getName()))
+    					items.add(repo.getName());
+    					//TODO add only if not already included
+    			}
+    		} catch (IOException ex) {
+    			// TODO: handle exception
+    		}
 		} catch (IOException ex) {
 			// TODO: handle exception
 		}
     	
 		
     	return items;
-    }*/
+    }
 }
