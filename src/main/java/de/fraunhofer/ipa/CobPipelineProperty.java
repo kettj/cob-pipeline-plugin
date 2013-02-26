@@ -151,11 +151,17 @@ public class CobPipelineProperty extends UserProperty {
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl)super.getDescriptor();
     }
+    
+    public String getGithubConfig() {
+    	return this.getDescriptor().githubAdmin;
+    }
 	
 	@Extension
     public static class DescriptorImpl extends UserPropertyDescriptor {
 
-		private static String githubAdmin;
+		private String githubAdmin;
+		
+		private static String login;
 		
 		public DescriptorImpl() {
 			load();
@@ -190,10 +196,15 @@ public class CobPipelineProperty extends UserProperty {
         
         public void setGithubAdmin(String githubAdmin) {
         	this.githubAdmin = githubAdmin;
+        	DescriptorImpl.login = githubAdmin;
         }
         
-        public static String getGithubAdmin() {
+        public String getGithubAdmin() {
         	return githubAdmin;
+        }
+        
+        public static String getLogin() {
+        	return login;
         }
         
         /**
