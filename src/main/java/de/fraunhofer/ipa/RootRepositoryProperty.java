@@ -46,11 +46,22 @@ import net.sf.json.JSONObject;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RootRepositoryProperty extends RepositoryProperty {
 
 	protected transient RootRepository rootRepository;
+	
+	private String suffix;
+	
+	private String fullName;
+	
+	@DataBoundConstructor
+	public RootRepositoryProperty(String name) {
+		super(name);
+		this.fullName = fullName;
+	}
 	
 	/*package*/ final void setRootRepository(RootRepository rootRepository) {
 		this.rootRepository = rootRepository;
@@ -69,7 +80,7 @@ public class RootRepositoryProperty extends RepositoryProperty {
         }
 		
         public RepositoryProperty newInstance(Repository repository) {
-            return new RootRepositoryProperty();
+            return new RootRepositoryProperty(repository.name);
         }
         
         /**

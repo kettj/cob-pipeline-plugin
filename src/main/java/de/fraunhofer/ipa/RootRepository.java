@@ -36,7 +36,7 @@
 
 package de.fraunhofer.ipa;
 
-public class RootRepository {
+public class RootRepository extends Repository {
 	
 	/*
 	 * repository name suffix to differentiate between
@@ -50,6 +50,7 @@ public class RootRepository {
 	public String fullName;
 	
 	public RootRepository() {
+		super();
 		this.fullName = fullName;
 		this.suffix = suffix;
 	}

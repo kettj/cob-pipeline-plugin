@@ -37,7 +37,28 @@
 package de.fraunhofer.ipa;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+
 
 public class RootRepositoryList extends ArrayList<RootRepository> {
+	public RootRepositoryList() {
+	}
+	
+	public RootRepositoryList(Collection<? extends RootRepository> c) {
+        super(c);
+    }
+
+    public RootRepositoryList(RootRepository... c) {
+        this(Arrays.asList(c));
+    }
+
+    public RootRepository find(String fullName) {
+        for (RootRepository r : this) {
+            if(r.fullName.equals(fullName))
+                return r;
+        }
+        return null;
+    }
 
 }

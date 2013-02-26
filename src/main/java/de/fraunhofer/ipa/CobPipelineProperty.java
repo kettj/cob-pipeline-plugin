@@ -85,6 +85,11 @@ public class CobPipelineProperty extends UserProperty {
 	 */
 	private String masterName = null;
 	
+	/**
+	 * Build repositories
+	 */
+	private volatile RootRepositoryList rootRepos = new RootRepositoryList();
+	
 	@DataBoundConstructor
 	public CobPipelineProperty(String id) {
 		/*TODO check if LDAPSecurityRealm is used
@@ -100,6 +105,7 @@ public class CobPipelineProperty extends UserProperty {
 		if (masterName == null) {
 			this.masterName = getMasterName();
 		}
+		this.rootRepos = rootRepos;
 	}
 	
 	public String defaultEmail() {
@@ -130,6 +136,15 @@ public class CobPipelineProperty extends UserProperty {
 		url = url.replace("http://", "");
 		
 		return url;
+	}
+	
+	public void setRootRepos(RootRepositoryList rootRepos) throws IOException {
+		this.rootRepos = new RootRepositoryList(rootRepos);
+		save();
+	}
+	
+	public RootRepositoryList getRootRepos() {
+		return rootRepos;
 	}
 	
     @Override

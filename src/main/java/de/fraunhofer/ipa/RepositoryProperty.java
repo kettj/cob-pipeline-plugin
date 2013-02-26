@@ -53,12 +53,16 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 	/*
 	 * name of repository
 	 */
-	private String name;
+	protected String name;
 	
 	/*
 	 * url address to repository
 	 */
-	private String url;
+	protected String url;
+	
+	public RepositoryProperty(String name) {
+		this.name = name;
+	}
 	
 	/*package*/ final void setRepository(Repository repository) {
 		this.Repository = Repository;
@@ -76,7 +80,7 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 	}
 		
 	@Override
-    public  RepositoryPropertyDescriptor getDescriptor() {
+    public RepositoryPropertyDescriptor getDescriptor() {
 		return (RepositoryPropertyDescriptor) Jenkins.getInstance().getDescriptorOrDie(getClass());
     }
 	
@@ -89,7 +93,7 @@ public class RepositoryProperty implements ReconfigurableDescribable<RepositoryP
 		
 		@Override
         public RepositoryProperty newInstance(Repository repository) {
-            return new RepositoryProperty();
+            return new RepositoryProperty(repository.name);
         }
 	}
 	
