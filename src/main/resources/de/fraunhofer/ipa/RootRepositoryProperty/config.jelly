@@ -3,6 +3,9 @@
   	<f:entry title="${%name}" field="name">
     	<f:textbox default="repository name" />
   	</f:entry>
+  	<f:entry field="adminRepos" title="${%Choose repository}">
+   		<f:select />
+	</f:entry>
     <f:block>
 	    <f:hetero-list name="repositories" hasHeader="true"
 	    			   descriptors="${descriptor.repositoryDescriptors}"
