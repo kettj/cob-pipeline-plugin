@@ -40,21 +40,34 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
+import hudson.model.User;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
+import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProperty> {
 	
-	/*
+	/**
 	 * name of repository
 	 */
 	protected String name;
 	
-	/*
+	/**
+	 * name of fork owner
+	 */
+	protected String fork;
+	
+	/**
+	 * name of branch
+	 */
+	protected String branch;
+	
+	/**
 	 * url address to repository
 	 */
 	protected String url;
@@ -68,11 +81,26 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 		return this.name;
 	}
 	
-	/*public void setName(String name) {
-		//TODO check if repo name exists
+	public void setName(String name) throws IOException {
 		this.name = name;
-	}*/
+	}
 	
+	public void setFork(String fork) throws IOException {
+		this.fork = fork;
+	}
+	
+	public String getFork() {
+		return this.fork;
+	}
+		
+	public void setBranch(String branch) throws IOException {
+		this.branch = branch;
+	}
+	
+	public String getBranch() {
+		return this.branch;
+	}
+		
 	public void setUrl(String url) {
 		//TODO check if url is valid
 		// necessary? master url

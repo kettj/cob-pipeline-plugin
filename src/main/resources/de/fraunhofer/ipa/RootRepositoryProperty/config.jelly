@@ -3,11 +3,17 @@
   	<!--f:entry title="${%name}" field="name">
     	<f:textbox default="repository name" />
   	</f:entry-->
-  	<f:entry field="name" title="${%Choose repository}">
-   		<f:select />
+  	<f:entry field="name" title="${%Enter repository}">
+   		<f:combobox />
 	</f:entry>
 	<f:entry field="suffix" title="${%Name suffix}">
    		<f:textbox />
+	</f:entry>
+  	<f:entry field="fork" title="${%Enter owner/fork}">
+   		<f:combobox />
+	</f:entry>
+	<f:entry field="branch" title="${%Enter branch}">
+   		<f:combobox />
 	</f:entry>
     <f:block>
 	    <f:hetero-list name="repositories" hasHeader="true"

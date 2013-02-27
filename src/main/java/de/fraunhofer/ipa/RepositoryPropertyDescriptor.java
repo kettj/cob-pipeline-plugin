@@ -38,15 +38,19 @@ package de.fraunhofer.ipa;
 
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
-import hudson.util.ListBoxModel;
+import hudson.util.ComboBoxModel;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 
+import org.kohsuke.stapler.QueryParameter;
+
+import org.eclipse.egit.github.core.RepositoryId;
+import org.eclipse.egit.github.core.RepositoryBranch;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
+
 
 /**
  * {@link Descriptor} for {@link RepositoryProperty}.
@@ -95,8 +99,9 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     //TODO doCheckUrl
     
     //TODO 
-    public ListBoxModel doFillNameItems() {
-    	ListBoxModel items = new ListBoxModel();    	
+    public ComboBoxModel doFillNameItems() {
+    	ComboBoxModel items =new ComboBoxModel();
+    	//ListBoxModel items = new ListBoxModel();    	
     	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
     	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
     	String githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
@@ -117,7 +122,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     			List<org.eclipse.egit.github.core.Repository> teamRepos = githubTeamSrv.getRepositories(team.getId());
     			for (org.eclipse.egit.github.core.Repository repo : teamRepos) {
     				if (!items.contains(repo.getName()))
-    					items.add(repo.getName());
+    					items.add(0, repo.getName());
+    					//items.add(repo.getName(), repo.generateId());
     					//TODO add only if not already included
     			}
     		} catch (IOException ex) {
@@ -129,4 +135,61 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 		
     	return items;
     }
+    
+    public ComboBoxModel doFillForkItems(@QueryParameter String name) {
+    	ComboBoxModel items = new ComboBoxModel();
+    	if (name.length() == 0) {
+    		items.add("Choose repository first");
+    		return items;
+    	}
+    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	String githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+    	
+    	try {
+			GitHubClient client = new GitHubClient();
+    		client.setCredentials(githubLogin, githubPassword);
+    		RepositoryService githubRepoSrv = new RepositoryService(client);
+    		RepositoryId repoId = new RepositoryId(githubOrg, name);
+    		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
+    		
+    		for (org.eclipse.egit.github.core.Repository fork : forks) {
+    			org.eclipse.egit.github.core.User user = fork.getOwner();
+    			items.add(0, user.getLogin());
+    		}
+    		items.add(0, githubOrg);
+    		
+    	} catch (Exception ex) {
+			// TODO: handle exception
+		}      	
+    	return items;
+    }
+    
+    
+    public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
+    	ComboBoxModel items = new ComboBoxModel();
+    	if (name.length() == 0 || fork.length() == 0) {
+    		items.add("Choose repository and fork first");
+    		return items;
+    	}
+    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	
+    	try {
+    		GitHubClient client = new GitHubClient();
+    		client.setCredentials(githubLogin, githubPassword);
+    		RepositoryId repoId = new RepositoryId(fork, name);
+    		RepositoryService githubRepoSrv = new RepositoryService(client);
+    		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
+    		
+    		for (RepositoryBranch branch : branches) {
+    			items.add(branch.getName());
+    		}   		
+    		
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+    	
+    	return items;
+    }       
 }
