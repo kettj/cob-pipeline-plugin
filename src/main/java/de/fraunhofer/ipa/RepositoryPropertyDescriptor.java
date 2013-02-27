@@ -141,8 +141,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     			for (org.eclipse.egit.github.core.Repository repo : teamRepos) {
     				if (!items.contains(repo.getName()))
     					items.add(0, repo.getName());
-    					//items.add(repo.getName(), repo.generateId());
-    					//TODO add only if not already included
     			}
     		} catch (IOException ex) {
     			// TODO: handle exception
@@ -187,8 +185,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	if (this.githubOrg == null) {
     		setGithubConfig();
     	}
-    	
-    	
+    	    	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
     	}
