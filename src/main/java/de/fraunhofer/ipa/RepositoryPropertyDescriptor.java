@@ -69,7 +69,9 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     private String githubOrg;
     private String githubTeam;
     
-    private GitHubClient githubClient;
+    private GitHubClient githubClient = new GitHubClient();
+    
+    private ComboBoxModel forkItems;
     
     /**
      * Infers the type of the corresponding {@link Describable} from the outer class.
@@ -114,13 +116,13 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
     	this.githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
     	
-    	this.githubClient = new GitHubClient();
+    	//this.githubClient = new GitHubClient();
     	this.githubClient.setCredentials(githubLogin, githubPassword);
     }
     
     //TODO 
     public ComboBoxModel doFillNameItems() {
-    	ComboBoxModel items =new ComboBoxModel();
+    	ComboBoxModel items = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
     		setGithubConfig();
@@ -154,11 +156,16 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
     
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
-    	ComboBoxModel items = new ComboBoxModel();
-    	if (name.length() == 0) {
-    		items.add("Choose repository first");
-    		return items;
+    	this.forkItems = new ComboBoxModel();
+    	
+    	if (this.githubOrg == null) {
+    		setGithubConfig();
     	}
+    	
+    	/*if (name.length() == 0) {
+    		this.forkItems.add("Choose repository first");
+    		return this.forkItems;
+    	}*/
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
@@ -167,14 +174,14 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
     			org.eclipse.egit.github.core.User user = fork.getOwner();
-    			items.add(0, user.getLogin());
+    			this.forkItems.add(0, user.getLogin());
     		}
-    		items.add(0, this.githubOrg);
+    		this.forkItems.add(0, this.githubOrg);
     		
     	} catch (Exception ex) {
 			// TODO: handle exception
 		}      	
-    	return items;
+    	return this.forkItems;
     }
     
     /**
@@ -182,6 +189,12 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      */
     public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
+    	
+    	if (this.githubOrg == null) {
+    		setGithubConfig();
+    	}
+    	
+    	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
     	}
@@ -212,6 +225,11 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	ComboBoxModel items = new ComboBoxModel();
+    	
+    	if (this.githubOrg == null) {
+    		setGithubConfig();
+    	}
+    	
     	if (name.length() == 0 || fork.length() == 0) {
     		items.add("Choose repository and fork first");
     		return items;
