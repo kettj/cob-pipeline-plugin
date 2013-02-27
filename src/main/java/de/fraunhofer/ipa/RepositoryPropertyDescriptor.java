@@ -116,7 +116,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
     	this.githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
     	
-    	//this.githubClient = new GitHubClient();
     	this.githubClient.setCredentials(githubLogin, githubPassword);
     }
     
@@ -162,11 +161,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		setGithubConfig();
     	}
     	
-    	/*if (name.length() == 0) {
-    		this.forkItems.add("Choose repository first");
-    		return this.forkItems;
-    	}*/
-    	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
     		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
@@ -199,14 +193,23 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
     	}
     	
+    	// check if given fork owner is in fork list
+    	for (String fork : this.forkItems) {
+			if (fork.equals(value)) {
+				return FormValidation.ok();
+			}
+		}
+    	
+    	// if fork owner was not in list
     	try {
+    		// check if user exists
 			try {
 				UserService githubUserSrv = new UserService(this.githubClient);
 				githubUserSrv.getUser(value);
 			} catch (Exception ex) {
 				return FormValidation.error("User not found!\n"+ex.getMessage());
 			}
-			
+			// check if user has public repository with given name
 			try {
 				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
