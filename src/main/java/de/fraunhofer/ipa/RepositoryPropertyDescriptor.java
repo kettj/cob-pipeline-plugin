@@ -72,6 +72,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     private GitHubClient githubClient = new GitHubClient();
     
     private ComboBoxModel forkItems;
+    private ComboBoxModel branchItems;
     
     /**
      * Infers the type of the corresponding {@link Describable} from the outer class.
@@ -224,15 +225,10 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
     
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
-    	ComboBoxModel items = new ComboBoxModel();
+    	this.branchItems = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
     		setGithubConfig();
-    	}
-    	
-    	if (name.length() == 0 || fork.length() == 0) {
-    		items.add("Choose repository and fork first");
-    		return items;
     	}
     	
     	try {
@@ -241,13 +237,38 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
     		
     		for (RepositoryBranch branch : branches) {
-    			items.add(branch.getName());
+    			this.branchItems.add(branch.getName());
     		}   		
     		
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
     	
-    	return items;
+    	return this.branchItems;
+    }
+    
+    /**
+     * Checks if given branch exists
+     */
+    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
+    		throws IOException, ServletException {
+    	
+    	if (this.githubOrg == null) {
+    		setGithubConfig();
+    	}
+    	
+    	if (value.length() == 0) {
+    		//TODO git master branch of repo
+    		return FormValidation.warning("Please enter branch name. Default: master");
+    	}
+    	
+    	// check if given branch is in branch list
+    	for (String branch : this.branchItems) {
+			if (branch.equals(value)) {
+				return FormValidation.ok();
+			}
+		}
+    	    	
+    	return FormValidation.error("Given branch not found. Check spelling!");
     }
 }
