@@ -67,8 +67,8 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	private volatile RepositoryList repoDeps = new RepositoryList();
 	
 	@DataBoundConstructor
-	public RootRepositoryProperty(String name) {
-		super(name);
+	public RootRepositoryProperty(String name, String suffix, String fork, String branch) {
+		super(name, fork, branch);
 		this.fullName = fullName;
 		this.suffix = suffix;
 		this.repoDeps = repoDeps;

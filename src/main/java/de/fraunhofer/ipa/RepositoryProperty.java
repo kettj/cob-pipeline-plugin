@@ -40,6 +40,7 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
 import hudson.model.User;
 
 import jenkins.model.Jenkins;
@@ -73,7 +74,13 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	protected String url;
 	
 	@DataBoundConstructor
-	public RepositoryProperty(String name) {
+	public RepositoryProperty(String name, String fork, String branch) {
+		this.name = name;
+		this.fork = fork;
+		this.branch = branch;
+	}
+	
+	public void setName(String name) throws IOException {
 		this.name = name;
 	}
 	
@@ -81,15 +88,14 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 		return this.name;
 	}
 	
-	public void setName(String name) throws IOException {
-		this.name = name;
-	}
-	
 	public void setFork(String fork) throws IOException {
 		this.fork = fork;
 	}
 	
 	public String getFork() {
+		if (this.fork.length() == 0) {
+			return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+		}
 		return this.fork;
 	}
 		
@@ -98,6 +104,9 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	}
 	
 	public String getBranch() {
+		if (this.branch.length() == 0) {
+			return "master";
+		}
 		return this.branch;
 	}
 		
