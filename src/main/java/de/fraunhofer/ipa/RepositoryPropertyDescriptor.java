@@ -66,10 +66,10 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
         super(clazz);
     }
     
-    private String githubLogin;
-    private String githubPassword;
     private String githubOrg;
     private String githubTeam;
+    
+    private GitHubClient githubClient;
     
     /**
      * Infers the type of the corresponding {@link Describable} from the outer class.
@@ -108,24 +108,26 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     //TODO doCheckUrl
     
     private void setGithubConfig() {
-    	this.githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
-    	this.githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	
     	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
     	this.githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
+    	
+    	this.githubClient = new GitHubClient();
+    	this.githubClient.setCredentials(githubLogin, githubPassword);
     }
     
     //TODO 
     public ComboBoxModel doFillNameItems() {
     	ComboBoxModel items =new ComboBoxModel();
     	    	
-    	if (this.githubLogin == null) {
+    	if (this.githubOrg == null) {
     		setGithubConfig();
     	}
     	
     	try {
-			GitHubClient client = new GitHubClient();
-    		client.setCredentials(this.githubLogin, this.githubPassword);
-    		TeamService githubTeamSrv = new TeamService(client);
+    		TeamService githubTeamSrv = new TeamService(this.githubClient);
     		Team team = new Team();
     		List<Team> teams = githubTeamSrv.getTeams(this.githubOrg);
     		for (Team t : teams) {
@@ -159,9 +161,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	}
     	
     	try {
-			GitHubClient client = new GitHubClient();
-    		client.setCredentials(this.githubLogin, this.githubPassword);
-    		RepositoryService githubRepoSrv = new RepositoryService(client);
+    		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
     		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
     		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
     		
@@ -187,17 +187,15 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	}
     	
     	try {
-			GitHubClient client = new GitHubClient();
-			client.setCredentials(this.githubLogin, this.githubPassword);
 			try {
-				UserService githubUserSrv = new UserService(client);
+				UserService githubUserSrv = new UserService(this.githubClient);
 				githubUserSrv.getUser(value);
 			} catch (Exception ex) {
 				return FormValidation.error("User not found!\n"+ex.getMessage());
 			}
 			
 			try {
-				RepositoryService githubRepoSrv = new RepositoryService(client);
+				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
 				for (org.eclipse.egit.github.core.Repository repo : repos) {
 					if (repo.getName().equals(name)) 
@@ -220,10 +218,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	}
     	
     	try {
-    		GitHubClient client = new GitHubClient();
-    		client.setCredentials(this.githubLogin, this.githubPassword);
     		RepositoryId repoId = new RepositoryId(fork, name);
-    		RepositoryService githubRepoSrv = new RepositoryService(client);
+    		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
     		
     		for (RepositoryBranch branch : branches) {
