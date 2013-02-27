@@ -65,7 +65,12 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     protected RepositoryPropertyDescriptor(Class<? extends RepositoryProperty> clazz) {
         super(clazz);
     }
-
+    
+    private String githubLogin;
+    private String githubPassword;
+    private String githubOrg;
+    private String githubTeam;
+    
     /**
      * Infers the type of the corresponding {@link Describable} from the outer class.
      * This version works when you follow the common convention, where a descriptor
@@ -102,23 +107,29 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     //TODO doCheckUrl
     
+    private void setGithubConfig() {
+    	this.githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	this.githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+    	this.githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
+    }
+    
     //TODO 
     public ComboBoxModel doFillNameItems() {
     	ComboBoxModel items =new ComboBoxModel();
-    	//ListBoxModel items = new ListBoxModel();    	
-    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
-    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
-    	String githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
-    	String githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
+    	    	
+    	if (this.githubLogin == null) {
+    		setGithubConfig();
+    	}
     	
     	try {
 			GitHubClient client = new GitHubClient();
-    		client.setCredentials(githubLogin, githubPassword);
+    		client.setCredentials(this.githubLogin, this.githubPassword);
     		TeamService githubTeamSrv = new TeamService(client);
     		Team team = new Team();
-    		List<Team> teams = githubTeamSrv.getTeams(githubOrg);
+    		List<Team> teams = githubTeamSrv.getTeams(this.githubOrg);
     		for (Team t : teams) {
-    			if (githubTeam.equals(t.getName())) {
+    			if (this.githubTeam.equals(t.getName())) {
     				team = t;
     			}
     		}    	
@@ -146,22 +157,19 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		items.add("Choose repository first");
     		return items;
     	}
-    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
-    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
-    	String githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
     	
     	try {
 			GitHubClient client = new GitHubClient();
-    		client.setCredentials(githubLogin, githubPassword);
+    		client.setCredentials(this.githubLogin, this.githubPassword);
     		RepositoryService githubRepoSrv = new RepositoryService(client);
-    		RepositoryId repoId = new RepositoryId(githubOrg, name);
+    		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
     		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
     			org.eclipse.egit.github.core.User user = fork.getOwner();
     			items.add(0, user.getLogin());
     		}
-    		items.add(0, githubOrg);
+    		items.add(0, this.githubOrg);
     		
     	} catch (Exception ex) {
 			// TODO: handle exception
@@ -178,12 +186,9 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
     	}
     	
-    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
-    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
-    	
     	try {
 			GitHubClient client = new GitHubClient();
-			client.setCredentials(githubLogin, githubPassword);
+			client.setCredentials(this.githubLogin, this.githubPassword);
 			try {
 				UserService githubUserSrv = new UserService(client);
 				githubUserSrv.getUser(value);
@@ -213,12 +218,10 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		items.add("Choose repository and fork first");
     		return items;
     	}
-    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
-    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
     	
     	try {
     		GitHubClient client = new GitHubClient();
-    		client.setCredentials(githubLogin, githubPassword);
+    		client.setCredentials(this.githubLogin, this.githubPassword);
     		RepositoryId repoId = new RepositoryId(fork, name);
     		RepositoryService githubRepoSrv = new RepositoryService(client);
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
