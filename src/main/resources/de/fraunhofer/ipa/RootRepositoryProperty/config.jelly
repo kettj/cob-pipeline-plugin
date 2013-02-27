@@ -9,7 +9,7 @@
 	<f:entry field="suffix" title="${%Name suffix}">
    		<f:textbox />
 	</f:entry>
-  	<f:entry field="fork" title="${%Enter owner/fork}">
+  	<f:entry field="fork" title="${%Enter fork owner}">
    		<f:combobox />
 	</f:entry>
 	<f:entry field="branch" title="${%Enter branch}">

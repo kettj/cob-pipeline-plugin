@@ -191,5 +191,5 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 		}
     	
     	return items;
-    }       
+    }
 }

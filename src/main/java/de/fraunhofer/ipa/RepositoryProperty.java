@@ -61,12 +61,12 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	/**
 	 * name of fork owner
 	 */
-	protected String fork;
+	protected String fork = null;
 	
 	/**
 	 * name of branch
 	 */
-	protected String branch;
+	protected String branch = null;
 	
 	/**
 	 * url address to repository
@@ -76,8 +76,12 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	@DataBoundConstructor
 	public RepositoryProperty(String name, String fork, String branch) {
 		this.name = name;
-		this.fork = fork;
-		this.branch = branch;
+		if (this.fork == null) {
+			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+		}
+		if (this.branch == null) {
+			this.branch = "master";
+		}
 	}
 	
 	public void setName(String name) throws IOException {
@@ -93,9 +97,6 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	}
 	
 	public String getFork() {
-		if (this.fork.length() == 0) {
-			return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
-		}
 		return this.fork;
 	}
 		
@@ -104,9 +105,6 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	}
 	
 	public String getBranch() {
-		if (this.branch.length() == 0) {
-			return "master";
-		}
 		return this.branch;
 	}
 		
