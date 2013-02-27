@@ -39,14 +39,18 @@ package de.fraunhofer.ipa;
 import hudson.model.Descriptor;
 import hudson.model.Hudson;
 import hudson.util.ComboBoxModel;
+import hudson.util.FormValidation;
 
 import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.QueryParameter;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryBranch;
+import org.eclipse.egit.github.core.SearchRepository;
 import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
@@ -165,6 +169,43 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	return items;
     }
     
+    /**
+     * Checks if given fork owner exists
+     */
+    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
+    		throws IOException, ServletException {
+    	if (value.length() == 0) {
+    		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
+    	}
+    	
+    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
+    	
+    	try {
+			GitHubClient client = new GitHubClient();
+			client.setCredentials(githubLogin, githubPassword);
+			try {
+				UserService githubUserSrv = new UserService(client);
+				githubUserSrv.getUser(value);
+			} catch (Exception ex) {
+				return FormValidation.error("User not found!\n"+ex.getMessage());
+			}
+			
+			try {
+				RepositoryService githubRepoSrv = new RepositoryService(client);
+				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
+				for (org.eclipse.egit.github.core.Repository repo : repos) {
+					if (repo.getName().equals(name)) 
+						return FormValidation.ok("Found");
+				}
+			} catch (Exception ex) {
+				return FormValidation.error("Failed to get users repositories! Probably no read access given.\n"+ex.getMessage());
+			}
+			return FormValidation.error("Fork not found for owner "+value+"!");
+		} catch (Exception ex) {
+			return FormValidation.error("Failed to authenticate. Inform administator\n"+ex.getMessage());
+		}
+    }
     
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	ComboBoxModel items = new ComboBoxModel();
