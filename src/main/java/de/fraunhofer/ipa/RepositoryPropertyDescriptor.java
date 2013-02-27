@@ -71,6 +71,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     private GitHubClient githubClient = new GitHubClient();
     
+    private ComboBoxModel nameItems;
     private ComboBoxModel forkItems;
     private ComboBoxModel branchItems;
     
@@ -120,16 +121,21 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	this.githubClient.setCredentials(githubLogin, githubPassword);
     }
     
-    //TODO 
     public ComboBoxModel doFillNameItems() {
-    	ComboBoxModel items = new ComboBoxModel();
+    	this.nameItems = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
     		setGithubConfig();
     	}
     	
     	try {
-    		TeamService githubTeamSrv = new TeamService(this.githubClient);
+    		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
+    		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getOrgRepositories(this.githubOrg);
+    		for (org.eclipse.egit.github.core.Repository repo : repos) {
+    			if (!this.nameItems.contains(repo.getName()))
+					this.nameItems.add(0, repo.getName());
+    		}
+    		/*TeamService githubTeamSrv = new TeamService(this.githubClient);
     		Team team = new Team();
     		List<Team> teams = githubTeamSrv.getTeams(this.githubOrg);
     		for (Team t : teams) {
@@ -140,17 +146,44 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		try {
     			List<org.eclipse.egit.github.core.Repository> teamRepos = githubTeamSrv.getRepositories(team.getId());
     			for (org.eclipse.egit.github.core.Repository repo : teamRepos) {
-    				if (!items.contains(repo.getName()))
-    					items.add(0, repo.getName());
+    				if (!this.nameItems.contains(repo.getName()))
+    					this.nameItems.add(0, repo.getName());
     			}
     		} catch (IOException ex) {
     			// TODO: handle exception
-    		}
+    		}*/
 		} catch (IOException ex) {
 			// TODO: handle exception
 		}  	
 		
-    	return items;
+    	return this.nameItems;
+    }
+    
+    /**
+     * Checks if given repository exists
+     */
+    public FormValidation doCheckName(@QueryParameter String value)
+    		throws IOException, ServletException {
+    	
+    	if (this.githubOrg == null) {
+    		setGithubConfig();
+    	}
+    	
+    	if (value.length() == 0) {
+    		return FormValidation.warning("Please enter repository name. E.g. cob_common");
+    	}
+    	
+    	// check if given repository is in repo list
+    	for (String name : this.nameItems) {
+			if (name.equals(value)) {
+				return FormValidation.ok();
+			}
+		}
+    	// if repository was not in list, for example extern repository
+    	// TODO check if org owns repo HACK until repo list is complete
+    	// TODO if owner is not given, ask for owner and check for repo    	
+    	
+    	return FormValidation.error("Repository not found. Check spelling!");
     }
     
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
