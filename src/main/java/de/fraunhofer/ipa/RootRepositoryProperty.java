@@ -96,6 +96,11 @@ public class RootRepositoryProperty extends RepositoryProperty {
             return "Root Repository Configurations";
         }
 		
+		@Override
+		public boolean isRoot() {
+			return true;
+		}
+		
 		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String name)
 				throws IOException, ServletException {
 			//TODO check if other repo with the same name exists
@@ -105,7 +110,6 @@ public class RootRepositoryProperty extends RepositoryProperty {
 			} else {
 				return FormValidation.ok("Full name: "+name);
 			}
-				
 		}
         
         /**
@@ -114,8 +118,9 @@ public class RootRepositoryProperty extends RepositoryProperty {
         public List<RepositoryPropertyDescriptor> getRepositoryDescriptors() {
         	List<RepositoryPropertyDescriptor> r = new ArrayList<RepositoryPropertyDescriptor>();
         	for (RepositoryPropertyDescriptor d : RepositoryProperty.all()) {
-        		//TODO only add RepositoryDescriptors not Root
-        		r.add(d);
+        		// add only RepositoryDescriptors not RootRepositoryDescriptors
+        		if (!d.isRoot())
+        			r.add(d);
         	}
         	return r;
         }
