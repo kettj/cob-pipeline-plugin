@@ -324,8 +324,9 @@ public class CobPipelineProperty extends UserProperty {
         public List<RepositoryPropertyDescriptor> getRootRepositoryDescriptors() {
         	List<RepositoryPropertyDescriptor> r = new ArrayList<RepositoryPropertyDescriptor>();
         	for (RepositoryPropertyDescriptor d : RootRepositoryProperty.all()) {
-        		//TODO only add RootRepositoryDescriptors
-        		r.add(d);
+        		//add only RootRepositoryDescriptors
+        		if (d.isRoot())
+        			r.add(d);
         	}
         	return r;
         }

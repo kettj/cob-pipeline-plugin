@@ -107,6 +107,13 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
     
     /**
+     * Return true if the repository is a root repository.
+     */
+    public boolean isRoot() {
+    	return false;
+    }
+    
+    /**
      * Sets the globally given GitHub configurations
      */
     private void setGithubConfig() {
