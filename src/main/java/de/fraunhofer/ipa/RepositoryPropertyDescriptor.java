@@ -135,23 +135,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     			if (!this.nameItems.contains(repo.getName()))
 					this.nameItems.add(0, repo.getName());
     		}
-    		/*TeamService githubTeamSrv = new TeamService(this.githubClient);
-    		Team team = new Team();
-    		List<Team> teams = githubTeamSrv.getTeams(this.githubOrg);
-    		for (Team t : teams) {
-    			if (this.githubTeam.equals(t.getName())) {
-    				team = t;
-    			}
-    		}    	
-    		try {
-    			List<org.eclipse.egit.github.core.Repository> teamRepos = githubTeamSrv.getRepositories(team.getId());
-    			for (org.eclipse.egit.github.core.Repository repo : teamRepos) {
-    				if (!this.nameItems.contains(repo.getName()))
-    					this.nameItems.add(0, repo.getName());
-    			}
-    		} catch (IOException ex) {
-    			// TODO: handle exception
-    		}*/
 		} catch (IOException ex) {
 			// TODO: handle exception
 		}  	
