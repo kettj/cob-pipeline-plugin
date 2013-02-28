@@ -67,8 +67,8 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	private volatile RepositoryList repoDeps = new RepositoryList();
 	
 	@DataBoundConstructor
-	public RootRepositoryProperty(String name, String suffix, String fork, String branch) {
-		super(name, fork, branch);
+	public RootRepositoryProperty(String repoName, String suffix, String fork, String branch) {
+		super(repoName, fork, branch);
 		this.fullName = fullName;
 		this.suffix = suffix;
 		this.repoDeps = repoDeps;
@@ -76,7 +76,7 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
-		this.fullName = this.name+suffix;
+		this.fullName = this.repoName+suffix;
 	}
 	
 	public void setRepoDeps(RepositoryList repoDeps) throws IOException {
@@ -101,14 +101,14 @@ public class RootRepositoryProperty extends RepositoryProperty {
 			return true;
 		}
 		
-		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String name)
+		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String repoName)
 				throws IOException, ServletException {
 			//TODO check if other repo with the same name exists
 			
 			if (value.length() != 0) { 
-				return FormValidation.ok("Full name: "+name+"__"+value);
+				return FormValidation.ok("Full name: "+repoName+"__"+value);
 			} else {
-				return FormValidation.ok("Full name: "+name);
+				return FormValidation.ok("Full name: "+repoName);
 			}
 		}
         

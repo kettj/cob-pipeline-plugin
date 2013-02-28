@@ -56,7 +56,7 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	/**
 	 * name of repository
 	 */
-	protected String name;
+	protected String repoName;
 	
 	/**
 	 * name of fork owner
@@ -74,8 +74,8 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	protected String url;
 	
 	@DataBoundConstructor
-	public RepositoryProperty(String name, String fork, String branch) {
-		this.name = name;
+	public RepositoryProperty(String repoName, String fork, String branch) {
+		this.repoName = repoName;
 		if (this.fork == null) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
 		}
@@ -84,12 +84,12 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 		}
 	}
 	
-	public void setName(String name) throws IOException {
-		this.name = name;
+	public void setRepoName(String repoName) throws IOException {
+		this.repoName = repoName;
 	}
 	
-	public String getName() {
-		return this.name;
+	public String getRepoName() {
+		return this.repoName;
 	}
 	
 	public void setFork(String fork) throws IOException {

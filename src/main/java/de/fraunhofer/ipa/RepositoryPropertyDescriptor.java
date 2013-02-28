@@ -68,7 +68,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     private GitHubClient githubClient = new GitHubClient();
     
-    private ComboBoxModel nameItems = null;
+    private ComboBoxModel repoNameItems = null;
     private ComboBoxModel forkItems = null;
     private ComboBoxModel branchItems = null;
     
@@ -128,7 +128,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     /**
      * Fills combobox with repository names of organization
      */
-    public ComboBoxModel doFillNameItems() {
+    public ComboBoxModel doFillRepoNameItems() {
     	ComboBoxModel aux = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
@@ -146,17 +146,17 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 			// TODO: handle exception
 		}  
     	
-    	return this.nameItems = aux;
+    	return this.repoNameItems = aux;
     }
     
     /**
      * Checks if given repository exists
      */
-    public FormValidation doCheckName(@QueryParameter String value)
+    public FormValidation doCheckRepoName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
-    	if (this.nameItems == null) {
-    		doFillNameItems();
+    	if (this.repoNameItems == null) {
+    		doFillRepoNameItems();
     	}
     	
     	if (value.length() == 0) {
@@ -164,8 +164,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	}
     	
     	// check if given repository is in repo list
-    	for (String name : this.nameItems) {
-			if (name.equals(value)) {
+    	for (String repoName : this.repoNameItems) {
+			if (repoName.equals(value)) {
 				return FormValidation.ok();
 			}
 		}
@@ -178,7 +178,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     /**
      * Fill combobox with forks of repository
      */
-    public ComboBoxModel doFillForkItems(@QueryParameter String name) {
+    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
@@ -187,7 +187,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
-    		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
+    		RepositoryId repoId = new RepositoryId(this.githubOrg, repoName);
     		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
@@ -205,11 +205,11 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     /**
      * Checks if given fork owner exists
      */
-    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
+    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
     		throws IOException, ServletException {
     	
     	if (this.forkItems == null) {
-    		doFillForkItems(name);
+    		doFillForkItems(repoName);
     	}
     	    	
     	if (value.length() == 0) {
@@ -237,7 +237,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
 				for (org.eclipse.egit.github.core.Repository repo : repos) {
-					if (repo.getName().equals(name)) 
+					if (repo.getName().equals(repoName)) 
 						return FormValidation.ok("Found");
 				}
 			} catch (Exception ex) {
@@ -251,11 +251,11 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     /**
      * Fills combobox with branches of given repository fork
-     * @param name
+     * @param repoName
      * @param fork
      * @return
      */
-    public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
+    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
@@ -263,7 +263,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     	}
     	
     	try {
-    		RepositoryId repoId = new RepositoryId(fork, name);
+    		RepositoryId repoId = new RepositoryId(fork, repoName);
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
     		
@@ -281,11 +281,11 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     /**
      * Checks if given branch exists
      */
-    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
+    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
     		throws IOException, ServletException {
     	
     	if (this.branchItems == null) {
-    		doFillBranchItems(name, fork);
+    		doFillBranchItems(repoName, fork);
     	}
     	
     	if (value.length() == 0) {

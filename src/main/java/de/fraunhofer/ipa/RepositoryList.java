@@ -55,7 +55,7 @@ public class RepositoryList extends ArrayList<RepositoryProperty>{
 
     public RepositoryProperty find(String name) {
         for (RepositoryProperty r : this) {
-            if(r.name.equals(name))
+            if(r.repoName.equals(name))
                 return r;
         }
         return null;
