@@ -68,9 +68,9 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     
     private GitHubClient githubClient = new GitHubClient();
     
-    private ComboBoxModel nameItems;
-    private ComboBoxModel forkItems;
-    private ComboBoxModel branchItems;
+    private ComboBoxModel nameItems = null;
+    private ComboBoxModel forkItems = null;
+    private ComboBoxModel branchItems = null;
     
     /**
      * Infers the type of the corresponding {@link Describable} from the outer class.
@@ -122,7 +122,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      * Fills combobox with repository names of organization
      */
     public ComboBoxModel doFillNameItems() {
-    	this.nameItems = new ComboBoxModel();
+    	ComboBoxModel aux = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
     		setGithubConfig();
@@ -132,14 +132,14 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
     		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getOrgRepositories(this.githubOrg);
     		for (org.eclipse.egit.github.core.Repository repo : repos) {
-    			if (!this.nameItems.contains(repo.getName()))
-					this.nameItems.add(0, repo.getName());
+    			if (!aux.contains(repo.getName()))
+					aux.add(0, repo.getName());
     		}
 		} catch (IOException ex) {
 			// TODO: handle exception
-		}  	
-		
-    	return this.nameItems;
+		}  
+    	
+    	return this.nameItems = aux;
     }
     
     /**
@@ -148,8 +148,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     public FormValidation doCheckName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
-    	if (this.githubOrg == null) {
-    		setGithubConfig();
+    	if (this.nameItems == null) {
+    		doFillNameItems();
     	}
     	
     	if (value.length() == 0) {
@@ -172,7 +172,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      * Fill combobox with forks of repository
      */
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
-    	this.forkItems = new ComboBoxModel();
+    	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
     		setGithubConfig();
@@ -185,14 +185,14 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
     			org.eclipse.egit.github.core.User user = fork.getOwner();
-    			this.forkItems.add(0, user.getLogin());
+    			aux.add(0, user.getLogin());
     		}
-    		this.forkItems.add(0, this.githubOrg);
+    		aux.add(0, this.githubOrg);
     		
     	} catch (Exception ex) {
 			// TODO: handle exception
 		}      	
-    	return this.forkItems;
+    	return this.forkItems = aux;
     }
     
     /**
@@ -201,8 +201,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
     	
-    	if (this.githubOrg == null) {
-    		setGithubConfig();
+    	if (this.forkItems == null) {
+    		doFillForkItems(name);
     	}
     	    	
     	if (value.length() == 0) {
@@ -249,7 +249,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      * @return
      */
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
-    	this.branchItems = new ComboBoxModel();
+    	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
     		setGithubConfig();
@@ -261,14 +261,14 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
     		
     		for (RepositoryBranch branch : branches) {
-    			this.branchItems.add(branch.getName());
+    			aux.add(branch.getName());
     		}   		
     		
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-    	
-    	return this.branchItems;
+
+    	return this.branchItems = aux;
     }
     
     /**
@@ -277,8 +277,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
     		throws IOException, ServletException {
     	
-    	if (this.githubOrg == null) {
-    		setGithubConfig();
+    	if (this.branchItems == null) {
+    		doFillBranchItems(name, fork);
     	}
     	
     	if (value.length() == 0) {
