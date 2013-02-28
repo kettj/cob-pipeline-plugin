@@ -50,8 +50,6 @@ import org.kohsuke.stapler.QueryParameter;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryBranch;
-import org.eclipse.egit.github.core.SearchRepository;
-import org.eclipse.egit.github.core.Team;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 
@@ -67,7 +65,6 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
     }
     
     private String githubOrg;
-    private String githubTeam;
     
     private GitHubClient githubClient = new GitHubClient();
     
@@ -109,18 +106,21 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
         return true;
     }
     
-    //TODO doCheckUrl
-    
+    /**
+     * Sets the globally given GitHub configurations
+     */
     private void setGithubConfig() {
     	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
     	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
     	
     	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
-    	this.githubTeam = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubTeam();
     	
     	this.githubClient.setCredentials(githubLogin, githubPassword);
     }
     
+    /**
+     * Fills combobox with repository names of organization
+     */
     public ComboBoxModel doFillNameItems() {
     	this.nameItems = new ComboBoxModel();
     	    	
@@ -163,12 +163,14 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 			}
 		}
     	// if repository was not in list, for example extern repository
-    	// TODO check if org owns repo HACK until repo list is complete
     	// TODO if owner is not given, ask for owner and check for repo    	
     	
     	return FormValidation.error("Repository not found. Check spelling!");
     }
     
+    /**
+     * Fill combobox with forks of repository
+     */
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
     	this.forkItems = new ComboBoxModel();
     	
@@ -240,6 +242,12 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
 		}
     }
     
+    /**
+     * Fills combobox with branches of given repository fork
+     * @param name
+     * @param fork
+     * @return
+     */
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	this.branchItems = new ComboBoxModel();
     	
