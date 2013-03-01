@@ -36,29 +36,57 @@
 
 package de.fraunhofer.ipa;
 
+import hudson.util.RobustCollectionConverter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
+import com.thoughtworks.xstream.XStream;
 
 
 public class RootRepositoryList extends ArrayList<RootRepositoryProperty> {
 	public RootRepositoryList() {
 	}
-	
+
 	public RootRepositoryList(Collection<? extends RootRepositoryProperty> c) {
-        super(c);
+		super(c);
+	}
+
+	public RootRepositoryList(RootRepositoryProperty... c) {
+		this(Arrays.asList(c));
+	}
+
+	public RootRepositoryProperty find(String fullName) {
+		for (RootRepositoryProperty r : this) {
+			if(r.fullName.equals(fullName))
+				return r;
+		}
+		return null;
+	}
+	
+	@Override
+    public boolean add(RootRepositoryProperty rootRepository) {
+        return rootRepository!=null && super.add(rootRepository);
     }
 
-    public RootRepositoryList(RootRepositoryProperty... c) {
-        this(Arrays.asList(c));
-    }
+	/**
+	 * {@link Converter} implementation for XStream.
+	 */
+	public static final class ConverterImpl extends RobustCollectionConverter {
+		public ConverterImpl(XStream xs) {
+			super(xs);
+		}
 
-    public RootRepositoryProperty find(String fullName) {
-        for (RootRepositoryProperty r : this) {
-            if(r.fullName.equals(fullName))
-                return r;
-        }
-        return null;
-    }
+		@Override
+		public boolean canConvert(Class type) {
+			return type==RootRepositoryList.class;
+		}
+
+		@Override
+		protected Object createCollection(Class type) {
+			return new RootRepositoryList();
+		}
+	}
 
 }

@@ -36,9 +36,13 @@
 
 package de.fraunhofer.ipa;
 
+import hudson.util.RobustCollectionConverter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+
+import com.thoughtworks.xstream.XStream;
 
 
 public class RepositoryList extends ArrayList<RepositoryProperty>{
@@ -60,4 +64,28 @@ public class RepositoryList extends ArrayList<RepositoryProperty>{
         }
         return null;
     }
+    
+    @Override
+    public boolean add(RepositoryProperty repository) {
+        return repository!=null && super.add(repository);
+    }
+
+	/**
+	 * {@link Converter} implementation for XStream.
+	 */
+	public static final class ConverterImpl extends RobustCollectionConverter {
+		public ConverterImpl(XStream xs) {
+			super(xs);
+		}
+
+		@Override
+		public boolean canConvert(Class type) {
+			return type==RepositoryList.class;
+		}
+
+		@Override
+		protected Object createCollection(Class type) {
+			return new RepositoryList();
+		}
+	}
 }
