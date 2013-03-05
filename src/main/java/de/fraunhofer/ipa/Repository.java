@@ -51,7 +51,7 @@ import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProperty> {
+public class Repository extends AbstractDescribableImpl<Repository> {
 	
 	/**
 	 * name of repository
@@ -74,7 +74,7 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	protected String url;
 	
 	@DataBoundConstructor
-	public RepositoryProperty(String repoName, String fork, String branch) {
+	public Repository(String repoName, String fork, String branch) {
 		this.repoName = repoName;
 		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
@@ -119,28 +119,28 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	}
 		
 	@Override
-    public RepositoryPropertyDescriptor getDescriptor() {
-		return (RepositoryPropertyDescriptor)super.getDescriptor();
+    public RepositoryDescriptor getDescriptor() {
+		return (RepositoryDescriptor)super.getDescriptor();
     }
 	
 	@Extension
-    public static class DescriptorImpl extends RepositoryPropertyDescriptor {
+    public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
             return "Repository Configurations";
         }
 	}
 	
-    public RepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+    public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
     }
     
     /**
-    * Returns all the registered {@link RepositoryPropertyDescriptor}s.
+    * Returns all the registered {@link RepositoryDescriptor}s.
     */
-    public static DescriptorExtensionList<RepositoryProperty, RepositoryPropertyDescriptor> all() {
-        return Jenkins.getInstance().<RepositoryProperty, RepositoryPropertyDescriptor>getDescriptorList(RepositoryProperty.class);
+    public static DescriptorExtensionList<Repository, RepositoryDescriptor> all() {
+        return Jenkins.getInstance().<Repository, RepositoryDescriptor>getDescriptorList(Repository.class);
     }
 
 }

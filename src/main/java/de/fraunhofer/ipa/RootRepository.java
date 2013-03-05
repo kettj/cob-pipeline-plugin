@@ -57,7 +57,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 
-public class RootRepositoryProperty extends RepositoryProperty {
+public class RootRepository extends Repository {
 
 	private String suffix;
 	
@@ -66,22 +66,21 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	/**
 	 * Repository dependencies
 	 */
-	//private volatile RepositoryList repoDeps = new RepositoryList();
-	private final ArrayList<RepositoryProperty> repoDeps;
+	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch, List<RepositoryProperty> repoDeps) {
+	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch);
-		this.suffix = suffix;
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
 			this.fullName = this.repoName+"__"+suffix;
 		}
-		this.repoDeps = new ArrayList<RepositoryProperty>(Util.fixNull(repoDeps));
+		this.suffix = suffix;
+		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch, RepositoryProperty... repoDeps) {
+	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, Repository... repoDeps) {
 		this(repoName, fullName, suffix, fork, branch, Arrays.asList(repoDeps));
 	}
 		
@@ -106,7 +105,7 @@ public class RootRepositoryProperty extends RepositoryProperty {
 		this.repoDeps = new RepositoryList(repoDeps);
 	}*/
 	
-	public List<RepositoryProperty> getRepoDeps() {
+	public List<Repository> getRepoDeps() {
 		return repoDeps;
 	}
 	
@@ -116,7 +115,7 @@ public class RootRepositoryProperty extends RepositoryProperty {
     }
 	
 	@Extension
-    public static class DescriptorImpl extends RepositoryPropertyDescriptor {
+    public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
             return "Root Repository Configurations";
@@ -141,9 +140,9 @@ public class RootRepositoryProperty extends RepositoryProperty {
         /**
          * All {@link RepositoryDescriptor}s
          */
-        public List<RepositoryPropertyDescriptor> getRepositoryDescriptors() {
-        	List<RepositoryPropertyDescriptor> r = new ArrayList<RepositoryPropertyDescriptor>();
-        	for (RepositoryPropertyDescriptor d : RepositoryProperty.all()) {
+        public List<RepositoryDescriptor> getRepositoryDescriptors() {
+        	List<RepositoryDescriptor> r = new ArrayList<RepositoryDescriptor>();
+        	for (RepositoryDescriptor d : Repository.all()) {
         		// add only RepositoryDescriptors not RootRepositoryDescriptors
         		if (!d.isRoot())
         			r.add(d);
@@ -153,16 +152,16 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	}
 
 	@Override
-    public RepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+    public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
     }
     
     /**
-     * Returns all the registered {@link RepositoryPropertyDescriptor}s.
+     * Returns all the registered {@link RepositoryDescriptor}s.
      */
     //return only Root
-    public static DescriptorExtensionList<RepositoryProperty, RepositoryPropertyDescriptor> all() {
-        return Jenkins.getInstance().<RepositoryProperty, RepositoryPropertyDescriptor>getDescriptorList(RepositoryProperty.class);
+    public static DescriptorExtensionList<Repository, RepositoryDescriptor> all() {
+        return Jenkins.getInstance().<Repository, RepositoryDescriptor>getDescriptorList(Repository.class);
     }
 }

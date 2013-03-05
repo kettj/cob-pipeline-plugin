@@ -55,12 +55,12 @@ import org.eclipse.egit.github.core.service.*;
 
 
 /**
- * {@link Descriptor} for {@link RepositoryProperty}.
+ * {@link Descriptor} for {@link Repository}.
  * 
  * @author Jannik Kett
  */
-public abstract class RepositoryPropertyDescriptor extends Descriptor<RepositoryProperty> {
-    protected RepositoryPropertyDescriptor(Class<? extends RepositoryProperty> clazz) {
+public abstract class RepositoryDescriptor extends Descriptor<Repository> {
+    protected RepositoryDescriptor(Class<? extends Repository> clazz) {
         super(clazz);
     }
     
@@ -79,7 +79,7 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      *
      * @since 1.278
      */
-    protected RepositoryPropertyDescriptor() {
+    protected RepositoryDescriptor() {
     }
 
     /**
@@ -88,8 +88,8 @@ public abstract class RepositoryPropertyDescriptor extends Descriptor<Repository
      *
      * <p>
      * Returning false from this method essentially has the same effect of
-     * making Hudson behaves as if this {@link RepositoryPropertyDescriptor} is
-     * not a part of {@link RepositoryProperty#all()}.
+     * making Hudson behaves as if this {@link RepositoryDescriptor} is
+     * not a part of {@link Repository#all()}.
      *
      * <p>
      * This mechanism is useful if the availability of the property is

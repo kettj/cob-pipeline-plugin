@@ -45,20 +45,20 @@ import java.util.Collection;
 import com.thoughtworks.xstream.XStream;
 
 
-public class RootRepositoryList extends ArrayList<RootRepositoryProperty> {
+public class RootRepositoryList extends ArrayList<RootRepository> {
 	public RootRepositoryList() {
 	}
 
-	public RootRepositoryList(Collection<? extends RootRepositoryProperty> c) {
+	public RootRepositoryList(Collection<? extends RootRepository> c) {
 		super(c);
 	}
 
-	public RootRepositoryList(RootRepositoryProperty... c) {
+	public RootRepositoryList(RootRepository... c) {
 		this(Arrays.asList(c));
 	}
 
-	public RootRepositoryProperty find(String fullName) {
-		for (RootRepositoryProperty r : this) {
+	public RootRepository find(String fullName) {
+		for (RootRepository r : this) {
 			if(r.fullName.equals(fullName))
 				return r;
 		}
@@ -66,7 +66,7 @@ public class RootRepositoryList extends ArrayList<RootRepositoryProperty> {
 	}
 	
 	@Override
-    public boolean add(RootRepositoryProperty rootRepository) {
+    public boolean add(RootRepository rootRepository) {
         return rootRepository!=null && super.add(rootRepository);
     }
 

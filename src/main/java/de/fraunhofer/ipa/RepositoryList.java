@@ -45,20 +45,20 @@ import java.util.Collection;
 import com.thoughtworks.xstream.XStream;
 
 
-public class RepositoryList extends ArrayList<RepositoryProperty>{
+public class RepositoryList extends ArrayList<Repository>{
 	public RepositoryList() {
 	}
 
-    public RepositoryList(Collection<? extends RepositoryProperty> c) {
+    public RepositoryList(Collection<? extends Repository> c) {
         super(c);
     }
 
-    public RepositoryList(RepositoryProperty... c) {
+    public RepositoryList(Repository... c) {
         this(Arrays.asList(c));
     }
 
-    public RepositoryProperty find(String name) {
-        for (RepositoryProperty r : this) {
+    public Repository find(String name) {
+        for (Repository r : this) {
             if(r.repoName.equals(name))
                 return r;
         }
@@ -66,7 +66,7 @@ public class RepositoryList extends ArrayList<RepositoryProperty>{
     }
     
     @Override
-    public boolean add(RepositoryProperty repository) {
+    public boolean add(Repository repository) {
         return repository!=null && super.add(repository);
     }
 
