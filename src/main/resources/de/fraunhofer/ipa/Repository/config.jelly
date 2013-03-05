@@ -11,6 +11,9 @@
 			<f:entry field="branch" title="${%branch}">
    				<f:combobox />
 			</f:entry>
+			<f:entry field="poll" title="${%poll}">
+   				<f:checkbox />
+			</f:entry>
   		</f:advanced>
   	</f:entry>
 </j:jelly>

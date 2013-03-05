@@ -69,12 +69,17 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 	protected String branch = null;
 	
 	/**
+	 * whether the repository should be pollod be SCM
+	 */
+	protected Boolean poll;
+	
+	/**
 	 * url address to repository
 	 */
 	protected String url;
 	
 	@DataBoundConstructor
-	public Repository(String repoName, String fork, String branch) {
+	public Repository(String repoName, String fork, String branch, Boolean poll) {
 		this.repoName = repoName;
 		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
@@ -86,6 +91,7 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 		} else {
 			this.branch = branch;
 		}
+		this.poll = poll;
 	}
 	
 	public void setRepoName(String repoName) throws IOException {
@@ -110,6 +116,14 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 	
 	public String getBranch() {
 		return this.branch;
+	}
+	
+	public void setPoll(Boolean poll) {
+		this.poll = poll;
+	}
+	
+	public Boolean getPoll() {
+		return this.poll;
 	}
 		
 	public void setUrl(String url) {

@@ -70,7 +70,7 @@ public class RootRepository extends Repository {
 	
 	@DataBoundConstructor
 	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, List<Repository> repoDeps) {
-		super(repoName, fork, branch);
+		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
