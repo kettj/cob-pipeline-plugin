@@ -6,12 +6,53 @@
 	<f:entry field="suffix" title="${%suffix}">
    		<f:textbox />
 	</f:entry>
-  	<f:entry field="fork" title="${%fork}">
-   		<f:combobox />
+	<f:entry title="${%ROS Release Version}">
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
+				<td valign="top" width="20%">
+					<f:checkbox title="electric"/>
+				</td>
+				<td valign="top" width="20%">
+					<f:checkbox title="fuerte"/>
+				</td>
+				<td valign="top" width="20%">
+					<f:checkbox title="groovy" disabled="true"/>
+				</td>
+				<td valign="top" width="20%">
+				</td>
+				<td valign="top" width="20%">
+				</td>
+			</tr></tbody>
+		</table>
 	</f:entry>
-	<f:entry field="branch" title="${%branch}">
-   		<f:combobox />
+	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+			<tbody><tr>
+				<td valign="top">
+   					<f:select />
+				</td>
+			</tr></tbody>
+   		</table>
 	</f:entry>
+	<f:entry field="prioArch" title="${%Priority Architecture}">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+			<tbody><tr>
+				<td valign="top">
+   					<f:select />
+				</td>
+			</tr></tbody>
+   		</table>
+	</f:entry>
+	<f:entry title="Advanced Repository Options">
+  		<f:advanced>
+		  	<f:entry field="fork" title="${%fork}">
+		   		<f:combobox />
+			</f:entry>
+			<f:entry field="branch" title="${%branch}">
+		   		<f:combobox />
+			</f:entry>
+  		</f:advanced>
+  	</f:entry>
   	<f:entry title="${%Dependency}" field="repoDeps">
 	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0">
 	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->

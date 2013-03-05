@@ -42,6 +42,7 @@ import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.User;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -59,9 +60,30 @@ import org.kohsuke.stapler.QueryParameter;
 
 public class RootRepository extends Repository {
 
+	/**
+	 * 
+	 */
 	private String suffix;
-	
+
+	/**
+	 * 
+	 */
 	protected String fullName;
+	
+	/**
+	 * List of ros distros to build
+	 */
+	private ArrayList<String> rosDistro;
+	
+	/**
+	 * Ubuntu distro to build with priority
+	 */
+	private String prioUbuntuDistro;
+	
+	/**
+	 * Architecturo to build with priority
+	 */
+	private String prioArch;
 	
 	/**
 	 * Repository dependencies
@@ -69,7 +91,8 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, List<Repository> repoDeps) {
+	public RootRepository(String repoName, String fullName, String suffix, String prioUbuntuDistro, String prioArch,
+			String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -77,11 +100,14 @@ public class RootRepository extends Repository {
 			this.fullName = this.repoName+"__"+suffix;
 		}
 		this.suffix = suffix;
+		this.prioUbuntuDistro = prioUbuntuDistro;
+		this.prioArch = prioArch;
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, Repository... repoDeps) {
-		this(repoName, fullName, suffix, fork, branch, Arrays.asList(repoDeps));
+	public RootRepository(String repoName, String fullName, String suffix, String prioUbuntuDistro, String prioArch,
+			String fork, String branch, Repository... repoDeps) {
+		this(repoName, fullName, suffix, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
 	}
 		
 	@Override
@@ -99,6 +125,22 @@ public class RootRepository extends Repository {
 	
 	public String getSuffix() {
 		return this.suffix;
+	}
+	
+	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
+		this.prioUbuntuDistro = prioUbuntuDistro;
+	}
+	
+	public String getPrioUbuntuDistro() {
+		return this.prioUbuntuDistro;
+	}
+	
+	public void setPrioArch(String prioArch) {
+		this.prioArch = prioArch;
+	}
+	
+	public String getPrioArch() {
+		return this.prioArch;
 	}
 	
 	/*public void setRepoDeps(RepositoryList repoDeps) throws IOException {
@@ -135,6 +177,30 @@ public class RootRepository extends Repository {
 			} else {
 				return FormValidation.ok("Full name: "+repoName);
 			}
+		}
+		
+		public ListBoxModel doFillPrioUbuntuDistroItems() {
+			ListBoxModel prioDistroItems = new ListBoxModel();
+			
+			//TODO get list of ros_distro
+			//TODO get target platforms from github
+			//TODO calc possible ubuntu distros
+			prioDistroItems.add("test_distro1");
+			prioDistroItems.add("test_distro2");
+			
+			return prioDistroItems;
+		}
+		
+		public ListBoxModel doFillPrioArchItems() {
+			ListBoxModel prioArchItems = new ListBoxModel();
+			
+			//TODO get list of ros_distro
+			//TODO get target platforms from github
+			//TODO calc possible archs
+			prioArchItems.add("test_arch1");
+			prioArchItems.add("test_arch2");
+			
+			return prioArchItems;
 		}
         
         /**
