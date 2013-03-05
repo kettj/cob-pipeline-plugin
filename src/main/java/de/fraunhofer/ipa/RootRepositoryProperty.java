@@ -67,21 +67,42 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	private volatile RepositoryList repoDeps = new RepositoryList();
 	
 	@DataBoundConstructor
-	public RootRepositoryProperty(String repoName, String suffix, String fork, String branch) {
+	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch) {
 		super(repoName, fork, branch);
 		this.fullName = fullName;
 		this.suffix = suffix;
 		this.repoDeps = repoDeps;
 	}
 	
+	@Override
+	public void setRepoName(String repoName) {
+		this.repoName = repoName;
+		setFullName(repoName, getSuffix());
+	}
+	
+	public void setFullName(String repoName, String suffix) {
+		if (suffix.length() == 0) {
+			this.fullName = repoName;
+		} else {
+			this.fullName = this.repoName+"__"+suffix;
+		}
+	}
+	
+	public String getFullName() {
+		return this.fullName;
+	}
+	
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
-		this.fullName = this.repoName+suffix;
+		setFullName(this.repoName, suffix);
+	}
+	
+	public String getSuffix() {
+		return this.suffix;
 	}
 	
 	public void setRepoDeps(RepositoryList repoDeps) throws IOException {
 		this.repoDeps = new RepositoryList(repoDeps);
-		//User.current().save(); TODO save deps
 	}
 	
 	@Override
@@ -125,9 +146,9 @@ public class RootRepositoryProperty extends RepositoryProperty {
         	return r;
         }
 	}
-	
-    @Override
-    public RootRepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
+
+	@Override
+    public RepositoryProperty reconfigure(StaplerRequest req, JSONObject form) throws FormException {
     	req.bindJSON(this, form);
     	return this;
     }

@@ -338,7 +338,6 @@ public class CobPipelineProperty extends UserProperty {
     	return this;
     }
 	
-	
 	public void save() throws IOException {
         user.save();
     }
