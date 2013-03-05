@@ -12,15 +12,15 @@
 	<f:entry field="branch" title="${%branch}">
    		<f:combobox />
 	</f:entry>
-  	<f:entry title="${%Dependency}" field="repoDeps">
-	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0">
+  	<f:entry title="${%repoDeps}" field="repoDeps">
+	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0" header="${%repoDep}">
 	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->
 	     	<table width="100%">
 	        	<st:include class="${descriptor.clazz}" page="config.jelly" />
 	
 	        	<f:entry>
 	          		<div align="right">
-	            		<input type="button" value="${%Delete Dependency}" class="repeatable-delete show-if-not-only" style="margin-left: 1em;" />
+	            		<input type="button" value="${%delete_dep}" class="repeatable-delete" style="margin-left: 1em;" />
 	          		</div>
 	        	</f:entry>
 	      	</table>
