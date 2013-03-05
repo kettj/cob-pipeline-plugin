@@ -38,6 +38,7 @@ package de.fraunhofer.ipa;
 
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.User;
 import hudson.util.FormValidation;
@@ -46,6 +47,7 @@ import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -64,28 +66,28 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	/**
 	 * Repository dependencies
 	 */
-	private volatile RepositoryList repoDeps = new RepositoryList();
+	//private volatile RepositoryList repoDeps = new RepositoryList();
+	private final ArrayList<RepositoryProperty> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch) {
+	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch, List<RepositoryProperty> repoDeps) {
 		super(repoName, fork, branch);
-		this.fullName = fullName;
 		this.suffix = suffix;
-		this.repoDeps = repoDeps;
-	}
-	
-	@Override
-	public void setRepoName(String repoName) {
-		this.repoName = repoName;
-		setFullName(repoName, getSuffix());
-	}
-	
-	public void setFullName(String repoName, String suffix) {
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
 			this.fullName = this.repoName+"__"+suffix;
 		}
+		this.repoDeps = new ArrayList<RepositoryProperty>(Util.fixNull(repoDeps));
+	}
+	
+	public RootRepositoryProperty(String repoName, String fullName, String suffix, String fork, String branch, RepositoryProperty... repoDeps) {
+		this(repoName, fullName, suffix, fork, branch, Arrays.asList(repoDeps));
+	}
+		
+	@Override
+	public void setRepoName(String repoName) {
+		this.repoName = repoName;
 	}
 	
 	public String getFullName() {
@@ -94,15 +96,18 @@ public class RootRepositoryProperty extends RepositoryProperty {
 	
 	public void setSuffix(String suffix) {
 		this.suffix = suffix;
-		setFullName(this.repoName, suffix);
 	}
 	
 	public String getSuffix() {
 		return this.suffix;
 	}
 	
-	public void setRepoDeps(RepositoryList repoDeps) throws IOException {
+	/*public void setRepoDeps(RepositoryList repoDeps) throws IOException {
 		this.repoDeps = new RepositoryList(repoDeps);
+	}*/
+	
+	public List<RepositoryProperty> getRepoDeps() {
+		return repoDeps;
 	}
 	
 	@Override

@@ -76,11 +76,15 @@ public class RepositoryProperty extends AbstractDescribableImpl<RepositoryProper
 	@DataBoundConstructor
 	public RepositoryProperty(String repoName, String fork, String branch) {
 		this.repoName = repoName;
-		if (this.fork == null) {
+		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+		} else {
+			this.fork = fork;
 		}
-		if (this.branch == null) {
+		if (branch.length() == 0) {
 			this.branch = "master";
+		} else {
+			this.branch = branch;
 		}
 	}
 	
