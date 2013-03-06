@@ -91,7 +91,7 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(String repoName, String fullName, String suffix, String prioUbuntuDistro, String prioArch,
+	public RootRepository(String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
@@ -100,14 +100,15 @@ public class RootRepository extends Repository {
 			this.fullName = this.repoName+"__"+suffix;
 		}
 		this.suffix = suffix;
+		this.rosDistro = new ArrayList<String>(Util.fixNull(rosDistro));
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(String repoName, String fullName, String suffix, String prioUbuntuDistro, String prioArch,
+	public RootRepository(String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, Repository... repoDeps) {
-		this(repoName, fullName, suffix, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
+		this(repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
 	}
 		
 	@Override
@@ -125,6 +126,18 @@ public class RootRepository extends Repository {
 	
 	public String getSuffix() {
 		return this.suffix;
+	}
+	
+	public void changeRosDistro(String rosDistro) {
+		if (this.rosDistro.contains(rosDistro)) {
+			this.rosDistro.remove(rosDistro);
+		} else {
+			this.rosDistro.add(rosDistro);
+		}
+	}
+	
+	public boolean isRosDistroSet(String rosDistro) {
+		return this.rosDistro.contains(rosDistro);
 	}
 	
 	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
