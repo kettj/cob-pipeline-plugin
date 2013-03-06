@@ -94,7 +94,7 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 		this.poll = poll;
 	}
 	
-	public void setRepoName(String repoName) throws IOException {
+	public void setRepoName(String repoName){
 		this.repoName = repoName;
 	}
 	
@@ -102,7 +102,7 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 		return this.repoName;
 	}
 	
-	public void setFork(String fork) throws IOException {
+	public void setFork(String fork){
 		this.fork = fork;
 	}
 	
@@ -110,7 +110,7 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 		return this.fork;
 	}
 		
-	public void setBranch(String branch) throws IOException {
+	public void setBranch(String branch){
 		this.branch = branch;
 	}
 	
