@@ -23,8 +23,8 @@
 			<tbody><tr>
 				<j:forEach var="g" items="${rosDistros}">
 					<td width="*">
-	                	<f:checkbox name="${g}" title="${g}" checked="instance.isRosDistroSet(g)"
-	                	onclick="it.changeRosDistro(g)"/>
+	                	<f:checkbox name="${g}" title="${g}" checked="${instance.isRosDistroSet(g)}"
+	                	onclick="${it.changeRosDistro(g)}"/>
 	              	</td>
 	            </j:forEach>			
 			</tr></tbody>
