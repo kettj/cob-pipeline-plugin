@@ -73,7 +73,7 @@ public class RootRepository extends Repository {
 	/**
 	 * List of ros distros to build
 	 */
-	private ArrayList<String> rosDistro;
+	private final ArrayList<String> rosDistro;
 	
 	/**
 	 * Ubuntu distro to build with priority
@@ -81,7 +81,7 @@ public class RootRepository extends Repository {
 	private String prioUbuntuDistro;
 	
 	/**
-	 * Architecturo to build with priority
+	 * Architecture to build with priority
 	 */
 	private String prioArch;
 	
@@ -91,7 +91,8 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
+	public RootRepository(boolean electric, boolean fuerte, boolean groovy, 
+			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
@@ -101,14 +102,30 @@ public class RootRepository extends Repository {
 		}
 		this.suffix = suffix;
 		this.rosDistro = new ArrayList<String>(Util.fixNull(rosDistro));
+		if (electric) {
+			this.rosDistro.add("electric");
+		} else {
+			this.rosDistro.remove("electric");
+		}
+		if (fuerte) {
+			this.rosDistro.add("fuerte");
+		} else {
+			this.rosDistro.remove("fuerte");
+		}
+		if (groovy) {
+			this.rosDistro.add("groovy");
+		} else {
+			this.rosDistro.remove("groovy");
+		}
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
+	public RootRepository(boolean electric, boolean fuerte, boolean groovy,
+			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, Repository... repoDeps) {
-		this(repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
+		this(electric, fuerte, groovy, repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
 	}
 		
 	@Override
@@ -128,16 +145,16 @@ public class RootRepository extends Repository {
 		return this.suffix;
 	}
 	
-	public void changeRosDistro(String rosDistro) {
-		if (this.rosDistro.contains(rosDistro)) {
-			this.rosDistro.remove(rosDistro);
-		} else {
-			this.rosDistro.add(rosDistro);
-		}
+	public boolean getElectric() {
+		return this.rosDistro.contains("electric");
 	}
 	
-	public boolean isRosDistroSet(String rosDistro) {
-		return this.rosDistro.contains(rosDistro);
+	public boolean getFuerte() {
+		return this.rosDistro.contains("fuerte");
+	}
+	
+	public boolean getGroovy() {
+		return this.rosDistro.contains("groovy");
 	}
 	
 	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
