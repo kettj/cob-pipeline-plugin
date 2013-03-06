@@ -223,12 +223,8 @@ public class RootRepository extends Repository {
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();
-			
-			//TODO get list of ros_distro
-			//TODO get target platforms from github
-			//TODO calc possible archs
-			prioArchItems.add("test_arch1");
-			prioArchItems.add("test_arch2");
+			prioArchItems.add("amd64");
+			prioArchItems.add("i386");
 			
 			return prioArchItems;
 		}
