@@ -182,10 +182,6 @@ public class RootRepository extends Repository {
 		return this.prioArch;
 	}
 	
-	/*public void setRepoDeps(RepositoryList repoDeps) throws IOException {
-		this.repoDeps = new RepositoryList(repoDeps);
-	}*/
-	
 	public List<Repository> getRepoDeps() {
 		return repoDeps;
 	}

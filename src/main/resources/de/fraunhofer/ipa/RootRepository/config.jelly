@@ -44,6 +44,15 @@
 			<f:entry field="branch" title="${%branch}">
 		   		<f:combobox />
 			</f:entry>
+			<f:block>
+  				<table align="right" width="98%">
+					<f:optionalBlock name="matrix" title="Build repository for additional environments">
+				      	<f:entry title="Environment matrix">
+				        	<!--TODO matrix-->
+				      	</f:entry>
+		    		</f:optionalBlock>
+		    	</table>
+		    </f:block>
   		</f:advanced>
   	</f:entry>
   	<f:entry title="${%Dependency}" field="repoDeps">
