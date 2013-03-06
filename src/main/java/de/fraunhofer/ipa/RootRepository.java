@@ -91,7 +91,7 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(boolean electric, boolean fuerte, boolean groovy, 
+	public RootRepository(boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
@@ -117,15 +117,20 @@ public class RootRepository extends Repository {
 		} else {
 			this.rosDistro.remove("groovy");
 		}
+		if (hydro) {
+			this.rosDistro.add("hydro");
+		} else {
+			this.rosDistro.remove("hydro");
+		}
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(boolean electric, boolean fuerte, boolean groovy,
+	public RootRepository(boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
 			String fork, String branch, Repository... repoDeps) {
-		this(electric, fuerte, groovy, repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
+		this(electric, fuerte, groovy, hydro, repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
 	}
 		
 	@Override
@@ -155,6 +160,10 @@ public class RootRepository extends Repository {
 	
 	public boolean getGroovy() {
 		return this.rosDistro.contains("groovy");
+	}
+	
+	public boolean getHydro() {
+		return this.rosDistro.contains("hydro");
 	}
 	
 	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
