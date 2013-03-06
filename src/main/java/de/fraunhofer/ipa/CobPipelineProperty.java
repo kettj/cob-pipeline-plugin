@@ -37,6 +37,7 @@
 package de.fraunhofer.ipa;
 
 import hudson.Extension;
+import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.RootAction;
 import hudson.model.User;
@@ -45,8 +46,11 @@ import hudson.model.UserPropertyDescriptor;
 import hudson.tasks.MailAddressResolver;
 import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
+import hudson.util.QuotedStringTokenizer;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -165,6 +169,8 @@ public class CobPipelineProperty extends UserProperty {
 		
 		private String githubPassword;
 		
+		private ArrayList<String> allRosDistros;
+		
 		public DescriptorImpl() {
 			load();
 		}
@@ -227,6 +233,26 @@ public class CobPipelineProperty extends UserProperty {
         
         public String getGithubPassword() {
         	return githubPassword;
+        }
+        
+        public void setAllRosDistrosString(String rosDistrosString) {
+        	this.allRosDistros = new ArrayList<String>(Arrays.asList(Util.tokenize(rosDistrosString)));
+        }
+        
+        public String getAllRosDistrosString() {
+        	int len=0;
+            for (String rosDistro : allRosDistros)
+                len += rosDistro.length();
+            char delim = len>30 ? '\n' : ' ';
+            // Build string connected with delimiter, quoting as needed
+            StringBuilder buf = new StringBuilder(len+allRosDistros.size()*3);
+            for (String rosDistro : allRosDistros)
+                buf.append(delim).append(QuotedStringTokenizer.quote(rosDistro,""));
+            return buf.substring(1);
+        }
+        
+        public List<String> getAllRosDistros() {
+        	return Collections.unmodifiableList(allRosDistros);
         }
         
         //TODO enhance output and order
