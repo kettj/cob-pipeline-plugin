@@ -6,12 +6,86 @@
 	<f:entry field="suffix" title="${%suffix}">
    		<f:textbox />
 	</f:entry>
-  	<f:entry field="fork" title="${%fork}">
-   		<f:combobox />
+	<f:entry title="${%ROS Release Version}">
+		<j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
+				<j:forEach var="g" items="${rosDistros}">
+					<td width="*">
+	                	<f:checkbox field="${g}" title="${g}"/>
+	              	</td>
+	            </j:forEach>			
+			</tr></tbody>
+		</table>
 	</f:entry>
-	<f:entry field="branch" title="${%branch}">
-   		<f:combobox />
+	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+			<tbody><tr>
+				<td valign="top">
+   					<f:select />
+				</td>
+			</tr></tbody>
+   		</table>
 	</f:entry>
+	<f:entry field="prioArch" title="${%Priority Architecture}">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+			<tbody><tr>
+				<td valign="top">
+   					<f:select />
+				</td>
+			</tr></tbody>
+   		</table>
+	</f:entry>
+	<f:entry title="Advanced Repository Options">
+  		<f:advanced>
+		  	<f:entry field="fork" title="${%fork}">
+		   		<f:combobox />
+			</f:entry>
+			<f:entry field="branch" title="${%branch}">
+		   		<f:combobox />
+			</f:entry>
+			<f:entry title="${%jobs}">
+  				<table border="0" width="*">
+					<f:optionalBlock field="regularBuild" title="${%buildMatrix}" inline="true">
+				      	<f:entry title="Environment matrix">
+				        	<!--TODO matrix-->
+				      	</f:entry>
+		    		</f:optionalBlock>
+		    	</table>
+  				<table border="0" width="*">
+					<f:optionalBlock field="downstreamBuild" title="${%downstreamBuild}" inline="true">
+						<td valign="top" width="150"></td>
+			      		<td valign="top" width="*">
+							<f:checkbox field="nongraphicsTest" title="${%nongraphicsTest}"/>
+						</td>
+						<tr></tr>
+						<td valign="top" width="150"></td>
+						<td valign="top" width="*">
+							<f:checkbox field="graphicsTest" title="${%graphicsTest}"/>
+						</td>
+		    		</f:optionalBlock>
+		    	</table>
+  				<table border="0" width="*">
+					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}" inline="true">
+						<td valign="top" width="150"></td>
+						<td valign="top" width="*">
+							<f:checkbox field="automaticHWTest" title="${%automaticHWTest}"/>
+						</td>
+						<tr></tr>
+						<td valign="top" width="150"></td>
+						<td valign="top" width="*">
+							<f:checkbox field="interactiveHWTest" title="${%interactiveHWTest}"/>
+						</td>
+		    		</f:optionalBlock>
+		    	</table>
+  				<table border="0" width="*">
+					<td valign="top" width="*">
+		    			<f:checkbox field="release" title="${%release}"/>
+		    		</td>
+		    	</table>
+		    </f:entry>
+  		</f:advanced>
+  	</f:entry>
   	<f:entry title="${%repoDeps}" field="repoDeps">
 	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0" header="${%repoDep}">
 	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->

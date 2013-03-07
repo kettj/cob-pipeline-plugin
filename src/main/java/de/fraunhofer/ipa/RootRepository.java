@@ -42,6 +42,7 @@ import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.User;
 import hudson.util.FormValidation;
+import hudson.util.ListBoxModel;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
@@ -59,9 +60,35 @@ import org.kohsuke.stapler.QueryParameter;
 
 public class RootRepository extends Repository {
 
+	/**
+	 * 
+	 */
 	private String suffix;
-	
+
+	/**
+	 * 
+	 */
 	protected String fullName;
+	
+	/**
+	 * List of ros distros to build
+	 */
+	private final ArrayList<String> rosDistro;
+	
+	/**
+	 * Ubuntu distro to build with priority
+	 */
+	private String prioUbuntuDistro;
+	
+	/**
+	 * Architecture to build with priority
+	 */
+	private String prioArch;
+	
+	/**
+	 * Jobs to include in pipeline
+	 */
+	private final ArrayList<String> jobs;
 	
 	/**
 	 * Repository dependencies
@@ -69,7 +96,12 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, List<Repository> repoDeps) {
+	public RootRepository(String repoName, String fullName, String suffix,
+			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+			String prioUbuntuDistro, String prioArch, String fork, String branch,
+			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			boolean release, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -77,12 +109,56 @@ public class RootRepository extends Repository {
 			this.fullName = this.repoName+"__"+suffix;
 		}
 		this.suffix = suffix;
+		
+		this.rosDistro = new ArrayList<String>();
+		updateListItem(this.rosDistro, electric, "electric");
+		updateListItem(this.rosDistro, fuerte, "fuerte");
+		updateListItem(this.rosDistro, groovy, "groovy");
+		updateListItem(this.rosDistro, hydro, "hydro");
+		
+		this.prioUbuntuDistro = prioUbuntuDistro;
+		this.prioArch = prioArch;
+		
+		this.jobs = new ArrayList<String>();
+		updateListItem(jobs, regularBuild, "regular_build");
+		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
+		updateListItem(jobs, graphicsTest, "graphics_test");
+		updateListItem(jobs, downstreamBuild, "downstream_build", "nongraphics_test", "graphics_test");
+		updateListItem(jobs, automaticHWTest, "automatic_hw_test");
+		updateListItem(jobs, interactiveHWTest, "interactive_hw_test");
+		updateListItem(jobs, hardwareBuild, "hardware_build", "automatic_hw_test", "interactive_hw_test");
+		updateListItem(jobs, release, "release");
+		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(String repoName, String fullName, String suffix, String fork, String branch, Repository... repoDeps) {
-		this(repoName, fullName, suffix, fork, branch, Arrays.asList(repoDeps));
+	public RootRepository(String repoName, String fullName, String suffix,
+			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+			String prioUbuntuDistro, String prioArch, String fork, String branch,
+			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			boolean release, Repository... repoDeps) {
+		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
+				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild, nongraphicsTest, graphicsTest,
+				hardwareBuild, automaticHWTest, interactiveHWTest, release, Arrays.asList(repoDeps));
 	}
+	
+	private void updateListItem(List<String> list, boolean item, String value) {
+		if (item) {
+			list.add(value);
+		} else {
+			list.remove(value);
+		}
+	}
+	
+	private void updateListItem(List<String> list, boolean item, String value, String... downstreamJobs) {
+		updateListItem(list, item, value);
+		if (!item) {
+			for (String downstreamJob : downstreamJobs) {
+				list.remove(downstreamJob);
+			}
+		}
+	}	
 		
 	@Override
 	public void setRepoName(String repoName) {
@@ -101,9 +177,69 @@ public class RootRepository extends Repository {
 		return this.suffix;
 	}
 	
-	/*public void setRepoDeps(RepositoryList repoDeps) throws IOException {
-		this.repoDeps = new RepositoryList(repoDeps);
-	}*/
+	public boolean getElectric() {
+		return this.rosDistro.contains("electric");
+	}
+	
+	public boolean getFuerte() {
+		return this.rosDistro.contains("fuerte");
+	}
+	
+	public boolean getGroovy() {
+		return this.rosDistro.contains("groovy");
+	}
+	
+	public boolean getHydro() {
+		return this.rosDistro.contains("hydro");
+	}
+	
+	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
+		this.prioUbuntuDistro = prioUbuntuDistro;
+	}
+	
+	public String getPrioUbuntuDistro() {
+		return this.prioUbuntuDistro;
+	}
+	
+	public void setPrioArch(String prioArch) {
+		this.prioArch = prioArch;
+	}
+	
+	public String getPrioArch() {
+		return this.prioArch;
+	}
+	
+	public boolean getRegularBuild() {
+		return this.jobs.contains("regular_build");
+	}
+	
+	public boolean getDownstreamBuild() {
+		return this.jobs.contains("downstream_build");
+	}
+	
+	public boolean getNongraphicsTest(){
+		return this.jobs.contains("nongraphics_test");
+	}
+	
+	public boolean getGraphicsTest() {
+		return this.jobs.contains("graphics_test");
+	}
+	
+	public boolean getHardwareBuild() {
+		return this.jobs.contains("hardware_build");
+	}
+	
+	public boolean getAutomaticHWTest() {
+		return this.jobs.contains("automatic_hw_test");
+	}
+	
+	public boolean getInteractiveHWTest() {
+		return this.jobs.contains("interactive_hw_test");
+	}
+	
+	public boolean getRelease() {
+		return this.jobs.contains("release");
+	}
 	
 	public List<Repository> getRepoDeps() {
 		return repoDeps;
@@ -135,6 +271,26 @@ public class RootRepository extends Repository {
 			} else {
 				return FormValidation.ok("Full name: "+repoName);
 			}
+		}
+		
+		public ListBoxModel doFillPrioUbuntuDistroItems() {
+			ListBoxModel prioDistroItems = new ListBoxModel();
+			
+			//TODO get list of ros_distro
+			//TODO get target platforms from github
+			//TODO calc possible ubuntu distros
+			prioDistroItems.add("test_distro1");
+			prioDistroItems.add("test_distro2");
+			
+			return prioDistroItems;
+		}
+		
+		public ListBoxModel doFillPrioArchItems() {
+			ListBoxModel prioArchItems = new ListBoxModel();
+			prioArchItems.add("amd64");
+			prioArchItems.add("i386");
+			
+			return prioArchItems;
 		}
         
         /**
