@@ -109,35 +109,16 @@ public class RootRepository extends Repository {
 		this.suffix = suffix;
 		
 		this.rosDistro = new ArrayList<String>();
-		if (electric) {
-			this.rosDistro.add("electric");
-		} else {
-			this.rosDistro.remove("electric");
-		}
-		if (fuerte) {
-			this.rosDistro.add("fuerte");
-		} else {
-			this.rosDistro.remove("fuerte");
-		}
-		if (groovy) {
-			this.rosDistro.add("groovy");
-		} else {
-			this.rosDistro.remove("groovy");
-		}
-		if (hydro) {
-			this.rosDistro.add("hydro");
-		} else {
-			this.rosDistro.remove("hydro");
-		}
+		updateListItem(this.rosDistro, electric, "electric");
+		updateListItem(this.rosDistro, fuerte, "fuerte");
+		updateListItem(this.rosDistro, groovy, "groovy");
+		updateListItem(this.rosDistro, hydro, "hydro");
+		
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		
 		this.jobs = new ArrayList<String>();
-		if (downstreamBuild) {
-			this.jobs.add("downstream_build");
-		} else {
-			this.rosDistro.remove("downstream_build");
-		}
+		updateListItem(jobs, downstreamBuild, "downstream_build");
 		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
@@ -148,6 +129,14 @@ public class RootRepository extends Repository {
 			boolean downstreamBuild, Repository... repoDeps) {
 		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
 				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, Arrays.asList(repoDeps));
+	}
+	
+	private void updateListItem(List<String> list, boolean item, String value) {
+		if (item) {
+			list.add(value);
+		} else {
+			list.remove(value);
+		}
 	}
 		
 	@Override
