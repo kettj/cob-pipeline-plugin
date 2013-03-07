@@ -99,7 +99,7 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
 			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
 			boolean release, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
@@ -120,6 +120,7 @@ public class RootRepository extends Repository {
 		this.prioArch = prioArch;
 		
 		this.jobs = new ArrayList<String>();
+		updateListItem(jobs, regularBuild, "regular_build");
 		updateListItem(jobs, downstreamBuild, "downstream_build");
 		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
 		updateListItem(jobs, graphicsTest, "graphics_test");
@@ -134,11 +135,11 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
 			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
 			boolean release, Repository... repoDeps) {
 		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
-				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, nongraphicsTest, graphicsTest,
+				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild, nongraphicsTest, graphicsTest,
 				hardwareBuild, automaticHWTest, interactiveHWTest, release, Arrays.asList(repoDeps));
 	}
 	
@@ -197,6 +198,10 @@ public class RootRepository extends Repository {
 	
 	public String getPrioArch() {
 		return this.prioArch;
+	}
+	
+	public boolean getRegularBuild() {
+		return this.jobs.contains("regular_build");
 	}
 	
 	public boolean getDownstreamBuild() {
