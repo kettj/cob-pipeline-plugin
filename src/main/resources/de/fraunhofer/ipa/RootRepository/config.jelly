@@ -45,7 +45,14 @@
 		   		<f:combobox />
 			</f:entry>
 			<f:entry title="${%jobs}">
-				<table border="1" width="100%">
+  				<table border="0" width="100%">
+					<f:optionalBlock name="matrix" title="${%buildMatrix}">
+				      	<f:entry title="Environment matrix">
+				        	<!--TODO matrix-->
+				      	</f:entry>
+		    		</f:optionalBlock>
+		    	</table>
+				<table border="0" width="100%">
 					<tbody><tr>
 						<td valign="top" width="*">
 							<f:checkbox field="downstreamBuild" title="${%downstreamBuild}"/>
@@ -58,15 +65,23 @@
 						<td valign="top" width="*">
 							<f:checkbox field="graphicsTest" title="${%graphicsTest}"/>
 						</td>
+						<tr></tr>
+						<td valign="top" width="*">
+							<f:checkbox field="hardwareBuild" title="${%hardwareBuild}"/>
+						</td>
+						<td valign="top" width="*">
+							<f:checkbox field="automaticHWTest" title="${%automaticHWTest}"/>
+						</td>
+						<tr></tr>
+						<td valign="top" width="*"></td>
+						<td valign="top" width="*">
+							<f:checkbox field="interactiveHWTest" title="${%interactiveHWTest}"/>
+						</td>
+						<td valign="top" width="*">
+							<f:checkbox field="release" title="${%release}"/>
+						</td>
 					</tr></tbody>
 				</table>
-  				<table border="1" width="100%">
-					<f:optionalBlock name="matrix" title="Build repository for additional environments">
-				      	<f:entry title="Environment matrix">
-				        	<!--TODO matrix-->
-				      	</f:entry>
-		    		</f:optionalBlock>
-		    	</table>
 		    </f:entry>
   		</f:advanced>
   	</f:entry>

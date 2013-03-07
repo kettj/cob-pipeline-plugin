@@ -99,7 +99,9 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest, List<Repository> repoDeps) {
+			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			boolean release, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -121,6 +123,10 @@ public class RootRepository extends Repository {
 		updateListItem(jobs, downstreamBuild, "downstream_build");
 		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
 		updateListItem(jobs, graphicsTest, "graphics_test");
+		updateListItem(jobs, hardwareBuild, "hardware_build");
+		updateListItem(jobs, automaticHWTest, "automatic_hw_test");
+		updateListItem(jobs, interactiveHWTest, "interactive_hw_test");
+		updateListItem(jobs, release, "release");
 		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
@@ -128,9 +134,12 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest, Repository... repoDeps) {
+			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
+			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			boolean release, Repository... repoDeps) {
 		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
-				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, nongraphicsTest, graphicsTest, Arrays.asList(repoDeps));
+				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, nongraphicsTest, graphicsTest,
+				hardwareBuild, automaticHWTest, interactiveHWTest, release, Arrays.asList(repoDeps));
 	}
 	
 	private void updateListItem(List<String> list, boolean item, String value) {
@@ -200,6 +209,22 @@ public class RootRepository extends Repository {
 	
 	public boolean getGraphicsTest() {
 		return this.jobs.contains("graphics_test");
+	}
+	
+	public boolean getHardwareBuild() {
+		return this.jobs.contains("hardware_build");
+	}
+	
+	public boolean getAutomaticHWTest() {
+		return this.jobs.contains("automatic_hw_test");
+	}
+	
+	public boolean getInteractiveHWTest() {
+		return this.jobs.contains("interactive_hw_test");
+	}
+	
+	public boolean getRelease() {
+		return this.jobs.contains("release");
 	}
 	
 	public List<Repository> getRepoDeps() {
