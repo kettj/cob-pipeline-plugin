@@ -45,43 +45,44 @@
 		   		<f:combobox />
 			</f:entry>
 			<f:entry title="${%jobs}">
-  				<table border="0" width="100%">
+  				<table border="0" width="*">
 					<f:optionalBlock field="regularBuild" title="${%buildMatrix}">
 				      	<f:entry title="Environment matrix">
 				        	<!--TODO matrix-->
 				      	</f:entry>
 		    		</f:optionalBlock>
 		    	</table>
-				<table border="0" width="100%">
-					<tbody><tr>
-						<td valign="top" width="*">
-							<f:checkbox field="downstreamBuild" title="${%downstreamBuild}"/>
-						</td>
-						<td valign="top" width="*">
+  				<table border="0" width="*">
+					<f:optionalBlock field="downstreamBuild" title="${%downstreamBuild}" inline="true">
+						<td valign="top" width="150"></td>
+			      		<td valign="top" width="*">
 							<f:checkbox field="nongraphicsTest" title="${%nongraphicsTest}"/>
 						</td>
 						<tr></tr>
-						<td valign="top" width="*"></td>
+						<td valign="top" width="150"></td>
 						<td valign="top" width="*">
 							<f:checkbox field="graphicsTest" title="${%graphicsTest}"/>
 						</td>
-						<tr></tr>
-						<td valign="top" width="*">
-							<f:checkbox field="hardwareBuild" title="${%hardwareBuild}"/>
-						</td>
+		    		</f:optionalBlock>
+		    	</table>
+  				<table border="0" width="*">
+					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}" inline="true">
+						<td valign="top" width="150"></td>
 						<td valign="top" width="*">
 							<f:checkbox field="automaticHWTest" title="${%automaticHWTest}"/>
 						</td>
 						<tr></tr>
-						<td valign="top" width="*"></td>
+						<td valign="top" width="150"></td>
 						<td valign="top" width="*">
 							<f:checkbox field="interactiveHWTest" title="${%interactiveHWTest}"/>
 						</td>
-						<td valign="top" width="*">
-							<f:checkbox field="release" title="${%release}"/>
-						</td>
-					</tr></tbody>
-				</table>
+		    		</f:optionalBlock>
+		    	</table>
+  				<table border="0" width="*">
+					<td valign="top" width="*">
+		    			<f:checkbox field="release" title="${%release}"/>
+		    		</td>
+		    	</table>
 		    </f:entry>
   		</f:advanced>
   	</f:entry>
