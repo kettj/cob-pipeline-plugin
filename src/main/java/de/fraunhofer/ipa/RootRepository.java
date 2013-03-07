@@ -86,6 +86,11 @@ public class RootRepository extends Repository {
 	private String prioArch;
 	
 	/**
+	 * Jobs to include in pipeline
+	 */
+	private final ArrayList<String> jobs;
+	
+	/**
 	 * Repository dependencies
 	 */
 	private final ArrayList<Repository> repoDeps;
@@ -93,7 +98,8 @@ public class RootRepository extends Repository {
 	@DataBoundConstructor
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
-			String prioUbuntuDistro, String prioArch, String fork, String branch, List<Repository> repoDeps) {
+			String prioUbuntuDistro, String prioArch, String fork, String branch,
+			boolean downstreamBuild, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -101,6 +107,7 @@ public class RootRepository extends Repository {
 			this.fullName = this.repoName+"__"+suffix;
 		}
 		this.suffix = suffix;
+		
 		this.rosDistro = new ArrayList<String>();
 		if (electric) {
 			this.rosDistro.add("electric");
@@ -124,13 +131,23 @@ public class RootRepository extends Repository {
 		}
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
+		
+		this.jobs = new ArrayList<String>();
+		if (downstreamBuild) {
+			this.jobs.add("downstream_build");
+		} else {
+			this.rosDistro.remove("downstream_build");
+		}
+		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
-			String prioUbuntuDistro, String prioArch, String fork, String branch, Repository... repoDeps) {
-		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
+			String prioUbuntuDistro, String prioArch, String fork, String branch,
+			boolean downstreamBuild, Repository... repoDeps) {
+		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
+				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, Arrays.asList(repoDeps));
 	}
 		
 	@Override
@@ -180,6 +197,10 @@ public class RootRepository extends Repository {
 	
 	public String getPrioArch() {
 		return this.prioArch;
+	}
+	
+	public boolean getDownstreamBuild() {
+		return this.jobs.contains("downstream_build");
 	}
 	
 	public List<Repository> getRepoDeps() {
