@@ -91,9 +91,9 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(boolean electric, boolean fuerte, boolean groovy, boolean hydro,
-			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
-			String fork, String branch, List<Repository> repoDeps) {
+	public RootRepository(String repoName, String fullName, String suffix,
+			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+			String prioUbuntuDistro, String prioArch, String fork, String branch, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -101,7 +101,7 @@ public class RootRepository extends Repository {
 			this.fullName = this.repoName+"__"+suffix;
 		}
 		this.suffix = suffix;
-		this.rosDistro = new ArrayList<String>(Util.fixNull(rosDistro));
+		this.rosDistro = new ArrayList<String>();
 		if (electric) {
 			this.rosDistro.add("electric");
 		} else {
@@ -127,10 +127,10 @@ public class RootRepository extends Repository {
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(boolean electric, boolean fuerte, boolean groovy, boolean hydro,
-			String repoName, String fullName, String suffix, List<String> rosDistro, String prioUbuntuDistro, String prioArch,
-			String fork, String branch, Repository... repoDeps) {
-		this(electric, fuerte, groovy, hydro, repoName, fullName, suffix, rosDistro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
+	public RootRepository(String repoName, String fullName, String suffix,
+			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+			String prioUbuntuDistro, String prioArch, String fork, String branch, Repository... repoDeps) {
+		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro, prioUbuntuDistro, prioArch, fork, branch, Arrays.asList(repoDeps));
 	}
 		
 	@Override
