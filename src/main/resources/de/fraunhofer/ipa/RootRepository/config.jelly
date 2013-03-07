@@ -69,12 +69,12 @@
 					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
 						<td valign="top" width="150"></td>
 						<td valign="top" width="*">
-							<f:checkbox field="automaticHWTest" title="${%automaticHWTest}"/>
+							<f:checkbox field="automaticHwTest" title="${%automaticHwTest}"/>
 						</td>
 						<tr></tr>
 						<td valign="top" width="150"></td>
 						<td valign="top" width="*">
-							<f:checkbox field="interactiveHWTest" title="${%interactiveHWTest}"/>
+							<f:checkbox field="interactiveHwTest" title="${%interactiveHwTest}"/>
 						</td>
 		    		</f:optionalBlock>
 		    	</table>

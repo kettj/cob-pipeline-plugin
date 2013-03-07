@@ -49,14 +49,19 @@ import net.sf.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+
+import org.apache.commons.lang.StringUtils;
 
 public class RootRepository extends Repository {
 
@@ -99,8 +104,7 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
-			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
@@ -120,13 +124,9 @@ public class RootRepository extends Repository {
 		this.prioArch = prioArch;
 		
 		this.jobs = new ArrayList<String>();
-		updateListItem(jobs, regularBuild, "regular_build");
-		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
-		updateListItem(jobs, graphicsTest, "graphics_test");
-		updateListItem(jobs, downstreamBuild, "downstream_build", "nongraphics_test", "graphics_test");
-		updateListItem(jobs, automaticHWTest, "automatic_hw_test");
-		updateListItem(jobs, interactiveHWTest, "interactive_hw_test");
-		updateListItem(jobs, hardwareBuild, "hardware_build", "automatic_hw_test", "interactive_hw_test");
+		updateListItem(jobs, (regularBuild != null), "regular_build");
+		updateList(jobs, downstreamBuild, "downstream_build");
+		updateList(jobs, hardwareBuild, "hardware_build");
 		updateListItem(jobs, release, "release");
 		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
@@ -135,30 +135,32 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean regularBuild, boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest,
-			boolean hardwareBuild, boolean automaticHWTest, boolean interactiveHWTest,
+			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, Repository... repoDeps) {
 		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
-				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild, nongraphicsTest, graphicsTest,
-				hardwareBuild, automaticHWTest, interactiveHWTest, release, Arrays.asList(repoDeps));
+				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild,
+				hardwareBuild, release, Arrays.asList(repoDeps));
+	}
+	
+	private void updateList(List<String> list, JSONObject parent, String name) {
+		if (parent != null) {
+			list.add(name);
+			Iterator iter = parent.keys();
+			while(iter.hasNext()){
+		        String key = (String)iter.next();
+		        String value = parent.getString(key);
+		        if (value.equals("true")) {
+		        	list.add(StringUtils.join(key.split("(?=\\p{Upper})"), "_").toLowerCase());
+		        }
+			}
+		}
 	}
 	
 	private void updateListItem(List<String> list, boolean item, String value) {
 		if (item) {
 			list.add(value);
-		} else {
-			list.remove(value);
-		}
+		} 
 	}
-	
-	private void updateListItem(List<String> list, boolean item, String value, String... downstreamJobs) {
-		updateListItem(list, item, value);
-		if (!item) {
-			for (String downstreamJob : downstreamJobs) {
-				list.remove(downstreamJob);
-			}
-		}
-	}	
 		
 	@Override
 	public void setRepoName(String repoName) {
@@ -229,11 +231,11 @@ public class RootRepository extends Repository {
 		return this.jobs.contains("hardware_build");
 	}
 	
-	public boolean getAutomaticHWTest() {
+	public boolean getAutomaticHwTest() {
 		return this.jobs.contains("automatic_hw_test");
 	}
 	
-	public boolean getInteractiveHWTest() {
+	public boolean getInteractiveHwTest() {
 		return this.jobs.contains("interactive_hw_test");
 	}
 	
