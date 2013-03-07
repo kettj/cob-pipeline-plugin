@@ -121,12 +121,12 @@ public class RootRepository extends Repository {
 		
 		this.jobs = new ArrayList<String>();
 		updateListItem(jobs, regularBuild, "regular_build");
-		updateListItem(jobs, downstreamBuild, "downstream_build");
 		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
 		updateListItem(jobs, graphicsTest, "graphics_test");
-		updateListItem(jobs, hardwareBuild, "hardware_build");
+		updateListItem(jobs, downstreamBuild, "downstream_build", "nongraphics_test", "graphics_test");
 		updateListItem(jobs, automaticHWTest, "automatic_hw_test");
 		updateListItem(jobs, interactiveHWTest, "interactive_hw_test");
+		updateListItem(jobs, hardwareBuild, "hardware_build", "automatic_hw_test", "interactive_hw_test");
 		updateListItem(jobs, release, "release");
 		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
@@ -150,6 +150,15 @@ public class RootRepository extends Repository {
 			list.remove(value);
 		}
 	}
+	
+	private void updateListItem(List<String> list, boolean item, String value, String... downstreamJobs) {
+		updateListItem(list, item, value);
+		if (!item) {
+			for (String downstreamJob : downstreamJobs) {
+				list.remove(downstreamJob);
+			}
+		}
+	}	
 		
 	@Override
 	public void setRepoName(String repoName) {
