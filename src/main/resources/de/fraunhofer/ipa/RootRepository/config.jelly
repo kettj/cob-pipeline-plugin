@@ -47,8 +47,16 @@
 			<f:entry title="${%jobs}">
 				<table border="1" width="100%">
 					<tbody><tr>
-						<td valign="top">
+						<td valign="top" width="*">
 							<f:checkbox field="downstreamBuild" title="${%downstreamBuild}"/>
+						</td>
+						<td valign="top" width="*">
+							<f:checkbox field="nongraphicsTest" title="${%nongraphicsTest}"/>
+						</td>
+						<tr></tr>
+						<td valign="top" width="*"></td>
+						<td valign="top" width="*">
+							<f:checkbox field="graphicsTest" title="${%graphicsTest}"/>
 						</td>
 					</tr></tbody>
 				</table>

@@ -99,7 +99,7 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, List<Repository> repoDeps) {
+			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest, List<Repository> repoDeps) {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -119,6 +119,8 @@ public class RootRepository extends Repository {
 		
 		this.jobs = new ArrayList<String>();
 		updateListItem(jobs, downstreamBuild, "downstream_build");
+		updateListItem(jobs, nongraphicsTest, "nongraphics_test");
+		updateListItem(jobs, graphicsTest, "graphics_test");
 		
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
@@ -126,9 +128,9 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix,
 			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
-			boolean downstreamBuild, Repository... repoDeps) {
+			boolean downstreamBuild, boolean nongraphicsTest, boolean graphicsTest, Repository... repoDeps) {
 		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
-				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, Arrays.asList(repoDeps));
+				prioUbuntuDistro, prioArch, fork, branch, downstreamBuild, nongraphicsTest, graphicsTest, Arrays.asList(repoDeps));
 	}
 	
 	private void updateListItem(List<String> list, boolean item, String value) {
@@ -190,6 +192,14 @@ public class RootRepository extends Repository {
 	
 	public boolean getDownstreamBuild() {
 		return this.jobs.contains("downstream_build");
+	}
+	
+	public boolean getNongraphicsTest(){
+		return this.jobs.contains("nongraphics_test");
+	}
+	
+	public boolean getGraphicsTest() {
+		return this.jobs.contains("graphics_test");
 	}
 	
 	public List<Repository> getRepoDeps() {
