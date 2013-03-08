@@ -114,22 +114,6 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     }
     
     /**
-     * Returns list of global defined supported ROS releases
-     * @return
-     */
-    public List<String> getAllRosDistros() {
-    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getAllRosDistros();
-    }
-    
-    /**
-     * Returns list of global defined available robots
-     * @return
-     */
-    public List<String> getRobots() {
-    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
-    }
-    
-    /**
      * Sets the globally given GitHub configurations
      */
     private void setGithubConfig() {

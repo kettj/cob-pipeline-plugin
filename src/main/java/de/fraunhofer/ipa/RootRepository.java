@@ -40,6 +40,7 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
+import hudson.model.Hudson;
 import hudson.model.User;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -90,6 +91,8 @@ public class RootRepository extends Repository {
 	 */
 	private String prioArch;
 	
+	private Map<String, List<String>> matrixDistroArch;
+	
 	/**
 	 * Jobs to include in pipeline
 	 */
@@ -128,9 +131,10 @@ public class RootRepository extends Repository {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		
+		this.matrixDistroArch = new HashMap<String, List<String>>();
 		this.robots = new ArrayList<String>();
 		this.jobs = new ArrayList<String>();
-		updateListItem(jobs, (regularBuild != null), "regular_build");
+		updateList(jobs, regularBuild, "regular_build");
 		updateList(jobs, downstreamBuild, "downstream_build");
 		updateList(jobs, hardwareBuild, "hardware_build");
 		updateListItem(jobs, release, "release");
@@ -158,6 +162,16 @@ public class RootRepository extends Repository {
 		        if (value.equals("true")) {
 		        	if (key.endsWith("__robot")) {
 		        		this.robots.add(key.replace("__robot", ""));
+		        	} else if (key.endsWith("__env")) {
+		        		List<String> archs = new ArrayList<String>();
+		        		String start = key.split("__")[0];
+		        		if (parent.getString(start+"__amd64__env").equals("true")) {
+		        			archs.add("amd64");
+		        		}
+		        		if (parent.getString(start+"__i386__env").equals("true")) {
+		        			archs.add("i386");
+		        		}
+		        		this.matrixDistroArch.put(start, archs);
 		        	} else {
 		        		list.add(StringUtils.join(key.split("(?=\\p{Upper})"), "_").toLowerCase());
 		        	}
@@ -221,6 +235,15 @@ public class RootRepository extends Repository {
 		return this.prioArch;
 	}
 	
+	public boolean isMatrixEntryChecked(String ubuntu, String arch) {
+		if (this.matrixDistroArch.containsKey(ubuntu)) {
+			if (this.matrixDistroArch.get(ubuntu).contains(arch)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public boolean getRegularBuild() {
 		return this.jobs.contains("regular_build");
 	}
@@ -277,6 +300,38 @@ public class RootRepository extends Repository {
 		public boolean isRoot() {
 			return true;
 		}
+	    
+	    /**
+	     * Returns list of global defined supported ROS releases
+	     * @return
+	     */
+	    public List<String> getAllRosDistros() {
+	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getAllRosDistros();
+	    }
+	    
+	    public List<String> getUbuntuReleases() {
+	    	List<String> ubuntuReleases = new ArrayList<String>();
+	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
+	    	
+	    	for (Map<String, List<String>> ros : targets) {
+	    		for (List<String> ubuntuList : ros.values()) {
+	    			for (String ubuntu : ubuntuList) {
+	    				if (!ubuntuReleases.contains(ubuntu)) {
+	    					ubuntuReleases.add(ubuntu);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	return ubuntuReleases;
+	    }
+	    
+	    /**
+	     * Returns list of global defined available robots
+	     * @return
+	     */
+	    public List<String> getRobots() {
+	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
+	    }
 		
 		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String repoName)
 				throws IOException, ServletException {

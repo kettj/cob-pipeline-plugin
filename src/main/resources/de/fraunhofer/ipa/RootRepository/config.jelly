@@ -45,13 +45,27 @@
 		   		<f:combobox />
 			</f:entry>
 			<f:entry title="${%jobs}">
-  				<table border="1" width="*">
+				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
+  				<table border="0" width="*">
 					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
-				      	<td valign="top" width="100"></td>
-				      	<td valign="top" width="150">${%ubuntu/arch}</td>
-				      	<td valign="top" width="50">${%amd64}</td>
-				      	<td valign="top" width="50">${%i386}</td>
+				      	<td align="center" width="100"></td>
+				      	<td align="center" width="150"><b>${%ubuntu/arch}</b></td>
+				      	<td align="center" width="50">${%amd64}</td>
+				      	<td align="center" width="50">${%i386}</td>
 						<tr></tr>
+						<j:forEach var="u" items="${ubuntuReleases}">
+				      		<td valign="top" width="100"></td>
+							<td align="center" width="*">
+			                	${u}
+			              	</td>
+							<td align="center" width="*">
+			                	<f:checkbox field="${u}__amd64__env" checked="${instance.isMatrixEntryChecked(u, 'amd64')}"/>
+			              	</td>
+							<td align="center" width="*">
+			                	<f:checkbox field="${u}__i386__env" checked="${instance.isMatrixEntryChecked(u, 'i386')}"/>
+			              	</td>
+							<tr></tr>
+	            		</j:forEach>
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
