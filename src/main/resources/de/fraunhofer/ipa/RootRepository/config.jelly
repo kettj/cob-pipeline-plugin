@@ -46,7 +46,7 @@
 			</f:entry>
 			<f:entry title="${%jobs}">
   				<table border="0" width="*">
-					<f:optionalBlock field="regularBuild" title="${%buildMatrix}">
+					<f:optionalBlock field="regularBuild" title="${%buildMatrix}" inline="true">
 				      	<f:entry title="Environment matrix">
 				        	<!--TODO matrix-->
 				      	</f:entry>
