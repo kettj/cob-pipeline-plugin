@@ -22,6 +22,9 @@
     	<f:entry title="${%robots}" field="robotsString">
     		<f:expandableTextbox />
     	</f:entry>
+    	<f:entry title="${%targetsURL}" field="targetsURL">
+    		<f:textbox default="https://raw.github.com/ros/rosdistro/master/releases/targets.yaml"/>
+    	</f:entry>
   	</f:section>
 </j:jelly>
 

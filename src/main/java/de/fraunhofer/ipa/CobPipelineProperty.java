@@ -48,11 +48,15 @@ import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -68,6 +72,8 @@ import org.kohsuke.stapler.QueryParameter;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
+
+import org.yaml.snakeyaml.*;
 
 /**
  * A UserProperty that can store a build pipeline
@@ -173,6 +179,10 @@ public class CobPipelineProperty extends UserProperty {
 		
 		private ArrayList<String> robots;
 		
+		private String targetsURL;
+		
+		private List<Map<String, List<String>>> targets;
+		
 		public DescriptorImpl() {
 			load();
 		}
@@ -275,7 +285,34 @@ public class CobPipelineProperty extends UserProperty {
         
         public List<String> getRobots() {
         	return Collections.unmodifiableList(robots);
-        }        
+        }
+        
+        public void setTargetsURL(String url) throws Exception{
+        	this.targetsURL = url;
+        	URL targets = new URL(url);
+            BufferedReader in = new BufferedReader(
+            		new InputStreamReader(targets.openStream()));
+            
+            String aux = "";
+            String yamlString = "";
+            while ((aux = in.readLine()) != null) {
+        		yamlString += aux;
+        		yamlString += "\n";
+            }
+            in.close();
+            
+            Yaml yaml = new Yaml();
+            this.targets = new ArrayList<Map<String, List<String>>>();
+            this.targets = (List<Map<String, List<String>>>) yaml.load(yamlString);
+        }
+        
+        public String getTargetsURL() {
+        	return this.targetsURL;
+        }
+        
+        public List<Map<String, List<String>>> getTargets() {
+        	return this.targets;
+        }
         
         //TODO enhance output and order
         /**
@@ -357,6 +394,14 @@ public class CobPipelineProperty extends UserProperty {
         	} catch (IOException ex) {
         		return FormValidation.error("Error occured while checking team existenz: "+ex.getMessage());
         	}
+        }
+        
+        public FormValidation doCheckTargets(@QueryParameter String value)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.warning("Please enter URL of the target platform yaml file");
+        	}
+        	return FormValidation.ok();
         }
         
         @Override
