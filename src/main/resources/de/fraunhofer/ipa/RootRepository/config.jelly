@@ -45,11 +45,13 @@
 		   		<f:combobox />
 			</f:entry>
 			<f:entry title="${%jobs}">
-  				<table border="0" width="*">
-					<f:optionalBlock field="regularBuild" title="${%buildMatrix}" inline="true">
-				      	<f:entry title="Environment matrix">
-				        	<!--TODO matrix-->
-				      	</f:entry>
+  				<table border="1" width="*">
+					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
+				      	<td valign="top" width="100"></td>
+				      	<td valign="top" width="150">${%ubuntu/arch}</td>
+				      	<td valign="top" width="50">${%amd64}</td>
+				      	<td valign="top" width="50">${%i386}</td>
+						<tr></tr>
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
