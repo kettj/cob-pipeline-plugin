@@ -96,6 +96,11 @@ public class RootRepository extends Repository {
 	private final ArrayList<String> jobs;
 	
 	/**
+	 * Hardware/robots to build code and run tests on
+	 */
+	private final ArrayList<String> robots;
+	
+	/**
 	 * Repository dependencies
 	 */
 	private final ArrayList<Repository> repoDeps;
@@ -123,6 +128,7 @@ public class RootRepository extends Repository {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
 		
+		this.robots = new ArrayList<String>();
 		this.jobs = new ArrayList<String>();
 		updateListItem(jobs, (regularBuild != null), "regular_build");
 		updateList(jobs, downstreamBuild, "downstream_build");
@@ -150,7 +156,11 @@ public class RootRepository extends Repository {
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
 		        if (value.equals("true")) {
-		        	list.add(StringUtils.join(key.split("(?=\\p{Upper})"), "_").toLowerCase());
+		        	if (key.endsWith("__robot")) {
+		        		this.robots.add(key.replace("__robot", ""));
+		        	} else {
+		        		list.add(StringUtils.join(key.split("(?=\\p{Upper})"), "_").toLowerCase());
+		        	}
 		        }
 			}
 		}
@@ -241,6 +251,10 @@ public class RootRepository extends Repository {
 	
 	public boolean getRelease() {
 		return this.jobs.contains("release");
+	}
+	
+	public boolean isRobotChecked(String robot) {
+		return this.robots.contains(robot);
 	}
 	
 	public List<Repository> getRepoDeps() {

@@ -171,6 +171,8 @@ public class CobPipelineProperty extends UserProperty {
 		
 		private ArrayList<String> allRosDistros;
 		
+		private ArrayList<String> robots;
+		
 		public DescriptorImpl() {
 			load();
 		}
@@ -254,6 +256,26 @@ public class CobPipelineProperty extends UserProperty {
         public List<String> getAllRosDistros() {
         	return Collections.unmodifiableList(allRosDistros);
         }
+        
+        public void setRobotsString(String robotsString) {
+        	this.robots = new ArrayList<String>(Arrays.asList(Util.tokenize(robotsString)));
+        }
+        
+        public String getRobotsString() {
+        	int len=0;
+            for (String robot : robots)
+                len += robot.length();
+            char delim = len>30 ? '\n' : ' ';
+            // Build string connected with delimiter, quoting as needed
+            StringBuilder buf = new StringBuilder(len+robots.size()*3);
+            for (String robot : robots)
+                buf.append(delim).append(QuotedStringTokenizer.quote(robot,""));
+            return buf.substring(1);
+        }
+        
+        public List<String> getRobots() {
+        	return Collections.unmodifiableList(robots);
+        }        
         
         //TODO enhance output and order
         /**
