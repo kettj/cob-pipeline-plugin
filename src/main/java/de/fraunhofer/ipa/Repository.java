@@ -51,7 +51,7 @@ import java.io.IOException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 
-public class Repository extends AbstractDescribableImpl<Repository> {
+public class Repository extends AbstractDescribableImpl<Repository> implements Comparable<Repository> {
 	
 	/**
 	 * name of repository
@@ -156,5 +156,8 @@ public class Repository extends AbstractDescribableImpl<Repository> {
     public static DescriptorExtensionList<Repository, RepositoryDescriptor> all() {
         return Jenkins.getInstance().<Repository, RepositoryDescriptor>getDescriptorList(Repository.class);
     }
-
+    
+    public int	compareTo(Repository that) {
+		return this.repoName.compareTo(that.repoName);
+	}
 }

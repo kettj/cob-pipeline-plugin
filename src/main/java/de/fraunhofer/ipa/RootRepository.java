@@ -401,4 +401,8 @@ public class RootRepository extends Repository {
     public static DescriptorExtensionList<Repository, RepositoryDescriptor> all() {
         return Jenkins.getInstance().<Repository, RepositoryDescriptor>getDescriptorList(Repository.class);
     }
+    
+    public int	compareTo(RootRepository that) {
+		return this.fullName.compareTo(that.fullName);
+	}
 }
