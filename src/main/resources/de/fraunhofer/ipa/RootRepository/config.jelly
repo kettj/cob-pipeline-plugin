@@ -10,13 +10,25 @@
 		<j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
+				<f:rowSet name="rosDistro">
+				<j:forEach var="g" items="${rosDistros}">
+					<td width="*">
+	                	<f:checkbox field="${g}" title="${g}" checked="${instance.isRosDistroChecked(g)}"/>
+	              	</td>
+	            </j:forEach>
+				</f:rowSet>		
+			</tr></tbody>
+		</table>
+		<!--j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
 				<j:forEach var="g" items="${rosDistros}">
 					<td width="*">
 	                	<f:checkbox field="${g}" title="${g}"/>
 	              	</td>
 	            </j:forEach>			
 			</tr></tbody>
-		</table>
+		</table-->
 	</f:entry>
 	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">

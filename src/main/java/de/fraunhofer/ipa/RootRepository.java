@@ -109,8 +109,7 @@ public class RootRepository extends Repository {
 	private final ArrayList<Repository> repoDeps;
 	
 	@DataBoundConstructor
-	public RootRepository(String repoName, String fullName, String suffix,
-			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+	public RootRepository(String repoName, String fullName, String suffix, JSONObject rosDistro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, List<Repository> repoDeps) {
@@ -123,10 +122,14 @@ public class RootRepository extends Repository {
 		this.suffix = suffix;
 		
 		this.rosDistro = new ArrayList<String>();
-		updateListItem(this.rosDistro, electric, "electric");
-		updateListItem(this.rosDistro, fuerte, "fuerte");
-		updateListItem(this.rosDistro, groovy, "groovy");
-		updateListItem(this.rosDistro, hydro, "hydro");
+		Iterator iter = rosDistro.keys();
+		while(iter.hasNext()){
+	        String key = (String)iter.next();
+	        String value = rosDistro.getString(key);
+	        if (value.equals("true")) {
+	        	updateListItem(this.rosDistro, true, key);
+	        }
+		}
 		
 		this.prioUbuntuDistro = prioUbuntuDistro;
 		this.prioArch = prioArch;
@@ -142,12 +145,11 @@ public class RootRepository extends Repository {
 		this.repoDeps = new ArrayList<Repository>(Util.fixNull(repoDeps));
 	}
 	
-	public RootRepository(String repoName, String fullName, String suffix,
-			boolean electric, boolean fuerte, boolean groovy, boolean hydro,
+	public RootRepository(String repoName, String fullName, String suffix, JSONObject rosDistro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, Repository... repoDeps) {
-		this(repoName, fullName, suffix, electric, fuerte, groovy, hydro,
+		this(repoName, fullName, suffix, rosDistro,
 				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild,
 				hardwareBuild, release, Arrays.asList(repoDeps));
 	}
@@ -203,20 +205,8 @@ public class RootRepository extends Repository {
 		return this.suffix;
 	}
 	
-	public boolean getElectric() {
-		return this.rosDistro.contains("electric");
-	}
-	
-	public boolean getFuerte() {
-		return this.rosDistro.contains("fuerte");
-	}
-	
-	public boolean getGroovy() {
-		return this.rosDistro.contains("groovy");
-	}
-	
-	public boolean getHydro() {
-		return this.rosDistro.contains("hydro");
+	public boolean isRosDistroChecked(String rosDistro) {
+		return this.rosDistro.contains(rosDistro);
 	}
 	
 	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
