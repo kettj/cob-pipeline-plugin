@@ -209,7 +209,9 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	doFillForkItems(repoName);
     	    	
     	if (value.length() == 0) {
-    		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
+    		return FormValidation.warning("Leave empty to use default fork '" +
+    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork() +
+    				"' otherwise enter fork name.");
     	}
     	
     	// check if given fork owner is in fork list
@@ -284,7 +286,9 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	
     	if (value.length() == 0) {
     		//TODO git master branch of repo
-    		return FormValidation.warning("Please enter branch name. Default: master");
+    		return FormValidation.warning("Leave empty to use default branch '" +
+    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch() +
+    				"' otherwise enter branch name.");
     	}
     	
     	// check if given branch is in branch list

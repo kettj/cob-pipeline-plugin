@@ -369,6 +369,10 @@ public class RootRepository extends Repository {
 			
 			return prioArchItems;
 		}
+		
+		public String getDefaultFork() {
+			return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+		}
         
         /**
          * All {@link RepositoryDescriptor}s
