@@ -21,7 +21,7 @@
 		</table>
 	</f:entry>
 	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
-		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
    					<f:select />
@@ -30,7 +30,7 @@
    		</table>
 	</f:entry>
 	<f:entry field="prioArch" title="${%Priority Architecture}">
-		<table align="left" border="0" cellpadding="5" cellspacing="0" width="20%">
+		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
    					<f:select />
@@ -50,15 +50,19 @@
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
   				<table border="0" width="*">
 					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
-				      	<td align="center" width="100"></td>
-				      	<td align="center" width="150"><b>${%ubuntu/arch}</b></td>
-				      	<td align="center" width="50">${%amd64}</td>
-				      	<td align="center" width="50">${%i386}</td>
+				      	<td width="*"></td>
+				      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
+				      	<th colspan="2" align="center" width="200"><font size="2px">${%arch}</font></th>
+						<tr></tr>
+				      	<td width="100"></td>
+				      	<td align="center" width="*"></td>
+				      	<td align="center" width="100"><b>${%amd64}</b></td>
+				      	<td align="center" width="100"><b>${%i386}</b></td>
 						<tr></tr>
 						<j:forEach var="u" items="${ubuntuReleases}">
-				      		<td valign="top" width="100"></td>
+				      		<td width="100"></td>
 							<td align="center" width="*">
-			                	${u}
+			                	<b>${u}</b> ${descriptor.getSupportedROS(u)}
 			              	</td>
 							<td align="center" width="*">
 			                	<f:checkbox field="${u}__amd64__env" checked="${instance.isMatrixEntryChecked(u, 'amd64')}"/>
@@ -87,21 +91,24 @@
 					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
 						<j:set var="robots" value="${descriptor.Robots}"/>
 						<td valign="top" width="150"></td>
-						<td valign="top" width="*">
+						<td valign="top" width="200">
 							<f:checkbox field="automaticHwTest" title="${%automaticHwTest}"/>
 						</td>
 						<tr></tr>
 						<td valign="top" width="150"></td>
-						<td valign="top" width="*">
+						<td valign="top" width="200">
 							<f:checkbox field="interactiveHwTest" title="${%interactiveHwTest}"/>
 						</td>
 						<tr></tr>
 						<td width="*"></td>
-						<td width="*">${%robots}</td>
+						<td width="200">${%robots}</td>
 						<j:forEach var="r" items="${robots}">
-							<td width="*">
+							<td align="left" width="*">
 			                	<f:checkbox field="${r}__robot" title="${r}" checked="${instance.isRobotChecked(r)}"/>
 			              	</td>
+							<tr></tr>
+							<td width="*"></td>
+							<td width="*"></td>
 			            </j:forEach>
 		    		</f:optionalBlock>
 		    	</table>

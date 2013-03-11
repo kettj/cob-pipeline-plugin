@@ -304,15 +304,32 @@ public class RootRepository extends Repository {
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
 	    	
 	    	for (Map<String, List<String>> ros : targets) {
-	    		for (List<String> ubuntuList : ros.values()) {
-	    			for (String ubuntu : ubuntuList) {
-	    				if (!ubuntuReleases.contains(ubuntu)) {
-	    					ubuntuReleases.add(ubuntu);
-	    				}
-	    			}
+	    		if (!ros.keySet().iterator().next().equals("backports")) {
+		    		for (List<String> ubuntuList : ros.values()) {
+		    			for (String ubuntu : ubuntuList) {
+		    				if (!ubuntuReleases.contains(ubuntu)) {
+		    					ubuntuReleases.add(ubuntu);
+		    				}
+		    			}
+		    		}
 	    		}
 	    	}
 	    	return ubuntuReleases;
+	    }
+	    
+	    public String getSupportedROS(String ubuntuDistro) {
+	    	List<String> rosDistros = new ArrayList<String>();	    	
+	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
+	    	
+	    	for (Map<String, List<String>> ros : targets) {
+	    		for (List<String> ubuntuList : ros.values()) {
+	    			if (ubuntuList.contains(ubuntuDistro) && !ros.keySet().iterator().next().equals("backports")) {
+	    				rosDistros.add(ros.keySet().iterator().next());
+	    			}
+	    		}
+	    	}
+	    		    	
+	    	return rosDistros.toString();
 	    }
 	    
 	    /**
@@ -339,7 +356,7 @@ public class RootRepository extends Repository {
 			
 			List<String> ubuntuDistros = getUbuntuReleases();
 			for (String ubuntuDistro : ubuntuDistros) {
-				prioDistroItems.add(ubuntuDistro);
+				prioDistroItems.add(ubuntuDistro + " " + getSupportedROS(ubuntuDistro), ubuntuDistro);
 			}
 			
 			return prioDistroItems;
