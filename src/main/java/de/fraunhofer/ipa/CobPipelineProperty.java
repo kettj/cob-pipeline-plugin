@@ -87,6 +87,10 @@ public class CobPipelineProperty extends UserProperty {
 	 */
 	private String email = null;
 	
+	private String defaultFork;
+	
+	private String defaultBranch;
+	
 	/**
 	 * user name
 	 */
@@ -113,7 +117,6 @@ public class CobPipelineProperty extends UserProperty {
 			// TODO: handle exception
 		}*/
 		this.userName = id;
-		this.email = email;
 		if (masterName == null) {
 			this.masterName = getMasterName();
 		}
@@ -136,6 +139,22 @@ public class CobPipelineProperty extends UserProperty {
 	
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public void setDefaultFork(String fork) {
+		this.defaultFork = fork;
+	}
+	
+	public String getDefaultFork() {
+		return this.defaultFork;
+	}
+	
+	public void setDefaultBranch(String branch) {
+		this.defaultBranch = branch;
+	}
+	
+	public String getDefaultBranch() {
+		return this.defaultBranch;
 	}
 	
 	private String getMasterName() {
@@ -182,6 +201,10 @@ public class CobPipelineProperty extends UserProperty {
 		private String targetsURL;
 		
 		private List<Map<String, List<String>>> targets;
+		
+		private String defaultFork;
+		
+		private String defaultBranch;
 		
 		public DescriptorImpl() {
 			load();
@@ -402,6 +425,34 @@ public class CobPipelineProperty extends UserProperty {
         		return FormValidation.warning("Please enter URL of the target platform yaml file");
         	}
         	return FormValidation.ok();
+        }
+        
+        public FormValidation doCheckDefaultFork(@QueryParameter String value)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.warning("Please enter default fork/owner.");
+        	}
+        	this.defaultFork = value;
+        	// TODO check if user exists
+        	return FormValidation.ok();
+        }
+        
+        public String getDefaultFork() {
+        	return this.defaultFork;
+        }
+        
+        public FormValidation doCheckDefaultBranch(@QueryParameter String value)
+        		throws IOException, ServletException {
+        	if (value.length() == 0) {
+        		return FormValidation.warning("Please enter default branch.");
+        		}
+        	this.defaultBranch = value;
+        	// TODO check if user exists
+        	return FormValidation.ok();
+        }
+        
+        public String getDefaultBranch() {
+        	return this.defaultBranch;
         }
         
         @Override

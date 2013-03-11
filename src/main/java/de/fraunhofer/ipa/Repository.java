@@ -82,12 +82,12 @@ public class Repository extends AbstractDescribableImpl<Repository> {
 	public Repository(String repoName, String fork, String branch, Boolean poll) {
 		this.repoName = repoName;
 		if (fork.length() == 0) {
-			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
 		} else {
 			this.fork = fork;
 		}
 		if (branch.length() == 0) {
-			this.branch = "master";
+			this.branch = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
 		} else {
 			this.branch = branch;
 		}
