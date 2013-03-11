@@ -155,9 +155,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public FormValidation doCheckRepoName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
-    	if (this.repoNameItems == null) {
-    		doFillRepoNameItems();
-    	}
+    	doFillRepoNameItems();
     	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter repository name. E.g. cob_common");
@@ -208,9 +206,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
     		throws IOException, ServletException {
     	
-    	if (this.forkItems == null) {
-    		doFillForkItems(repoName);
-    	}
+    	doFillForkItems(repoName);
     	    	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter fork owner. Default: "+Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg());
@@ -284,9 +280,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
     		throws IOException, ServletException {
     	
-    	if (this.branchItems == null) {
-    		doFillBranchItems(repoName, fork);
-    	}
+    	doFillBranchItems(repoName, fork);
     	
     	if (value.length() == 0) {
     		//TODO git master branch of repo
