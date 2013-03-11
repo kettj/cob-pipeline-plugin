@@ -337,11 +337,10 @@ public class RootRepository extends Repository {
 		public ListBoxModel doFillPrioUbuntuDistroItems() {
 			ListBoxModel prioDistroItems = new ListBoxModel();
 			
-			//TODO get list of ros_distro
-			//TODO get target platforms from github
-			//TODO calc possible ubuntu distros
-			prioDistroItems.add("test_distro1");
-			prioDistroItems.add("test_distro2");
+			List<String> ubuntuDistros = getUbuntuReleases();
+			for (String ubuntuDistro : ubuntuDistros) {
+				prioDistroItems.add(ubuntuDistro);
+			}
 			
 			return prioDistroItems;
 		}
