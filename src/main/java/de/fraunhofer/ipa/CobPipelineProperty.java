@@ -36,11 +36,15 @@
 
 package de.fraunhofer.ipa;
 
+import hudson.BulkChange;
 import hudson.Extension;
 import hudson.Util;
+import hudson.XmlFile;
+import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.RootAction;
 import hudson.model.User;
+import hudson.model.listeners.SaveableListener;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
 import hudson.tasks.MailAddressResolver;
@@ -49,14 +53,20 @@ import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Writer;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -484,7 +494,25 @@ public class CobPipelineProperty extends UserProperty {
 	
 	public void save() throws IOException {
         user.save();
+        try {
+        	Map<String, Object> data = new HashMap<String, Object>();
+        	data.put("user_name", this.userName);
+        	data.put("server_name", this.masterName);
+        	data.put("email", this.email);
+        	data.put("committer_email_enabled", true);
+        	data.put("repositories", this.rootRepos);
+        	Yaml yaml = new Yaml();
+        	yaml.dump(data, getPipelineConfigFile());
+        } catch (IOException e) {
+        	LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFile(),e);
+        }
     }
+        
+    private Writer getPipelineConfigFile() throws IOException {
+    	return new FileWriter(new File(Jenkins.getInstance().getRootDir(), "users/"+user.getId()+"/pipeline_config.yaml"));
+    }
+    
+    private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
 	
 	@Extension
 	public static class GlobalAction implements RootAction {
