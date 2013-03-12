@@ -500,7 +500,34 @@ public class CobPipelineProperty extends UserProperty {
         	data.put("server_name", this.masterName);
         	data.put("email", this.email);
         	data.put("committer_email_enabled", true);
-        	data.put("repositories", this.rootRepos);
+        	Map<String, Object> repos = new HashMap<String, Object>();
+        	for (RootRepository rootRepo : this.rootRepos) {
+        		Map<String, Object> repo = new HashMap<String, Object>();
+        		repo.put("type", rootRepo.type);
+        		repo.put("url", rootRepo.url);
+        		repo.put("version", rootRepo.branch);
+        		repo.put("poll", rootRepo.poll);
+        		repo.put("ros_distro", rootRepo.getRosDistro());
+        		repo.put("prio_ubuntu_distro", rootRepo.getPrioUbuntuDistro());
+        		repo.put("prio_arch", rootRepo.getPrioArch());
+        		repo.put("matrix_distro_arch", rootRepo.getMatrixDistroArch());
+        		repo.put("jobs", rootRepo.getJobs());
+        		repo.put("robots", rootRepo.getRobots());
+        		
+        		Map<String, Object> deps = new HashMap<String, Object>();
+        		for (Repository repoDep : rootRepo.getRepoDeps()) {
+            		Map<String, Object> dep = new HashMap<String, Object>();
+        			dep.put("type", repoDep.type);
+        			dep.put("url", repoDep.url);
+        			dep.put("version", repoDep.branch);
+        			dep.put("poll", repoDep.poll);
+        			deps.put(repoDep.repoName, dep);
+        		}
+        		repo.put("dependencies", deps);
+        		
+        		repos.put(rootRepo.fullName, repo);
+        	}
+        	data.put("repositories", repos);
         	Yaml yaml = new Yaml();
         	yaml.dump(data, getPipelineConfigFile());
         } catch (IOException e) {
