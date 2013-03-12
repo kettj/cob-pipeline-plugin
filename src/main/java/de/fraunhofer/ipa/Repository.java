@@ -78,8 +78,13 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	 */
 	protected String url;
 	
+	/**
+	 * type of VCS, e.g. git, svn, hp, cvs
+	 */
+	protected String type;
+	
 	@DataBoundConstructor
-	public Repository(String repoName, String fork, String branch, Boolean poll) {
+	public Repository(String repoName, String fork, String branch, Boolean poll) throws Exception {
 		this.repoName = repoName;
 		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
@@ -90,6 +95,12 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 			this.branch = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
 		} else {
 			this.branch = branch;
+		}
+		this.type = "git"; // right now only supported VCS is Git
+		if (this.type.equals("git")) {
+			this.url = "git@github.com:"+fork+"/"+repoName+".git";
+		} else {
+			throw new Exception("Given VCS type '"+type+"' is not supported");
 		}
 		this.poll = poll;
 	}
