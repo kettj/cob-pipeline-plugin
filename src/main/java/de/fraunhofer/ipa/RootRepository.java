@@ -112,7 +112,7 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix, JSONObject rosDistro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
-			boolean release, List<Repository> repoDeps) {
+			boolean release, List<Repository> repoDeps) throws Exception {
 		super(repoName, fork, branch, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
@@ -148,7 +148,7 @@ public class RootRepository extends Repository {
 	public RootRepository(String repoName, String fullName, String suffix, JSONObject rosDistro,
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
-			boolean release, Repository... repoDeps) {
+			boolean release, Repository... repoDeps) throws Exception {
 		this(repoName, fullName, suffix, rosDistro,
 				prioUbuntuDistro, prioArch, fork, branch, regularBuild, downstreamBuild,
 				hardwareBuild, release, Arrays.asList(repoDeps));
@@ -209,6 +209,10 @@ public class RootRepository extends Repository {
 		return this.rosDistro.contains(rosDistro);
 	}
 	
+	public List<String> getRosDistro() {
+		return this.rosDistro;
+	}
+	
 	public void setPrioUbuntuDistro(String prioUbuntuDistro) {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 	}
@@ -232,6 +236,10 @@ public class RootRepository extends Repository {
 			}
 		}
 		return false;
+	}
+	
+	public Map<String, List<String>> getMatrixDistroArch() {
+		return this.matrixDistroArch;
 	}
 	
 	public boolean getRegularBuild() {
@@ -266,8 +274,16 @@ public class RootRepository extends Repository {
 		return this.jobs.contains("release");
 	}
 	
+	public List<String> getJobs() {
+		return this.jobs;
+	}
+	
 	public boolean isRobotChecked(String robot) {
 		return this.robots.contains(robot);
+	}
+	
+	public List<String> getRobots() {
+		return this.robots;
 	}
 	
 	public List<Repository> getRepoDeps() {
