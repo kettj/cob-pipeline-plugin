@@ -530,13 +530,39 @@ public class CobPipelineProperty extends UserProperty {
 			data.put("repositories", repos);
 			Yaml yaml = new Yaml();
 			yaml.dump(data, getPipelineConfigFile());
+			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath());
+
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFile(),e);
+			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
+		}
+
+		// TODO clone repo, cp pipeline-config.yaml, commit, push
+
+		// copy pipeline-config.yaml into repository
+		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), "/home/jenkins/"};
+
+		Runtime rt = Runtime.getRuntime();
+		Process proc;
+		BufferedReader readIn, readErr = null;
+
+		try {
+			proc = rt.exec(cpCommand);
+			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" into repository");
+			if (readIn.readLine()!=null) LOGGER.log(Level.INFO, readIn.readLine());
+		} catch (IOException e) {
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to repository",e);
+			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
 		}
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
-		return new FileWriter(new File(Jenkins.getInstance().getRootDir(), "users/"+user.getId()+"/pipeline_config.yaml"));
+		return new FileWriter(getPipelineConfigFilePath());
+	}
+
+	private File getPipelineConfigFilePath() {
+		return new File(Jenkins.getInstance().getRootDir(), "users/"+user.getId()+"/pipeline_config.yaml");
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
