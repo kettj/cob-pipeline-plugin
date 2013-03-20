@@ -573,7 +573,9 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// copy pipeline-config.yaml into repository
-		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFolder.getAbsolutePath()}; // TODO check if repo exists; cp to subfolder 'server/user'
+		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
+		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
+		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()}; // TODO check if repo exists; cp to subfolder 'server/user'
 
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
@@ -583,14 +585,27 @@ public class CobPipelineProperty extends UserProperty {
 			proc = rt.exec(cpCommand);
 			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFolder.getAbsolutePath());
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
 			if (readIn.readLine()!=null) LOGGER.log(Level.INFO, readIn.readLine());
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFolder.getAbsolutePath(),e);
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath(),e);
 			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
 		}
+		
+		// add
+		try {
+			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
+			LOGGER.log(Level.INFO, "Successfully added file to configuration repository");
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+		}
 
-		// TODO commit
+		// commit
+		try {
+			git.commit().setMessage("Updated pipeline for"+this.userName);
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+		}
 
 		// TODO push
 
