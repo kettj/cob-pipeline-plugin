@@ -552,7 +552,7 @@ public class CobPipelineProperty extends UserProperty {
 		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
-		// check if config repo exists
+		// check if configuration repository exists
 		if (!configRepoFolder.isDirectory()) {
 			try {
 				Git.cloneRepository()
@@ -575,7 +575,7 @@ public class CobPipelineProperty extends UserProperty {
 		// copy pipeline-config.yaml into repository
 		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
 		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
-		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()}; // TODO check if repo exists; cp to subfolder 'server/user'
+		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()};
 
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
@@ -602,7 +602,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		// commit
 		try {
-			git.commit().setMessage("Updated pipeline for"+this.userName).call();
+			git.commit().setMessage("Updated pipeline configuration for "+this.userName).call();
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
 		}
