@@ -556,7 +556,11 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
 		}
 
-		// TODO clone repo, cp pipeline-config.yaml, commit, push
+		// TODO check if config repo exists
+		
+		// TODO if not clone
+		
+		// TODO else pull 
 
 		// copy pipeline-config.yaml into repository
 		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(),
@@ -578,6 +582,12 @@ public class CobPipelineProperty extends UserProperty {
 				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal(),e);
 			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
 		}
+		
+		// TODO commit
+		
+		// TODO push
+		
+		// TODO trigger python generation script 
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
