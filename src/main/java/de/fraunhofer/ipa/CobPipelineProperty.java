@@ -215,6 +215,10 @@ public class CobPipelineProperty extends UserProperty {
 		private String defaultFork;
 
 		private String defaultBranch;
+		
+		private String configRepoURL;
+		
+		private String configRepoLocal;
 
 		public DescriptorImpl() {
 			load();
@@ -345,6 +349,22 @@ public class CobPipelineProperty extends UserProperty {
 
 		public List<Map<String, List<String>>> getTargets() {
 			return this.targets;
+		}
+		
+		public void setConfigRepoURL(String configRepoURL) {
+			this.configRepoURL = configRepoURL;
+		}
+		
+		public String getConfigRepoURL() {
+			return this.configRepoURL;
+		}
+		
+		public void setConfigRepoLocal(String configRepoLocal) {
+			this.configRepoLocal = configRepoLocal;
+		}
+		
+		public String getConfigRepoLocal() {
+			return this.configRepoLocal;
 		}
 
 		//TODO enhance output and order
@@ -539,7 +559,8 @@ public class CobPipelineProperty extends UserProperty {
 		// TODO clone repo, cp pipeline-config.yaml, commit, push
 
 		// copy pipeline-config.yaml into repository
-		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), "/home/jenkins/"};
+		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(),
+				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal()}; // TODO check if repo exists; cp to subfolder 'server/user'
 
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
@@ -549,10 +570,12 @@ public class CobPipelineProperty extends UserProperty {
 			proc = rt.exec(cpCommand);
 			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" into repository");
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+
+					Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal());
 			if (readIn.readLine()!=null) LOGGER.log(Level.INFO, readIn.readLine());
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to repository",e);
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+
+				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal(),e);
 			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
 		}
 	}
