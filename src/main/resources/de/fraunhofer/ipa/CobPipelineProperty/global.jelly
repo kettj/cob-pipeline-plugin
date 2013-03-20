@@ -28,9 +28,6 @@
     	<f:entry title="${%configRepoURL}" field="configRepoURL">
     		<f:textbox />
     	</f:entry>
-    	<f:entry title="${%configRepoLocal}" field="configRepoLocal">
-    		<f:textbox />
-    	</f:entry>
   	</f:section>
 </j:jelly>
 
