@@ -602,12 +602,18 @@ public class CobPipelineProperty extends UserProperty {
 
 		// commit
 		try {
-			git.commit().setMessage("Updated pipeline for"+this.userName);
+			git.commit().setMessage("Updated pipeline for"+this.userName).call();
 		} catch (Exception e) {
 			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
 		}
 
-		// TODO push
+		// push
+		try {
+			git.push().call();
+			LOGGER.log(Level.INFO, "Successfully pushed configuration repository");
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
+		}
 
 		// TODO trigger python generation script 
 	}
