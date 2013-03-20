@@ -550,7 +550,7 @@ public class CobPipelineProperty extends UserProperty {
 		// clone/pull configuration repository
 		File configRepoFolder = new File(Jenkins.getInstance().getRootDir(), "pipeline/jenkins_config");
 		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
-		Git git = new Git(new FileRepository(configRepoFolder + ".git"));
+		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
 		// check if config repo exists
 		if (!configRepoFolder.isDirectory()) {
@@ -563,11 +563,13 @@ public class CobPipelineProperty extends UserProperty {
 			} catch (Exception ex) {
 				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
 			}
-			// TODO clone
-
 		} else {
-			// TODO pull 
-
+			try {
+				git.pull().call();
+				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL);
+			} catch (Exception ex) {
+				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
+			}
 		}
 
 		// copy pipeline-config.yaml into repository
