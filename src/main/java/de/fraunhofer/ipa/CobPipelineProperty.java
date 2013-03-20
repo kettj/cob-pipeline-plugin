@@ -39,7 +39,6 @@ package de.fraunhofer.ipa;
 import hudson.BulkChange;
 import hudson.Extension;
 import hudson.Util;
-import hudson.XmlFile;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.RootAction;
@@ -82,6 +81,8 @@ import org.kohsuke.stapler.QueryParameter;
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.storage.file.FileRepository;
 
 import org.yaml.snakeyaml.*;
 
@@ -215,9 +216,9 @@ public class CobPipelineProperty extends UserProperty {
 		private String defaultFork;
 
 		private String defaultBranch;
-		
+
 		private String configRepoURL;
-		
+
 		private String configRepoLocal;
 
 		public DescriptorImpl() {
@@ -350,19 +351,19 @@ public class CobPipelineProperty extends UserProperty {
 		public List<Map<String, List<String>>> getTargets() {
 			return this.targets;
 		}
-		
+
 		public void setConfigRepoURL(String configRepoURL) {
 			this.configRepoURL = configRepoURL;
 		}
-		
+
 		public String getConfigRepoURL() {
 			return this.configRepoURL;
 		}
-		
+
 		public void setConfigRepoLocal(String configRepoLocal) {
 			this.configRepoLocal = configRepoLocal;
 		}
-		
+
 		public String getConfigRepoLocal() {
 			return this.configRepoLocal;
 		}
@@ -556,11 +557,28 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
 		}
 
-		// TODO check if config repo exists
-		
-		// TODO if not clone
-		
-		// TODO else pull 
+		// clone/pull configuration repository
+		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal(), "jenkins_config");
+		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
+		Git git = new Git(new FileRepository(configRepoFolder + ".git"));
+
+		// check if config repo exists
+		if (!configRepoFolder.isDirectory()) {
+			try {
+				Git.cloneRepository()
+					.setURI(configRepoURL)
+					.setDirectory(configRepoFolder)
+					.call();
+				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL);
+			} catch (Exception ex) {
+				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
+			}
+			// TODO clone
+
+		} else {
+			// TODO pull 
+
+		}
 
 		// copy pipeline-config.yaml into repository
 		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(),
@@ -579,14 +597,14 @@ public class CobPipelineProperty extends UserProperty {
 			if (readIn.readLine()!=null) LOGGER.log(Level.INFO, readIn.readLine());
 		} catch (IOException e) {
 			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+
-				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal(),e);
+					Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoLocal(),e);
 			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
 		}
-		
+
 		// TODO commit
-		
+
 		// TODO push
-		
+
 		// TODO trigger python generation script 
 	}
 
