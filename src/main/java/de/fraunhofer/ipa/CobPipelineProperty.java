@@ -46,7 +46,6 @@ import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
-import hudson.tasks.MailAddressResolver;
 import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
@@ -119,37 +118,26 @@ public class CobPipelineProperty extends UserProperty {
 
 	@DataBoundConstructor
 	public CobPipelineProperty(String id) {
-		/*TODO check if LDAPSecurityRealm is used
-		 * 	   	check if MailAddressResolver is enabled
-		 * 		try to get email from there
-		 * try { 
-			this.email = 
-		} catch (Exception e) {
-			// TODO: handle exception
-		}*/
 		this.userName = id;
 		if (masterName == null) {
 			this.masterName = getMasterName();
 		}
 		this.rootRepos = rootRepos;
 	}
-
-	public String defaultEmail() {
-		if (email != null) {
-			return email;
-		} else {
-			return "enter your email address here";
-		}
-		//TODO 
-		/*else if (MailAddressResolver.resolve(User) == null) {
-			return "enter your email address here";
-		} else {
-			return MailAddressResolver.resolve(User);
-		}*/
-	}
-
+	
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getEmail() {
+		String addr = null;
+        if(this.user != null) {
+            Mailer.UserProperty mailProperty = this.user.getProperty(Mailer.UserProperty.class);
+            if (mailProperty != null) {
+                addr = mailProperty.getAddress();
+            }
+        }
+        return addr;
 	}
 
 	public void setDefaultFork(String fork) {
@@ -238,16 +226,10 @@ public class CobPipelineProperty extends UserProperty {
 		 */
 		public FormValidation doCheckEmail(@QueryParameter String value)
 				throws IOException, ServletException {
-			if (value.equals("enter your email address here")) {
-				return FormValidation.warning("email address not set yet");
+			if (value.length()==0) {
+				return FormValidation.error("Please enter your email address above");
 			}
-			try {
-				InternetAddress emailAddr = new InternetAddress(value);
-				emailAddr.validate();
-				return FormValidation.ok();
-			} catch (AddressException ex) {
-				return FormValidation.error("invalid email address");
-			}
+			return FormValidation.ok();
 		}
 
 		public void setGithubOrg(String githubOrg) {
