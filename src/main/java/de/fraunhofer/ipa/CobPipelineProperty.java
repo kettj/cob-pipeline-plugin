@@ -579,17 +579,21 @@ public class CobPipelineProperty extends UserProperty {
 
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
-		BufferedReader readIn, readErr = null;
-
+		BufferedReader readIn, readErr;
+		String s;
+		proc = rt.exec(cpCommand);
 		try {
-			proc = rt.exec(cpCommand);
 			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
-			if (readIn.readLine()!=null) LOGGER.log(Level.INFO, readIn.readLine());
+			while ((s = readIn.readLine()) != null) {
+				LOGGER.log(Level.INFO, s);
+	        }
 		} catch (IOException e) {
+			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
 			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath(),e);
-			if (readErr.readLine()!=null) LOGGER.log(Level.WARNING, readErr.readLine());
+			while ((s = readErr.readLine()) != null) {
+				LOGGER.log(Level.INFO, s);
+	        }
 		}
 		
 		// add
@@ -615,7 +619,23 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
 		}
 
-		// TODO trigger python generation script 
+		// TODO trigger python generation script
+		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/test.py", this.userName};
+		
+		proc = rt.exec(generationCall);
+		try {
+			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+			LOGGER.log(Level.INFO, "Successfully generated pipeline");
+			while ((s = readIn.readLine()) != null) {
+				LOGGER.log(Level.INFO, s);
+	        }
+		} catch (IOException e) {
+			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+			LOGGER.log(Level.WARNING, "Failed to generate pipeline", e);
+			while ((s = readErr.readLine()) != null) {
+				LOGGER.log(Level.INFO, s);
+	        }
+		}
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
