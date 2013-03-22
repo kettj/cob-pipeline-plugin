@@ -580,20 +580,18 @@ public class CobPipelineProperty extends UserProperty {
 		Runtime rt = Runtime.getRuntime();
 		Process proc;
 		BufferedReader readIn, readErr;
-		String s;
+		String s, feedback;
 		proc = rt.exec(cpCommand);
-		try {
-			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+		feedback = "";
+		while ((s = readErr.readLine()) != null) feedback += s+"\n";
+		if (feedback.length()!=0) {
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
+			LOGGER.log(Level.WARNING, feedback);
+		}
+		else {
 			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
-			while ((s = readIn.readLine()) != null) {
-				LOGGER.log(Level.INFO, s);
-	        }
-		} catch (IOException e) {
-			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath(),e);
-			while ((s = readErr.readLine()) != null) {
-				LOGGER.log(Level.INFO, s);
-	        }
 		}
 		
 		// add
@@ -619,23 +617,25 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
 		}
 
-		// TODO trigger python generation script
-		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/test.py", this.userName};
+		// trigger Python job generation script
+		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py", this.userName};
 		
 		proc = rt.exec(generationCall);
-		try {
-			readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
-			LOGGER.log(Level.INFO, "Successfully generated pipeline");
-			while ((s = readIn.readLine()) != null) {
-				LOGGER.log(Level.INFO, s);
-	        }
-		} catch (IOException e) {
-			readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
-			LOGGER.log(Level.WARNING, "Failed to generate pipeline", e);
-			while ((s = readErr.readLine()) != null) {
-				LOGGER.log(Level.INFO, s);
-	        }
-		}
+		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+		feedback = "";
+		while ((s = readErr.readLine()) != null) feedback += s+"\n";
+		if (feedback.length()!=0) {
+			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
+			LOGGER.log(Level.WARNING, feedback);
+		} else {
+			feedback = "";
+			while ((s = readIn.readLine()) != null) feedback += s+"\n";
+			if (feedback.length()!=0) {
+				LOGGER.log(Level.INFO, feedback);
+				LOGGER.log(Level.INFO, "Successfully generated pipeline");
+			}
+		}		
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
