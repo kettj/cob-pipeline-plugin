@@ -77,6 +77,7 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
@@ -505,6 +506,13 @@ public class CobPipelineProperty extends UserProperty {
 
 	public void save() throws IOException {
 		user.save();
+		LOGGER.log(Level.INFO, "Saved user configuration");
+	}
+		
+	@JavaScriptMethod
+	public String doGeneratePipeline() throws IOException {
+		String response = "";
+		save();
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("user_name", this.userName);
@@ -628,14 +636,17 @@ public class CobPipelineProperty extends UserProperty {
 		if (feedback.length()!=0) {
 			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
 			LOGGER.log(Level.WARNING, feedback);
+			return response + feedback + "\nPipeline generation failed";
 		} else {
 			feedback = "";
 			while ((s = readIn.readLine()) != null) feedback += s+"\n";
 			if (feedback.length()!=0) {
 				LOGGER.log(Level.INFO, feedback);
 				LOGGER.log(Level.INFO, "Successfully generated pipeline");
+				response += feedback;
 			}
-		}		
+		}
+		return response + "\nPipeline generated";
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
