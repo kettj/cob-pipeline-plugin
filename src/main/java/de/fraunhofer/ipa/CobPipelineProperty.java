@@ -647,7 +647,7 @@ public class CobPipelineProperty extends UserProperty {
 				response += feedback;
 			}
 		}
-		return response + "\nPipeline generated";
+		return response.replace("\n", "\\n") + "\\nPipeline generated";
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
