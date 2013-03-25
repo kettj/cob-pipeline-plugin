@@ -626,7 +626,8 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// trigger Python job generation script
-		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py", this.userName};
+		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
+				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(), this.userName};
 		
 		proc = rt.exec(generationCall);
 		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
