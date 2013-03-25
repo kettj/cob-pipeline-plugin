@@ -637,7 +637,7 @@ public class CobPipelineProperty extends UserProperty {
 		if (feedback.length()!=0) {
 			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
 			LOGGER.log(Level.WARNING, feedback);
-			return response + feedback + "\nPipeline generation failed";
+			return response.replace("\n", "<br>") + feedback.replace("\n", "<br>") + "<br><font color=\"red\">Pipeline generation failed</font>";
 		} else {
 			feedback = "";
 			while ((s = readIn.readLine()) != null) feedback += s+"\n";
@@ -647,7 +647,7 @@ public class CobPipelineProperty extends UserProperty {
 				response += feedback;
 			}
 		}
-		return response.replace("\n", "\\n") + "\\nPipeline generated";
+		return response.replace("\n", "<br>") + "<br><font color=\"green\">Pipeline generated</font>";
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {

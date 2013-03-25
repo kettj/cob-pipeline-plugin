@@ -15,23 +15,35 @@
 	    			   items="${instance.rootRepos}"
 	    			   addCaption="${%Add repository}"/>
 	</f:block>
-	<f:entry title="${%generation}" help="/plugin/cob-pipeline/help-generateButton.html" >
-  		<input type="button" name="${%generate}" value="${%generate}" id="generateButton" style="margin-left:5em" onclick="generate()" onmouseover="updateGenButton(this.form)"/>
-		<div id="msg" />
-  	</f:entry>
+	<f:block title="${%generation}" help="/plugin/cob-pipeline/help-generateButton.html" >
+		<div style="float:left" help="/plugin/cob-pipeline/help-generateButton.html">
+  			<input type="button" name="${%generate}" value="${%generate}" id="generateButton" style="margin-left:5em" onclick="generate()" onmouseover="updateGenButton(this.form)"/>
+		</div>
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
+              	<td width="*">
+              		<div id="msg" />
+              	</td>
+			</tr></tbody>
+		</table>
+  	</f:block>
   	<script>
   		var inst = <st:bind value="${instance}"/>
   		
   		var genButton = makeButton($('generateButton'),null);
   		
   		function generate(form) {
-  			genButton.set('disabled',false,false);
-  			inst.doGeneratePipeline(function(t) {
+  			genButton.set('disabled',true,false);
+  			document.getElementById('msg').innerHTML = '<img src="${imagesURL}/spinner.gif" /> ${%generating}';
+  			
+			inst.doGeneratePipeline( function (t) 
+			{
   				document.getElementById('msg').innerHTML = t.responseObject();
+  				genButton.set('disabled',false,false);
   			});
-  			document.getElementById('msg').innerHTML = "OK4";
-  			updateGenButton(form);
+			
   		}
+  		  		
   		
   		function updateGenButton(form) {
 	      	function state() {
