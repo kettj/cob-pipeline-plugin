@@ -131,14 +131,16 @@ public class CobPipelineProperty extends UserProperty {
 	}
 	
 	public String getEmail() {
-		String addr = null;
+		if(!this.email.isEmpty()) {
+			return this.email;
+		}
         if(this.user != null) {
             Mailer.UserProperty mailProperty = this.user.getProperty(Mailer.UserProperty.class);
             if (mailProperty != null) {
-                addr = mailProperty.getAddress();
+                return mailProperty.getAddress();
             }
         }
-        return addr;
+        return "";
 	}
 
 	public void setDefaultFork(String fork) {
