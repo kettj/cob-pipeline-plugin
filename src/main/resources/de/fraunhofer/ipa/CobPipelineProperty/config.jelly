@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:entry title="${%email}" field="email">
-        <f:textbox />
+        <f:textbox id="email" onchange="updateGenButton(this.form)"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
         <f:textbox default="${descriptor.getGithubOrg()}"/>
@@ -59,13 +59,18 @@
 	      	function state() {
 		      	
 				var repos = document.getElementsByName('repoName');
+				var email = document.getElementById('email');
 		      	
-				if (repos.length!=0) {
-		        	document.getElementById('status').innerHTML = "${%ready}";
-		        	return false;
-		        }
-		        document.getElementById('status').innerHTML = "${%noRepo}";
-		        return true;
+		      	if (repos.length==0) {
+			      	document.getElementById('status').innerHTML = "${%noRepo}";
+			        return true;
+			    }
+			    if (email.value.length==0) {
+			    	document.getElementById('status').innerHTML = "${%noEmail}";
+			    	return true;
+			    }
+		        document.getElementById('status').innerHTML = "${%ready}";
+		        return false;
 	      	}
 	      
 	      	genButton.set('disabled',state(),false);
