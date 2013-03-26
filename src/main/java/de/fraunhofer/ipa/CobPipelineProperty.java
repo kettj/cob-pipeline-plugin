@@ -510,8 +510,9 @@ public class CobPipelineProperty extends UserProperty {
 	}
 		
 	@JavaScriptMethod
-	public String doGeneratePipeline() throws IOException {
-		String response = "";
+	public JSONObject doGeneratePipeline() throws IOException {
+		JSONObject response  = new JSONObject();
+		String message = "";
 		save();
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
@@ -579,7 +580,7 @@ public class CobPipelineProperty extends UserProperty {
 				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
 			}
 		}
-
+		
 		// copy pipeline-config.yaml into repository
 		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
 		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
@@ -637,17 +638,21 @@ public class CobPipelineProperty extends UserProperty {
 		if (feedback.length()!=0) {
 			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
 			LOGGER.log(Level.WARNING, feedback);
-			return response.replace("\n", "<br>") + feedback.replace("\n", "<br>") + "<br><font color=\"red\">Pipeline generation failed</font>";
+			response.put("message", feedback.replace("\n", "<br/>"));
+			response.put("status", "<br/><font color=\"red\">Pipeline generation failed</font>");
+			return response;
 		} else {
 			feedback = "";
 			while ((s = readIn.readLine()) != null) feedback += s+"\n";
 			if (feedback.length()!=0) {
 				LOGGER.log(Level.INFO, feedback);
 				LOGGER.log(Level.INFO, "Successfully generated pipeline");
-				response += feedback;
+				message += feedback;
 			}
 		}
-		return response.replace("\n", "<br>") + "<br><font color=\"green\">Pipeline generated</font>";
+		response.put("message", message.replace("\n", "<br/>"));
+		response.put("status", "<br/><font color=\"green\">Pipeline generated</font>");
+		return response;
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
