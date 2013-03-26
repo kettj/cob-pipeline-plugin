@@ -122,7 +122,7 @@
   	</f:entry>
   	<f:entry title="${%repoDeps}" field="repoDeps">
 	    <f:repeatable field="repoDeps" noAddButton="true" minimum="0" header="${%repoDep}">
-			<div style="border:1px solid gray">
+			<div style="background-color:gainsboro">
 	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->
 	     	<table width="100%">
 	        	<st:include class="${descriptor.clazz}" page="config.jelly" />
