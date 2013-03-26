@@ -61,10 +61,10 @@
 				var repos = document.getElementsByName('repoName');
 		      	
 				if (repos.length!=0) {
-		        	document.getElementById('status').innerHTML = "Ready";
+		        	document.getElementById('status').innerHTML = "${%ready}";
 		        	return false;
 		        }
-		        document.getElementById('status').innerHTML = "Choose one or more repositories to test!";
+		        document.getElementById('status').innerHTML = "${%noRepo}";
 		        return true;
 	      	}
 	      
