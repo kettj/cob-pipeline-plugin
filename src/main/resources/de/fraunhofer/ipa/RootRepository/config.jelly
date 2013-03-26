@@ -121,9 +121,8 @@
   		</f:advanced>
   	</f:entry>
   	<f:entry title="${%repoDeps}" field="repoDeps">
-	    <f:repeatable field="repoDeps" noAddButton="true" minimum="0" header="${%repoDep}">
-			<div style="background-color:gainsboro">
-	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->
+	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0" header="${%repoDep}">
+			<div style="border:2px solid gray">
 	     	<table width="100%">
 	        	<st:include class="${descriptor.clazz}" page="config.jelly" />
 	
@@ -133,10 +132,7 @@
 	          		</div>
 	        	</f:entry>
 	      	</table>
-	      	</div> 
-      		<div align="left">
-        		<input type="button" value="${%addDep}" class="repeatable-add show-if-last" />
-      		</div>     	
+	      	</div>    	
 	    </f:repeatable>
 	 </f:entry>
 </j:jelly>
