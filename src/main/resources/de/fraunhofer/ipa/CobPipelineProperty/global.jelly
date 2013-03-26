@@ -25,6 +25,9 @@
     	<f:entry title="${%targetsURL}" field="targetsURL">
     		<f:textbox default="https://raw.github.com/ros/rosdistro/master/releases/targets.yaml"/>
     	</f:entry>
+    	<f:entry title="${%configRepoURL}" field="configRepoURL">
+    		<f:textbox />
+    	</f:entry>
   	</f:section>
 </j:jelly>
 

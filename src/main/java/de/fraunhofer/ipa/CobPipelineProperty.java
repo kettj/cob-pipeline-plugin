@@ -39,7 +39,6 @@ package de.fraunhofer.ipa;
 import hudson.BulkChange;
 import hudson.Extension;
 import hudson.Util;
-import hudson.XmlFile;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.RootAction;
@@ -77,10 +76,13 @@ import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.storage.file.FileRepository;
 
 import org.yaml.snakeyaml.*;
 
@@ -203,6 +205,8 @@ public class CobPipelineProperty extends UserProperty {
 		private String defaultFork;
 
 		private String defaultBranch;
+
+		private String configRepoURL;
 
 		public DescriptorImpl() {
 			load();
@@ -327,6 +331,14 @@ public class CobPipelineProperty extends UserProperty {
 
 		public List<Map<String, List<String>>> getTargets() {
 			return this.targets;
+		}
+
+		public void setConfigRepoURL(String configRepoURL) {
+			this.configRepoURL = configRepoURL;
+		}
+
+		public String getConfigRepoURL() {
+			return this.configRepoURL;
 		}
 
 		//TODO enhance output and order
@@ -476,6 +488,14 @@ public class CobPipelineProperty extends UserProperty {
 
 	public void save() throws IOException {
 		user.save();
+		LOGGER.log(Level.INFO, "Saved user configuration");
+	}
+		
+	@JavaScriptMethod
+	public JSONObject doGeneratePipeline() throws IOException {
+		JSONObject response  = new JSONObject();
+		String message = "";
+		save();
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("user_name", this.userName);
@@ -512,13 +532,117 @@ public class CobPipelineProperty extends UserProperty {
 			data.put("repositories", repos);
 			Yaml yaml = new Yaml();
 			yaml.dump(data, getPipelineConfigFile());
+			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath());
+
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFile(),e);
+			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
 		}
+
+		// clone/pull configuration repository
+		File configRepoFolder = new File(Jenkins.getInstance().getRootDir(), "pipeline/jenkins_config");
+		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
+		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
+
+		// check if configuration repository exists
+		if (!configRepoFolder.isDirectory()) {
+			try {
+				Git.cloneRepository()
+					.setURI(configRepoURL)
+					.setDirectory(configRepoFolder)
+					.call();
+				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL);
+			} catch (Exception ex) {
+				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
+			}
+		} else {
+			try {
+				git.pull().call();
+				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL);
+			} catch (Exception ex) {
+				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
+			}
+		}
+		
+		// copy pipeline-config.yaml into repository
+		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
+		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
+		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()};
+
+		Runtime rt = Runtime.getRuntime();
+		Process proc;
+		BufferedReader readIn, readErr;
+		String s, feedback;
+		proc = rt.exec(cpCommand);
+		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+		feedback = "";
+		while ((s = readErr.readLine()) != null) feedback += s+"\n";
+		if (feedback.length()!=0) {
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
+			LOGGER.log(Level.WARNING, feedback);
+		}
+		else {
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
+		}
+		
+		// add
+		try {
+			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
+			LOGGER.log(Level.INFO, "Successfully added file to configuration repository");
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+		}
+
+		// commit
+		try {
+			git.commit().setMessage("Updated pipeline configuration for "+this.userName).call();
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+		}
+
+		// push
+		try {
+			git.push().call();
+			LOGGER.log(Level.INFO, "Successfully pushed configuration repository");
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
+		}
+
+		// trigger Python job generation script
+		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
+				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(), this.userName};
+		
+		proc = rt.exec(generationCall);
+		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+		readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+		feedback = "";
+		while ((s = readErr.readLine()) != null) feedback += s+"\n";
+		if (feedback.length()!=0) {
+			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
+			LOGGER.log(Level.WARNING, feedback);
+			response.put("message", feedback.replace("\n", "<br/>"));
+			response.put("status", "<font color=\"red\">Pipeline generation failed</font>");
+			return response;
+		} else {
+			feedback = "";
+			while ((s = readIn.readLine()) != null) feedback += s+"\n";
+			if (feedback.length()!=0) {
+				LOGGER.log(Level.INFO, feedback);
+				LOGGER.log(Level.INFO, "Successfully generated pipeline");
+				message += feedback;
+			}
+		}
+		response.put("message", message.replace("\n", "<br/>"));
+		response.put("status", "<font color=\"green\">Pipeline generated</font>");
+		return response;
 	}
 
 	private Writer getPipelineConfigFile() throws IOException {
-		return new FileWriter(new File(Jenkins.getInstance().getRootDir(), "users/"+user.getId()+"/pipeline_config.yaml"));
+		return new FileWriter(getPipelineConfigFilePath());
+	}
+
+	private File getPipelineConfigFilePath() {
+		return new File(Jenkins.getInstance().getRootDir(), "users/"+user.getId()+"/pipeline_config.yaml");
 	}
 
 	private static final Logger LOGGER = Logger.getLogger(Descriptor.class.getName());
