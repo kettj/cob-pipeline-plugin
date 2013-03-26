@@ -639,7 +639,7 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
 			LOGGER.log(Level.WARNING, feedback);
 			response.put("message", feedback.replace("\n", "<br/>"));
-			response.put("status", "<br/><font color=\"red\">Pipeline generation failed</font>");
+			response.put("status", "<font color=\"red\">Pipeline generation failed</font>");
 			return response;
 		} else {
 			feedback = "";
@@ -651,7 +651,7 @@ public class CobPipelineProperty extends UserProperty {
 			}
 		}
 		response.put("message", message.replace("\n", "<br/>"));
-		response.put("status", "<br/><font color=\"green\">Pipeline generated</font>");
+		response.put("status", "<font color=\"green\">Pipeline generated</font>");
 		return response;
 	}
 

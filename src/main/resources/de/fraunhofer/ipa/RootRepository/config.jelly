@@ -121,17 +121,22 @@
   		</f:advanced>
   	</f:entry>
   	<f:entry title="${%repoDeps}" field="repoDeps">
-	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0" header="${%repoDep}">
+	    <f:repeatable field="repoDeps" noAddButton="true" minimum="0" header="${%repoDep}">
+			<div style="border:1px solid gray">
 	      	<j:set var="instance" value="${instance.descriptor!=descriptor?null:instance}"/><!-- work around until 1.382 -->
 	     	<table width="100%">
 	        	<st:include class="${descriptor.clazz}" page="config.jelly" />
 	
 	        	<f:entry>
 	          		<div align="right">
-	            		<input type="button" value="${%delete_dep}" class="repeatable-delete" style="margin-left: 1em;" />
+	            		<input type="button" value="${%delDep}" class="repeatable-delete" style="margin-left: 1em;" />
 	          		</div>
 	        	</f:entry>
 	      	</table>
+	      	</div> 
+      		<div align="left">
+        		<input type="button" value="${%addDep}" class="repeatable-add show-if-last" />
+      		</div>     	
 	    </f:repeatable>
 	 </f:entry>
 </j:jelly>
