@@ -7,7 +7,7 @@
   </s:documentation>
   <input type="hidden" name="core:generation" value="" />
   <input type="button" value="${%Generation}" class="generation-button generationButton" /><!-- generationButton is legacy -->
-  <script>
+  <script>var inst = <st:bind value="${instance}"/>
   	Behaviour.specify("INPUT.generation-button", 'generation', 0, function (e) {
         var id;
         var containerId = "container"+(iota++);
@@ -36,6 +36,7 @@
 
         makeButton(e,function (e) {
             var f = findAncestor(e.target, "FORM");
+            
 
             // create a throw-away IFRAME to avoid back button from loading the POST result back
             id = "iframe"+(iota++);
@@ -67,6 +68,7 @@
             try {
                 buildFormTree(f);
                 f.submit();
+                inst.doGeneratePipeline();
             } finally {
                 f.elements['core:generation'].value = null;
                 f.target = null;
