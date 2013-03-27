@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<f:entry title="${%title}" field="email">
-        <f:textbox readOnly="yes" />
+	<f:entry title="${%email}" field="email">
+        <f:textbox id="email" onchange="updateGenButton(this.form)"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
         <f:textbox default="${descriptor.getGithubOrg()}"/>
@@ -9,10 +9,72 @@
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
         <f:textbox default="master"/>
 	</f:entry>
-	<f:block>
+	<f:block >
 	    <f:hetero-list name="rootRepos" hasHeader="true"
 	    			   descriptors="${descriptor.rootRepositoryDescriptors}"
 	    			   items="${instance.rootRepos}"
-	    			   addCaption="${%Add repository}"/>
+	    			   addCaption="${%addRepo}"
+	    			   deleteCaption="${%delRepo}"/>
 	</f:block>
+	<f:block>
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
+				<td width="150">
+              		<div style="float:left" help="/plugin/cob-pipeline/help-generateButton.html">
+			  			<input type="button" name="${%generate}" value="${%generate}" id="generateButton" style="margin-left:5em" onclick="generate()" onmouseover="updateGenButton(this.form)"/>
+					</div>
+              	</td>
+              	<td width="*" style="vertical-align:middle">
+              		<div id="status" />
+              	</td>
+            </tr><tr>
+            	<td width="150"></td>
+            	<td width="*">
+              		<div id="msg" />
+              	</td>
+			</tr></tbody>
+		</table>
+  	</f:block>
+  	<script>
+  		var inst = <st:bind value="${instance}"/>
+  		
+  		var genButton = makeButton($('generateButton'),null);
+  		
+  		function generate(form) {
+  			genButton.set('disabled',true,false);
+  			document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
+  			document.getElementById('msg').innerHTML = '';
+  			
+			inst.doGeneratePipeline( function (t) 
+			{
+  				document.getElementById('status').innerHTML = '<b>' + t.responseObject().status + '</b>';
+  				document.getElementById('msg').innerHTML = t.responseObject().message;
+  				genButton.set('disabled',false,false);
+  			});
+			
+  		}
+  		  		
+  		
+  		function updateGenButton(form) {
+	      	function state() {
+		      	
+				var repos = document.getElementsByName('repoName');
+				var email = document.getElementById('email');
+		      	
+		      	if (repos.length==0) {
+			      	document.getElementById('status').innerHTML = "${%noRepo}";
+			        return true;
+			    }
+			    if (email.value.length==0) {
+			    	document.getElementById('status').innerHTML = "${%noEmail}";
+			    	return true;
+			    }
+		        document.getElementById('status').innerHTML = "${%ready}";
+		        return false;
+	      	}
+	      
+	      	genButton.set('disabled',state(),false);
+	    }
+	    updateGenButton(genButton.getForm());
+  	</script>
 </j:jelly>
