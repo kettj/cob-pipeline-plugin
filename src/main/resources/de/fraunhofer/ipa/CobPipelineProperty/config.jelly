@@ -35,6 +35,9 @@
 			</tr></tbody>
 		</table>
   	</f:block>
+  	<f:entry title="gen_test">
+        <f:generation />
+	</f:entry>
   	<script>
   		var inst = <st:bind value="${instance}"/>
   		
