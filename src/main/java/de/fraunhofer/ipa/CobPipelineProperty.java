@@ -497,7 +497,11 @@ public class CobPipelineProperty extends UserProperty {
 	public JSONObject doGeneratePipeline() throws IOException {
 		JSONObject response  = new JSONObject();
 		String message = "";
-		save();
+		try { // HACK to give submit() enough time to save config.xml
+		    Thread.sleep(2000);
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("user_name", this.userName);

@@ -22,6 +22,7 @@
 				<td width="150">
               		<div style="float:left" help="/plugin/cob-pipeline/help-generateButton.html">
 			  			<input type="button" name="${%generate}" value="${%generate}" id="generateButton" style="margin-left:5em" onclick="generate()" onmouseover="updateGenButton(this.form)"/>
+        				<f:generation />
 					</div>
               	</td>
               	<td width="*" style="vertical-align:middle">
@@ -35,18 +36,15 @@
 			</tr></tbody>
 		</table>
   	</f:block>
-  	<f:entry title="gen_test">
-        <f:generation />
-	</f:entry>
   	<script>
   		var inst = <st:bind value="${instance}"/>
   		
   		var genButton = makeButton($('generateButton'),null);
   		
-  		function generate(form) {
-  			genButton.set('disabled',true,false);
-  			document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
-  			document.getElementById('msg').innerHTML = '';
+  		function generate() {
+  			//genButton.set('disabled',true,false);
+  			//document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
+  			//document.getElementById('msg').innerHTML = '';
   			
 			inst.doGeneratePipeline( function (t) 
 			{

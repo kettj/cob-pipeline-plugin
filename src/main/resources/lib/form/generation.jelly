@@ -50,14 +50,14 @@
                 if (target.contentWindow &amp;&amp; target.contentWindow.generationCompletionHandler) {
                     // generation-aware server is expected to set this handler
                     target.contentWindow.generationCompletionHandler(window);
-                } else {
+                } /*else {
                     // otherwise this is possibly an error from the server, so we need to render the whole content.
                     var r = YAHOO.util.Dom.getClientRegion();
                     responseDialog.cfg.setProperty("width",r.width*3/4+"px");
                     responseDialog.cfg.setProperty("height",r.height*3/4+"px");
                     responseDialog.center();
                     responseDialog.show();
-                }
+                }*/
                 window.setTimeout(function() {// otherwise Firefox will fail to leave the "connecting" state
                     $(id).remove();
                 },0)
@@ -66,9 +66,18 @@
             f.target = target.id;
             f.elements['core:generation'].value = "true";
             try {
+		  		genButton.set('disabled',true,false);
+		  		document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
+		  		document.getElementById('msg').innerHTML = '';
                 buildFormTree(f);
                 f.submit();
-                inst.doGeneratePipeline();
+                generate();
+                /*inst.doGeneratePipeline( function (t) 
+				{
+	  				document.getElementById('status').innerHTML = '<b>' + t.responseObject().status + '</b>';
+	  				document.getElementById('msg').innerHTML = t.responseObject().message;
+	  				genButton.set('disabled',false,false);
+	  			});*/
             } finally {
                 f.elements['core:generation'].value = null;
                 f.target = null;
