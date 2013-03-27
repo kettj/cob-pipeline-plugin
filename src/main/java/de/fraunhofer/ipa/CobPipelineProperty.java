@@ -46,7 +46,7 @@ import hudson.model.User;
 import hudson.model.listeners.SaveableListener;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
-import hudson.tasks.Mailer;
+//import hudson.tasks.Mailer;
 import hudson.util.FormValidation;
 import hudson.util.QuotedStringTokenizer;
 
@@ -134,12 +134,12 @@ public class CobPipelineProperty extends UserProperty {
 		if(!this.email.isEmpty()) {
 			return this.email;
 		}
-        if(this.user != null) {
+        /*if(this.user != null) {
             Mailer.UserProperty mailProperty = this.user.getProperty(Mailer.UserProperty.class);
             if (mailProperty != null) {
                 return mailProperty.getAddress();
             }
-        }
+        }*/
         return "";
 	}
 
