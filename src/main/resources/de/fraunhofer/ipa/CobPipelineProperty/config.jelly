@@ -56,19 +56,34 @@
     </f:bottomButtonBar>
   	<script>
   		function validate() {
-  			var repos = document.getElementsByName('repoName');
 			var email = document.getElementById('email');
-					      	
-	      	if (repos.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Repository"/>';
-		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
-		        return false;
-		    }
+  			var repos = document.getElementsByName('repoName');
+  			var deps = document.getElementsByName('depName');
+					
 		    if (email.value.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Email"/>';
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
 		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
 		    	return false;
 		    }
+		    			      	
+	      	if (repos.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
+		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
+		        return false;
+		    }
+		    
+		    for (i=0;i&lt;deps.length;i++) {
+		    	for (j=0;j&lt;deps.length;j++) {
+		    		if(i!=j) {
+		    			if(deps[i].value == deps[j].value) {
+		    				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
+		    				document.getElementById('valMsg').innerHTML = "${%duplicateDeps}" + deps[i].value;
+		    				return false;
+		    			}
+		    		}
+		    	}
+		    }
+		    
 		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="OK"/>';
 	        document.getElementById('valMsg').innerHTML = "${%ok}";
 	        return true;
