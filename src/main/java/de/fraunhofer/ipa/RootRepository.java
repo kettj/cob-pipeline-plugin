@@ -299,7 +299,7 @@ public class RootRepository extends Repository {
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Root Repository Configurations";
+            return "Repository Configurations";
         }
 		
 		@Override
