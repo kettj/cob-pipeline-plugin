@@ -17,7 +17,7 @@
 	    			   deleteCaption="${%delRepo}"/>
 	</f:block>
 	<f:bottomButtonBar>
-	<f:entry title="${%valdation}">
+	<f:entry title="${%validation}">
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="30" style="vertical-align:middle">
