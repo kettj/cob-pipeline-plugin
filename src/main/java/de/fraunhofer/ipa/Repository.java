@@ -56,7 +56,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	/**
 	 * name of repository
 	 */
-	protected String repoName;
+	protected String name;
 	
 	/**
 	 * name of fork owner
@@ -69,7 +69,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected String branch = null;
 	
 	/**
-	 * whether the repository should be pollod be SCM
+	 * whether the repository should be polled be SCM
 	 */
 	protected Boolean poll;
 	
@@ -84,8 +84,8 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected String type;
 	
 	@DataBoundConstructor
-	public Repository(String repoName, String fork, String branch, Boolean poll) throws Exception {
-		this.repoName = repoName;
+	public Repository(String depName, String fork, String branch, Boolean poll) throws Exception {
+		this.name = depName;
 		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
 		} else {
@@ -98,19 +98,19 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 		}
 		this.type = "git"; // right now only supported VCS is Git
 		if (this.type.equals("git")) {
-			this.url = "git@github.com:"+fork+"/"+repoName+".git";
+			this.url = "git@github.com:"+fork+"/"+depName+".git";
 		} else {
 			throw new Exception("Given VCS type '"+type+"' is not supported");
 		}
 		this.poll = poll;
 	}
 	
-	public void setRepoName(String repoName){
-		this.repoName = repoName;
+	public void setDepName(String depName){
+		this.name = depName;
 	}
 	
-	public String getRepoName() {
-		return this.repoName;
+	public String getDepName() {
+		return this.name;
 	}
 	
 	public void setFork(String fork){
@@ -169,6 +169,6 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
     }
     
     public int	compareTo(Repository that) {
-		return this.repoName.compareTo(that.repoName);
+		return this.name.compareTo(that.name);
 	}
 }

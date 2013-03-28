@@ -117,7 +117,7 @@ public class RootRepository extends Repository {
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
-			this.fullName = this.repoName+"__"+suffix;
+			this.fullName = this.name+"__"+suffix;
 		}
 		this.suffix = suffix;
 		
@@ -188,9 +188,12 @@ public class RootRepository extends Repository {
 		} 
 	}
 		
-	@Override
 	public void setRepoName(String repoName) {
-		this.repoName = repoName;
+		this.name = repoName;
+	}
+	
+	public String getRepoName() {
+		return this.name;
 	}
 	
 	public String getFullName() {

@@ -173,6 +173,16 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return FormValidation.error("Repository not found. Check spelling!");
     }
     
+    public ComboBoxModel doFillDepNameItems() {
+    	return doFillRepoNameItems();
+    }
+    
+    public FormValidation doCheckDepName(@QueryParameter String value)
+    		throws IOException, ServletException {
+    	return doCheckRepoName(value);
+    }
+    
+    
     /**
      * Fill combobox with forks of repository
      */

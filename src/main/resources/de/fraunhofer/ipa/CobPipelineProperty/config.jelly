@@ -72,16 +72,18 @@
 		        return false;
 		    }
 		    
-		    for (i=0;i&lt;deps.length;i++) {
-		    	for (j=0;j&lt;deps.length;j++) {
-		    		if(i!=j) {
-		    			if(deps[i].value == deps[j].value) {
-		    				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
-		    				document.getElementById('valMsg').innerHTML = "${%duplicateDeps}" + deps[i].value;
-		    				return false;
-		    			}
-		    		}
-		    	}
+		    if (deps.length!=0) {
+			    for (i=0;i&lt;deps.length;i++) {
+			    	for (j=0;j&lt;deps.length;j++) {
+			    		if(i!=j) {
+			    			if(deps[i].value == deps[j].value) {
+			    				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
+			    				document.getElementById('valMsg').innerHTML = "${%duplicateDeps}" + deps[i].value;
+			    				return false;
+			    			}
+			    		}
+			    	}
+			    }
 		    }
 		    
 		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="OK"/>';

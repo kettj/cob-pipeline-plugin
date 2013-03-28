@@ -59,7 +59,7 @@ public class RepositoryList extends ArrayList<Repository>{
 
     public Repository find(String name) {
         for (Repository r : this) {
-            if(r.repoName.equals(name))
+            if(r.name.equals(name))
                 return r;
         }
         return null;
