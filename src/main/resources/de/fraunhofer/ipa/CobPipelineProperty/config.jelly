@@ -62,16 +62,16 @@
 	      	if (repos.length==0) {
 		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Repository"/>';
 		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
-		        return true;
+		        return false;
 		    }
 		    if (email.value.length==0) {
 		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Email"/>';
 		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
-		    	return true;
+		    	return false;
 		    }
-		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="${%OK}"/>';
-	        document.getElementById('valMsg').innerHTML = "${%Everything seems to be OK}";
-	        return false;
+		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="OK"/>';
+	        document.getElementById('valMsg').innerHTML = "${%ok}";
+	        return true;
   		}
   		validate();
   	</script>
