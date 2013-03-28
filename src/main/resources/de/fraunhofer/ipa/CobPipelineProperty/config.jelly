@@ -28,7 +28,7 @@
               	</td>
               	<td width="*" style="vertical-align:middle">
               		<div tooltip="${%validate}">
-              		  	<img src="${rootURL}/plugin/cob-pipeline/images/edit-redo.png" alt="${%validate}" style="cursor: pointer;" onclick="validate()"/>
+              		  	<img src="${rootURL}/images/48x48/refresh.png" alt="${%validate}" style="cursor: pointer;" onclick="validate()" height="22" width="22"/>
               		</div>
               	</td>
 			</tr></tbody>
@@ -60,16 +60,16 @@
 			var email = document.getElementById('email');
 					      	
 	      	if (repos.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Repository"/>';
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/error.png" alt="No Repository" height="22" width="22"/>';
 		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
 		        return false;
 		    }
 		    if (email.value.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="No Email"/>';
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="No Email" height="22" width="22"/>';
 		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
 		    	return false;
 		    }
-		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="OK"/>';
+		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" onclick="validate()" height="22" width="22"/>';
 	        document.getElementById('valMsg').innerHTML = "${%ok}";
 	        return true;
   		}
