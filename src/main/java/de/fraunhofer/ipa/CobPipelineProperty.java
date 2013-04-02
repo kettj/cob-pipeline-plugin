@@ -125,22 +125,22 @@ public class CobPipelineProperty extends UserProperty {
 		}
 		this.rootRepos = rootRepos;
 	}
-	
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
 	public String getEmail() {
 		if(!this.email.isEmpty()) {
 			return this.email;
 		}
-        /*if(this.user != null) {
+		/*if(this.user != null) {
             Mailer.UserProperty mailProperty = this.user.getProperty(Mailer.UserProperty.class);
             if (mailProperty != null) {
                 return mailProperty.getAddress();
             }
         }*/
-        return "";
+		return "";
 	}
 
 	public void setDefaultFork(String fork) {
@@ -232,7 +232,13 @@ public class CobPipelineProperty extends UserProperty {
 			if (value.length()==0) {
 				return FormValidation.error("Please enter your email address above");
 			}
-			return FormValidation.ok();
+			try {
+				InternetAddress emailAddr = new InternetAddress(value);
+				emailAddr.validate();
+				return FormValidation.ok();
+			} catch (AddressException ex) {
+				return FormValidation.error("invalid email address");
+			}
 		}
 
 		public void setGithubOrg(String githubOrg) {
@@ -492,15 +498,15 @@ public class CobPipelineProperty extends UserProperty {
 		user.save();
 		LOGGER.log(Level.INFO, "Saved user configuration");
 	}
-		
+
 	@JavaScriptMethod
 	public JSONObject doGeneratePipeline() throws IOException {
 		JSONObject response  = new JSONObject();
 		String message = "";
 		try { // HACK to give submit() enough time to save config.xml
-		    Thread.sleep(2000);
+			Thread.sleep(2000);
 		} catch(InterruptedException ex) {
-		    Thread.currentThread().interrupt();
+			Thread.currentThread().interrupt();
 		}
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
@@ -553,9 +559,9 @@ public class CobPipelineProperty extends UserProperty {
 		if (!configRepoFolder.isDirectory()) {
 			try {
 				Git.cloneRepository()
-					.setURI(configRepoURL)
-					.setDirectory(configRepoFolder)
-					.call();
+				.setURI(configRepoURL)
+				.setDirectory(configRepoFolder)
+				.call();
 				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL);
 			} catch (Exception ex) {
 				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
@@ -568,7 +574,7 @@ public class CobPipelineProperty extends UserProperty {
 				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
 			}
 		}
-		
+
 		// copy pipeline-config.yaml into repository
 		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
 		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
@@ -590,7 +596,7 @@ public class CobPipelineProperty extends UserProperty {
 		else {
 			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
 		}
-		
+
 		// add
 		try {
 			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
@@ -617,7 +623,7 @@ public class CobPipelineProperty extends UserProperty {
 		// trigger Python job generation script
 		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
 				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(), this.userName};
-		
+
 		proc = rt.exec(generationCall);
 		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
 		readErr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
