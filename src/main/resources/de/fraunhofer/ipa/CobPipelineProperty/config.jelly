@@ -1,7 +1,7 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:entry title="${%email}" field="email">
-        <f:textbox id="email" onchange="validate()"/>
+        <f:textbox id="email" onchange="validateEmail()"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
         <f:textbox default="${descriptor.getGithubOrg()}"/>
@@ -17,7 +17,7 @@
 	    			   deleteCaption="${%delRepo}"/>
 	</f:block>
 	<f:bottomButtonBar>
-	<f:entry title="${%valdation}">
+	<f:entry title="${%validation}">
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="30" style="vertical-align:middle">
@@ -28,7 +28,7 @@
               	</td>
               	<td width="*" style="vertical-align:middle">
               		<div tooltip="${%validate}">
-              		  	<img src="${rootURL}/plugin/cob-pipeline/images/edit-redo.png" alt="${%validate}" style="cursor: pointer;" onclick="validate()"/>
+              		  	<img src="${rootURL}/images/48x48/refresh.png" alt="${%validate}" style="cursor: pointer;" onclick="validateAll()" height="22" width="22"/>
               		</div>
               	</td>
 			</tr></tbody>
@@ -55,24 +55,45 @@
   	</f:block>
     </f:bottomButtonBar>
   	<script>
-  		function validate() {
+  		
+  		function validateEmail() {
 			var email = document.getElementById('email');
-  			var repos = document.getElementsByName('repoName');
-  			var deps = document.getElementsByName('depName');
-					
-		    if (email.value.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
+			
+  			if (email.value.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="No Email" height="22" width="22"/>';
 		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
 		    	return false;
 		    }
-		    			      	
-	      	if (repos.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-error.png" alt="${%invalid}"/>';
+		    return validateAll();		    
+  		}
+  		
+  		function validateRepos() {
+  			var repos = document.getElementsByName('repoName');
+  			
+  			if (repos.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/error.png" alt="No Repository" height="22" width="22"/>';
 		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
 		        return false;
 		    }
-		    
-		    if (deps.length!=0) {
+		    return validateAll();
+  		}
+  	
+  		function validateAll() {
+  			var repos = document.getElementsByName('repoName');
+			var email = document.getElementById('email');
+			var deps = document.getElementsByName('depName');
+					      	
+	      	if (repos.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/error.png" alt="No Repository" height="22" width="22"/>';
+		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
+		        return false;
+		    }
+  			if (email.value.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="No Email" height="22" width="22"/>';
+		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
+		    	return false;
+		    }
+			if (deps.length!=0) {
 			    for (i=0;i&lt;deps.length;i++) {
 			    	for (j=0;j&lt;deps.length;j++) {
 			    		if(i!=j) {
@@ -84,12 +105,12 @@
 			    		}
 			    	}
 			    }
-		    }
+			}
 		    
-		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/plugin/cob-pipeline/images/dialog-clean.png" alt="OK"/>';
+		    document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
 	        document.getElementById('valMsg').innerHTML = "${%ok}";
 	        return true;
   		}
-  		validate();
+  		validateAll();
   	</script>
 </j:jelly>
