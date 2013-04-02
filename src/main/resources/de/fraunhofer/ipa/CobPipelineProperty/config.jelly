@@ -77,21 +77,54 @@
 		    }
 		    return validateAll();
   		}
+  		
+  		function generateFullName(id) {
+  			var repoName = document.getElementById(id+"repoName");
+  			var suffix = document.getElementById(id+"suffix");
+  			
+  			if (suffix.value.length==0) {
+  				document.getElementById(id+'fullName').value = repoName.value;
+  			}
+  			else {
+  				document.getElementById(id+'fullName').value = repoName.value + '__' + suffix.value;
+  			}
+  			validateFullNames()
+  		}
+  		
+  		function validateFullNames() {
+  			var fullNames = document.getElementsByName('fullName');
+  			
+  			if (fullNames.length!=0) {
+			    for (i=0;i&lt;fullNames.length;i++) {
+			    	for (j=0;j&lt;fullNames.length;j++) {
+			    		if(i!=j) {
+			    			if(fullNames[i].value == fullNames[j].value) {
+			    				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}"/>';
+			    				document.getElementById('valMsg').innerHTML = "${%duplicateFullNames}" + fullNames[i].value;
+			    				return false;
+			    			}
+			    		}
+			    	}
+			    }
+			}
+			return true;
+  		}
   	
   		function validateAll() {
-  			var repos = document.getElementsByName('repoName');
 			var email = document.getElementById('email');
+  			var repos = document.getElementsByName('repoName');
+  			var fullNames = document.getElementsByName('fullName');
 			var deps = document.getElementsByName('depName');
-					      	
-	      	if (repos.length==0) {
-		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/error.png" alt="No Repository" height="22" width="22"/>';
-		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
-		        return false;
-		    }
+			
   			if (email.value.length==0) {
 		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="No Email" height="22" width="22"/>';
 		    	document.getElementById('valMsg').innerHTML = "${%noEmail}";
 		    	return false;
+		    }
+	      	if (repos.length==0) {
+		    	document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/error.png" alt="No Repository" height="22" width="22"/>';
+		      	document.getElementById('valMsg').innerHTML = "${%noRepo}";
+		        return false;
 		    }
 			if (deps.length!=0) {
 			    for (i=0;i&lt;deps.length;i++) {
