@@ -59,6 +59,7 @@ import java.io.Writer;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
@@ -497,11 +498,21 @@ public class CobPipelineProperty extends UserProperty {
 	public JSONObject doGeneratePipeline() throws IOException {
 		JSONObject response  = new JSONObject();
 		String message = "";
-		try { // HACK to give submit() enough time to save config.xml
-		    Thread.sleep(2000);
-		} catch(InterruptedException ex) {
-		    Thread.currentThread().interrupt();
-		}
+		
+		// wait until config.xml is updated
+		File configFile = new File(Jenkins.getInstance().getRootDir() + "users", user.getId() + "/config.xml");
+		Date modDate;
+		Date now;
+		do {
+			try { 
+			    Thread.sleep(1000);
+			} catch(InterruptedException ex) {
+			    Thread.currentThread().interrupt();
+			}
+			modDate = new Date(configFile.lastModified());
+			now = new Date();
+		} while (modDate.getTime() - now.getTime() > 30000);
+				
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
 			data.put("user_name", this.userName);
