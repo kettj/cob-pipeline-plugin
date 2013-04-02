@@ -55,14 +55,14 @@
                 if (target.contentWindow &amp;&amp; target.contentWindow.applyCompletionHandler) {
                     // apply-aware server is expected to set this handler
                     target.contentWindow.applyCompletionHandler(window);
-                } else {
+                } /*else {
                     // otherwise this is possibly an error from the server, so we need to render the whole content.
                     var r = YAHOO.util.Dom.getClientRegion();
                     responseDialog.cfg.setProperty("width",r.width*3/4+"px");
                     responseDialog.cfg.setProperty("height",r.height*3/4+"px");
                     responseDialog.center();
                     responseDialog.show();
-                }
+                }*/
                 window.setTimeout(function() {// otherwise Firefox will fail to leave the "connecting" state
                     $(id).remove();
                 },0)
@@ -71,9 +71,16 @@
             f.target = target.id;
             f.elements['core:apply'].value = "true";
             try {
-                buildFormTree(f);
-                f.submit();
-                generate();
+		    	if (valid()!=true) {
+		    		document.getElementById('status').innerHTML = '<b>${%notValid}</b>';
+		    		document.getElementById('msg').innerHTML = '${%notValidMsg}';
+		    		return;
+		    	}
+		    	else {
+	                buildFormTree(f);
+	                f.submit();
+	                generate();
+	            }
             } finally {
                 f.elements['core:apply'].value = null;
                 f.target = null;

@@ -359,17 +359,6 @@ public class RootRepository extends Repository {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
 		
-		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String repoName)
-				throws IOException, ServletException {
-			//TODO check if other repo with the same name exists
-			
-			if (value.length() != 0) { 
-				return FormValidation.ok("Full name: "+repoName+"__"+value);
-			} else {
-				return FormValidation.ok("Full name: "+repoName);
-			}
-		}
-		
 		public ListBoxModel doFillPrioUbuntuDistroItems() {
 			ListBoxModel prioDistroItems = new ListBoxModel();
 			
