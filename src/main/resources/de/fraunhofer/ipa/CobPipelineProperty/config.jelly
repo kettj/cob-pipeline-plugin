@@ -102,11 +102,31 @@
 			}
 			return "";
   		}
+  		
+  		function validDeps() {
+  			var deps = document.getElementsByName('depName');
+  			
+  			if (deps.length!=0) {
+			    for (i=0;i&lt;deps.length;i++) {
+			    	for (j=0;j&lt;deps.length;j++) {
+			    		if(i!=j) {
+			    			if (deps[i].id == deps[j].id) {
+				    			if(deps[i].value == deps[j].value) {
+				    				return document.getElementById('valMsg').innerHTML = "${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.replace("dep", "repoName")).value;
+				    			}
+				    		}
+			    		}
+			    	}
+			    }
+			}
+			return "";
+  		}
   	
   		function valid() {
 			var result = validEmail();
 			result += validRepos();
 			result += validFullNames();
+			result += validDeps();
 			if (result.length!=0) {
 				document.getElementById('valMsg').innerHTML = result;
 				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';

@@ -2,13 +2,13 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<j:set var="genId" value="${h.generateId()}"/>
   	<f:entry field="repoName" title="${%repoName}">
-   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}')"/>
+   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}')" style="width:250px;"/>
 	</f:entry>
 	<f:entry field="suffix" title="${%suffix}">
-   		<f:textbox id="${genId}suffix" onchange="generateFullName('${genId}')" onkeyup="generateFullName('${genId}')"/>
+   		<f:textbox id="${genId}suffix" onchange="generateFullName('${genId}')" onkeyup="generateFullName('${genId}')" style="width:250px;"/>
 	</f:entry>
 	<f:entry field="fullName" title="${%fullName}">
-   		<f:textbox name="fullName" id="${genId}fullName" readOnly="yes" size="100"/>
+   		<f:textbox name="fullName" id="${genId}fullName" readOnly="yes" style="width:500px;"/>
 	</f:entry>
 	<f:entry title="${%ROS Release Version}" help="/plugin/cob-pipeline/help-rosDistros.html">
 		<j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
