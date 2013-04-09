@@ -441,7 +441,7 @@ public class CobPipelineProperty extends UserProperty {
 			}
 			
 			this.defaultFork = value;
-			// TODO check if user exists
+
 			return doCheckGithubLogin(value);
 		}
 
