@@ -130,14 +130,15 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      */
     public ComboBoxModel doFillNameItems() {
     	ComboBoxModel aux = new ComboBoxModel();
-    	    	
-    	if (this.githubOrg == null) {
+
+    	if (this.githubClient.getUser() == "") {
     		setGithubConfig();
     	}
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
-    		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getOrgRepositories(this.githubOrg);
+    		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(
+    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork());
     		for (org.eclipse.egit.github.core.Repository repo : repos) {
     			if (!aux.contains(repo.getName()))
 					aux.add(0, repo.getName());
