@@ -128,7 +128,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Fills combobox with repository names of organization
      */
-    public ComboBoxModel doFillRepoNameItems() {
+    public ComboBoxModel doFillNameItems() {
     	ComboBoxModel aux = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
@@ -152,10 +152,10 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Checks if given repository exists
      */
-    public FormValidation doCheckRepoName(@QueryParameter String value)
+    public FormValidation doCheckName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
-    	doFillRepoNameItems();
+    	doFillNameItems();
     	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter repository name. E.g. cob_common");
@@ -173,20 +173,11 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return FormValidation.error("Repository not found. Check spelling!");
     }
     
-    public ComboBoxModel doFillDepNameItems() {
-    	return doFillRepoNameItems();
-    }
-    
-    public FormValidation doCheckDepName(@QueryParameter String value)
-    		throws IOException, ServletException {
-    	return doCheckRepoName(value);
-    }
-    
     
     /**
      * Fill combobox with forks of repository
      */
-    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
+    public ComboBoxModel doFillForkItems(@QueryParameter String name) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
@@ -195,7 +186,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
-    		RepositoryId repoId = new RepositoryId(this.githubOrg, repoName);
+    		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
     		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
@@ -213,10 +204,10 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Checks if given fork owner exists
      */
-    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
+    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
     	
-    	doFillForkItems(repoName);
+    	doFillForkItems(name);
     	    	
     	if (value.length() == 0) {
     		return FormValidation.warning("Leave empty to use default fork '" +
@@ -245,7 +236,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
 				for (org.eclipse.egit.github.core.Repository repo : repos) {
-					if (repo.getName().equals(repoName)) 
+					if (repo.getName().equals(name))
 						return FormValidation.ok("Found");
 				}
 			} catch (Exception ex) {
