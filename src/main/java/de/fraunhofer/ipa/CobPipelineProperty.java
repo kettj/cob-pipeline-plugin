@@ -61,9 +61,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -461,6 +463,43 @@ public class CobPipelineProperty extends UserProperty {
 		public String getDefaultBranch() {
 			return this.defaultBranch;
 		}
+	    
+	    @JavaScriptMethod
+	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
+	    	List<Map<String, List<String>>> targets = getTargets();
+	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	
+	    	for (String rosDistro : rosDistroListString.split(",")) {
+	    		for (Map<String, List<String>> ros : targets) {
+	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				for (List<String> ubuntuList : ros.values()) {
+	    					allUbuntuSet.retainAll(ubuntuList);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    	Collections.sort(allUbuntuList);
+	    	return allUbuntuList;
+	    }
+	    
+	    public List<String> getUbuntuReleases() {
+	    	List<String> ubuntuReleases = new ArrayList<String>();
+	    	List<Map<String, List<String>>> targets = getTargets();
+	    	
+	    	for (Map<String, List<String>> ros : targets) {
+	    		if (!ros.keySet().iterator().next().equals("backports")) {
+		    		for (List<String> ubuntuList : ros.values()) {
+		    			for (String ubuntu : ubuntuList) {
+		    				if (!ubuntuReleases.contains(ubuntu)) {
+		    					ubuntuReleases.add(ubuntu);
+		    				}
+		    			}
+		    		}
+	    		}
+	    	}
+	    	return ubuntuReleases;
+	    }
 
 		@Override
 		public boolean configure(StaplerRequest req, JSONObject form) throws FormException {

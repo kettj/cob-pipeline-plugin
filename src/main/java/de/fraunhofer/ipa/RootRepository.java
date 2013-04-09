@@ -61,6 +61,7 @@ import javax.servlet.ServletException;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -232,6 +233,7 @@ public class RootRepository extends Repository {
 		return this.prioArch;
 	}
 	
+	@JavaScriptMethod
 	public boolean isMatrixEntryChecked(String ubuntu, String arch) {
 		if (this.matrixDistroArch.containsKey(ubuntu)) {
 			if (this.matrixDistroArch.get(ubuntu).contains(arch)) {
@@ -359,7 +361,7 @@ public class RootRepository extends Repository {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
 		
-		public ListBoxModel doFillPrioUbuntuDistroItems() {
+		/*public ListBoxModel doFillPrioUbuntuDistroItems() {
 			ListBoxModel prioDistroItems = new ListBoxModel();
 			
 			List<String> ubuntuDistros = getUbuntuReleases();
@@ -368,7 +370,7 @@ public class RootRepository extends Repository {
 			}
 			
 			return prioDistroItems;
-		}
+		}*/
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();

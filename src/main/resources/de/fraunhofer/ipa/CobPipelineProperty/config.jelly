@@ -55,6 +55,7 @@
   	</f:block>
     </f:bottomButtonBar>
   	<script>
+  		var des = <st:bind value="${descriptor}"/>
   		function validEmail() {
 			var email = document.getElementById('email');
 			
@@ -84,6 +85,110 @@
   				document.getElementById(id+'fullName').value = repoName.value + '__' + suffix.value;
   			}
   			valid();
+  		}
+  		
+  		function updateEnv(id) {
+  			var rosDistros = document.getElementsByTagName('input');
+  			var rosDistroList = new Array();
+  			
+  			for(i=0;i&lt;rosDistros.length;i++) {
+  				if (rosDistros[i].id == id+'rosDistro') {
+	  				if(rosDistros[i].checked) {
+				        rosDistroList.push(rosDistros[i].value);
+				    }
+  				}
+	        }
+	        generateSelection(id, rosDistroList.toString());
+	        generateMatrix(id, rosDistroList.toString());
+  		}
+  		
+  		function generateSelection(id, rosDistroListString) {
+  			var selection = document.getElementById(id+'selection');
+	        var option=document.createElement("option");
+	        
+	        var len = selection.length;
+	        for(i=0;i&lt;len;i++) {
+	        	selection.remove(0);
+	        }
+  			
+  			if (rosDistroListString.length==0) {
+  				option=document.createElement("option");
+	        	option.text="Select ROS Distro";
+	        	selection.add(option, null);
+  			}
+  			else  {
+	        	des.getSupportedUbuntuReleases(rosDistroListString, function(t) {
+		      		var list = t.responseObject();
+		      		if (list.length==0) {
+		      			option=document.createElement("option");
+			        	option.text="No shared Ubuntu Release";
+			        	selection.add(option, null);
+			        }
+			        else {
+			        	for(i=0;i&lt;list.length;i++) {
+				        	option=document.createElement("option");
+				        	option.text= list[i];
+				        	selection.add(option, null);
+			        	}
+		        	}
+		        });
+  			}
+  		}
+  		
+  		function generateMatrix(id, rosDistroListString) {
+  			if (rosDistroListString.length==0) {
+  				document.getElementById(id+"regularBuild").innerHTML = '<b>Select ${rosDistro} first!</b>';
+  			}
+  			else  {
+  				var head = '<td width="*">
+	  				<table border="1" width="*">
+			      	<td width="100"></td>
+			      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
+			      	<td width="25"></td>
+			      	<th colspan="2" align="center" width="150"><font size="2px">${%arch}</font></th>
+					<tr/>
+			      	<td width="100"></td>
+			      	<td align="center" width="*"></td>
+			      	<td width="25"></td>
+			      	<td align="center" width="75"><b>${%amd64}</b></td>
+			      	<td align="center" width="75"><b>${%i386}</b></td>
+					<tr></tr>';
+					
+				var tail = '</table></td>';
+				
+				var body = '';
+				des.getSupportedUbuntuReleases(rosDistroListString, function(t) {
+		      		var list = t.responseObject();
+		      		var boxIsChecked = window[id+'isChecked'];
+		      		var thisInst = window[id+'inst'];
+		      		
+		      		for (i=0;i&lt;list.length;i++) {
+		      			var amd64 = ''; //boxIsChecked(list[i], 'amd64');
+		      			var i386 = boxIsChecked(list[i], 'i386').toString();
+		      			thisInst.isMatrixEntryChecked(list[i], 'amd64', function(t) {
+			      			body += '<td width="100"></td>
+								<td align="center" width="*">
+				                	<b>' + list[i] + '</b>
+				              	</td>
+			      				<td width="25"></td>
+								<td align="center" width="*">
+				                	<input type="checkbox" id="' + id + list[i] + 'amd64" field="' + list[i] + '__amd64__env" checked="${(' + t.responseObject() + ') ? 'true' : null}"/>
+				              	</td>';
+								
+								thisInst.isMatrixEntryChecked(list[i], 'i386', function(t) {
+			      					body += '<td align="center" width="*">
+					                	<input type="checkbox" field="' + list[i] + '__i386__env" checked="' + t.responseObject() + '"/>
+					              		</td>
+										<tr></tr>';
+		      						document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
+					            });
+				              	document.getElementById('valMsg').innerHTML += t.responseObject();
+						});
+		      		}
+		      		//document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
+		      	});				
+  				
+  			}
   		}
   		
   		function validFullNames() {
@@ -138,6 +243,16 @@
 		        return true;
 			}
   		}
+  		
+  		function initEnv() {
+	  		var existentRepos = document.getElementsByName('repoName');
+	  		
+	  		for (i=0;i&lt;existentRepos.length;i++) {
+	  			updateEnv(existentRepos[i].id.replace("repoName", ""));
+	  		}
+  		}
+  		
+  		initEnv();
   		valid();
   	</script>
 </j:jelly>

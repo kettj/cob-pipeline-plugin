@@ -17,7 +17,7 @@
 				<f:rowSet name="rosDistro">
 				<j:forEach var="g" items="${rosDistros}">
 					<td width="*">
-	                	<f:checkbox field="${g}" title="${g}" checked="${instance.isRosDistroChecked(g)}"/>
+	                	<f:checkbox field="${g}" title="${g}" id="${genId}rosDistro" value="${g}" checked="${instance.isRosDistroChecked(g)}" onclick="updateEnv('${genId}')"/>
 	              	</td>
 	            </j:forEach>
 				</f:rowSet>		
@@ -28,7 +28,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select />
+   					<select name="prioUbuntuDistro" id="${genId}selection" style="width:100px;"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -37,7 +37,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select />
+   					<f:select onclick="updateEnv('${genId}')" style="width:100px;"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -52,30 +52,10 @@
 			</f:entry>
 			<f:entry title="${%jobs}">
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
-  				<table border="0" width="*">
+  				<table border="1" width="*">
 					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
-				      	<td width="*"></td>
-				      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
-				      	<th colspan="2" align="center" width="200"><font size="2px">${%arch}</font></th>
-						<tr></tr>
-				      	<td width="100"></td>
-				      	<td align="center" width="*"></td>
-				      	<td align="center" width="100"><b>${%amd64}</b></td>
-				      	<td align="center" width="100"><b>${%i386}</b></td>
-						<tr></tr>
-						<j:forEach var="u" items="${ubuntuReleases}">
-				      		<td width="100"></td>
-							<td align="center" width="*">
-			                	<b>${u}</b> ${descriptor.getSupportedROS(u)}
-			              	</td>
-							<td align="center" width="*">
-			                	<f:checkbox field="${u}__amd64__env" checked="${instance.isMatrixEntryChecked(u, 'amd64')}"/>
-			              	</td>
-							<td align="center" width="*">
-			                	<f:checkbox field="${u}__i386__env" checked="${instance.isMatrixEntryChecked(u, 'i386')}"/>
-			              	</td>
-							<tr></tr>
-	            		</j:forEach>
+						<tr id="${genId}regularBuild" />
+						<tr> <div id="${genId}aux" /> </tr>
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
@@ -139,4 +119,21 @@
 	      	</div>    	
 	    </f:repeatable>
 	 </f:entry>
+	 
+	 <script>
+	 	var ${genId}inst = <st:bind value="${instance}"/>;
+	 	var inst2 = <st:bind value="${instance}"/>;
+	 	
+	 	function ${genId}isChecked(ubuntu, arch) {
+	 		var checked = false;
+	 		inst2.isMatrixEntryChecked(ubuntu, arch, function(t) {
+	 			document.getElementById("${genId}aux").innerHTML = t.responseObject();
+	 			//document.getElementById('valMsg').innerHTML += ubuntu + arch + t.responseObject();
+	 		});
+	 		
+	 		window.setTimeout(function(){checked = document.getElementById("${genId}aux").innerHTML; }, 500);
+	 		//document.getElementById('valMsg').innerHTML += checked;
+	 		return checked;
+	 	}
+	 </script>
 </j:jelly>
