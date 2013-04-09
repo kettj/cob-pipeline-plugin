@@ -42,6 +42,7 @@ import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
 import hudson.model.User;
+import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
@@ -349,6 +350,51 @@ public class RootRepository extends Repository {
 	    	}
 	    		    	
 	    	return rosDistros.toString();
+	    }
+	    
+	    /**
+	     * Fills combobox with repository names of organization
+	     */
+	    public ComboBoxModel doFillRepoNameItems() {
+	    	return super.doFillNameItems();
+	    }
+	    
+	    /**
+	     * Checks if given repository exists
+	     */
+	    public FormValidation doCheckRepoName(@QueryParameter String value)
+	    		throws IOException, ServletException {
+	    	return super.doCheckName(value);
+	    }
+	    
+	    /**
+	     * Fill combobox with forks of repository
+	     */
+	    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
+	    	return super.doFillForkItems(repoName);
+	    }
+	    
+	    /**
+	     * Checks if given fork owner exists
+	     */
+	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
+	    		throws IOException, ServletException {
+	    	return super.doCheckFork(value, repoName);
+	    }
+
+	    /**
+	     * Fill combobox with branches of fork
+	     */
+	    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
+	    	return super.doFillBranchItems(repoName, fork);
+	    }
+	    
+	    /**
+	     * Checks if given branch exists
+	     */
+	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
+	    		throws IOException, ServletException {
+	    	return super.doCheckBranch(value, repoName, fork);
 	    }
 	    
 	    /**

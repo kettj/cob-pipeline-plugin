@@ -128,7 +128,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Fills combobox with repository names of organization
      */
-    public ComboBoxModel doFillRepoNameItems() {
+    public ComboBoxModel doFillNameItems() {
     	ComboBoxModel aux = new ComboBoxModel();
     	    	
     	if (this.githubOrg == null) {
@@ -152,10 +152,10 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Checks if given repository exists
      */
-    public FormValidation doCheckRepoName(@QueryParameter String value)
+    public FormValidation doCheckName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
-    	doFillRepoNameItems();
+    	doFillNameItems();
     	
     	if (value.length() == 0) {
     		return FormValidation.warning("Please enter repository name. E.g. cob_common");
@@ -173,20 +173,11 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return FormValidation.error("Repository not found. Check spelling!");
     }
     
-    public ComboBoxModel doFillDepNameItems() {
-    	return doFillRepoNameItems();
-    }
-    
-    public FormValidation doCheckDepName(@QueryParameter String value)
-    		throws IOException, ServletException {
-    	return doCheckRepoName(value);
-    }
-    
     
     /**
      * Fill combobox with forks of repository
      */
-    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
+    public ComboBoxModel doFillForkItems(@QueryParameter String name) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
@@ -195,7 +186,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
-    		RepositoryId repoId = new RepositoryId(this.githubOrg, repoName);
+    		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
     		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
     		
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
@@ -213,21 +204,22 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Checks if given fork owner exists
      */
-    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
+    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
     	
-    	doFillForkItems(repoName);
+    	String msg = "";
+    	
+    	doFillForkItems(name);
     	    	
     	if (value.length() == 0) {
-    		return FormValidation.warning("Leave empty to use default fork '" +
-    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork() +
-    				"' otherwise enter fork name.");
+    		value = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    		msg = "Default fork '" + value + "' is used. ";
     	}
     	
     	// check if given fork owner is in fork list
     	for (String fork : this.forkItems) {
 			if (fork.equals(value)) {
-				return FormValidation.ok();
+				return (msg.length()==0) ? FormValidation.ok() : FormValidation.ok(msg);
 			}
 		}
     	
@@ -238,20 +230,20 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				UserService githubUserSrv = new UserService(this.githubClient);
 				githubUserSrv.getUser(value);
 			} catch (Exception ex) {
-				return FormValidation.error("User not found!\n"+ex.getMessage());
+				return FormValidation.error(msg + "User not found!\n"+ex.getMessage());
 			}
 			// check if user has public repository with given name
 			try {
 				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
 				for (org.eclipse.egit.github.core.Repository repo : repos) {
-					if (repo.getName().equals(repoName)) 
-						return FormValidation.ok("Found");
+					if (repo.getName().equals(name))
+						return FormValidation.ok(msg + "Found");
 				}
 			} catch (Exception ex) {
 				return FormValidation.error("Failed to get users repositories! Probably no read access given.\n"+ex.getMessage());
 			}
-			return FormValidation.error("Fork not found for owner "+value+"!");
+			return FormValidation.error(msg + "Fork not found for owner "+value+"!");
 		} catch (Exception ex) {
 			return FormValidation.error("Failed to authenticate. Inform administator\n"+ex.getMessage());
 		}
@@ -263,15 +255,19 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      * @param fork
      * @return
      */
-    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
+    public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubOrg == null) {
     		setGithubConfig();
     	}
     	
+    	if (fork.length() == 0) {
+    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    	}
+    	
     	try {
-    		RepositoryId repoId = new RepositoryId(fork, repoName);
+    		RepositoryId repoId = new RepositoryId(fork, name);
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
     		List<RepositoryBranch> branches = githubRepoSrv.getBranches(repoId);
     		
@@ -289,25 +285,25 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Checks if given branch exists
      */
-    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
+    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
     		throws IOException, ServletException {
     	
-    	doFillBranchItems(repoName, fork);
+    	String msg = "";
+    	
+    	doFillBranchItems(name, fork);
     	
     	if (value.length() == 0) {
-    		//TODO git master branch of repo
-    		return FormValidation.warning("Leave empty to use default branch '" +
-    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch() +
-    				"' otherwise enter branch name.");
+    		value = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
+    		msg = "Default branch '" + value + "' is used. ";
     	}
     	
     	// check if given branch is in branch list
     	for (String branch : this.branchItems) {
 			if (branch.equals(value)) {
-				return FormValidation.ok();
+				return (msg.length()==0) ? FormValidation.ok() : FormValidation.ok(msg);
 			}
 		}
     	    	
-    	return FormValidation.error("Given branch not found. Check spelling!");
+    	return FormValidation.error(msg + "Given branch not found. Check spelling!");
     }
 }
