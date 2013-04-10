@@ -120,6 +120,7 @@
 	 </f:entry>
 	 
 	 <script>
+  		var ${genId}Des = <st:bind value="${descriptor}"/>
 	 	var ${genId}Inst = <st:bind value="${instance}"/>;
 	 	
 	 	function ${genId}isChecked(ubuntu, arch) {
@@ -131,5 +132,129 @@
 		 	catch(err) {
 		 	}
 	 	}
+  		
+  		function ${genId}updateEnv(id) {
+  			var rosDistros = document.getElementsByTagName('input');
+  			var rosDistroList = new Array();
+  			
+  			for(i=0;i&lt;rosDistros.length;i++) {
+  				if (rosDistros[i].id == id+'rosDistro') {
+	  				if(rosDistros[i].checked) {
+				        rosDistroList.push(rosDistros[i].value);
+				    }
+  				}
+	        }
+	        
+	        if (rosDistroList.length==0) {
+	        	//TODO raise warning to select at least one rosDistro
+	        	document.getElementById(id+"regularBuild").innerHTML = '<b>Select ${%rosDistro} first!</b>';
+	        	//return;
+	        }
+	        
+	        ${genId}Des.getSupportedUbuntuReleases(rosDistroList.toString(), function(t) {
+		        ${genId}getSelected(id, t.responseObject());
+	        });
+  		}
+  		
+  		function ${genId}getSelected(id, ubuntuList) {
+  			var selected = document.getElementById(id+'selection').value;
+	        
+	        if (selected == "" || typeof selected === 'undefined' || selected === null) {
+	        	try {
+		        	${genId}Inst.getPrioUbuntuDistro(function(t) {
+		        		${genId}generateSelection(id, ubuntuList, t.responseObject());
+		        	});
+	        	}
+	        	catch(err) {
+	        		${genId}generateSelection(id, ubuntuList, "");
+	        	}
+	        }
+	        else {
+	        	${genId}generateSelection(id, ubuntuList, selected);
+	        }
+  		}
+  		
+  		function ${genId}generateSelection(id, ubuntuList, selected) {
+  			var selection = document.getElementById(id+'selection');
+	        var option=document.createElement("option");
+	        
+	        var len = selection.length;
+	        for(i=0;i&lt;len;i++) {
+	        	selection.remove(0);
+	        }
+
+      		if (ubuntuList.length==0) {
+      			option=document.createElement("option");
+	        	option.text="No shared Ubuntu Release";
+	        	selection.add(option, null);
+	        }
+	        else {
+	        	for(i=0;i&lt;ubuntuList.length;i++) {
+		        	option=document.createElement("option");
+		        	option.text= ubuntuList[i];
+	        		if (selected==ubuntuList[i]) {
+	        			option.selected = true;
+		        	}
+		        	selection.add(option, null);
+	        	}
+        	}
+        	
+	        ${genId}generateMatrix(id, ubuntuList, function() {
+	        	var inputs = document.getElementsByTagName('input');
+	        	var boxIsChecked = window[id+'isChecked'];
+	        	
+	        	for(i=0;i&lt;inputs.length;i++) {
+	        		if (inputs[i].name.split("__")[0]==document.getElementById("${genId}selection").value &amp;&amp; inputs[i].name.split("__")[1]==document.getElementById("${genId}arch").value) {
+	        			document.getElementById("${genId}matrix"+inputs[i].name.split("__")[0]+inputs[i].name.split("__")[1]).disabled = true;
+	        		}
+	        		else if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
+	        			boxIsChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
+	        		}
+	        	}	        	
+            });
+  		}
+  		
+  		function ${genId}generateMatrix(id, ubuntuList, callback) {
+  			if (ubuntuList.length==0) {
+  				document.getElementById(id+"regularBuild").innerHTML = '<b>No shared Ubuntu Release! Change selection.</b>';
+  			}
+  			else  {
+  				var head = '<td width="*">
+	  				<table border="0" width="*">
+			      	<td width="100"></td>
+			      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
+			      	<td width="25"></td>
+			      	<th colspan="2" align="center" width="150"><font size="2px">${%arch}</font></th>
+					<tr/>
+			      	<td width="100"></td>
+			      	<td align="center" width="*"></td>
+			      	<td width="25"></td>
+			      	<td align="center" width="75"><b>${%amd64}</b></td>
+			      	<td align="center" width="75"><b>${%i386}</b></td>
+					<tr></tr>';
+					
+				var tail = '</table></td>';
+				
+				var body = '';
+		      		
+	      		for (i=0;i&lt;ubuntuList.length;i++) {
+	      			body += '<td width="100"></td>
+						<td align="center" width="*">
+		                	<b>' + ubuntuList[i] + '</b>
+		              	</td>
+	      				<td width="25"></td>
+						<td align="center" width="*">
+		                	<input type="checkbox" id="' + id + 'matrix' + ubuntuList[i] + 'amd64" name="' + ubuntuList[i] + '__amd64__env"/>
+		              	</td><td align="center" width="*">
+	                		<input type="checkbox" id="' + id + 'matrix' + ubuntuList[i] + 'i386" name="' + ubuntuList[i] + '__i386__env"/>
+	              		</td>
+						<tr></tr>';
+	      		}
+	      		document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
+				callback();
+  			}
+  		}
+  		
+  		${genId}updateEnv("${genId}");
 	 </script>
 </j:jelly>

@@ -41,26 +41,23 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
-import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-
-import javax.servlet.ServletException;
+import java.util.Set;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.apache.commons.lang.StringUtils;
@@ -337,6 +334,25 @@ public class RootRepository extends Repository {
 	    		}
 	    	}
 	    	return ubuntuReleases;
+	    }
+	    
+	    @JavaScriptMethod
+	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
+	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
+	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	
+	    	for (String rosDistro : rosDistroListString.split(",")) {
+	    		for (Map<String, List<String>> ros : targets) {
+	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				for (List<String> ubuntuList : ros.values()) {
+	    					allUbuntuSet.retainAll(ubuntuList);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    	Collections.sort(allUbuntuList);
+	    	return allUbuntuList;
 	    }
 	    
 	    public String getSupportedROS(String ubuntuDistro) {
