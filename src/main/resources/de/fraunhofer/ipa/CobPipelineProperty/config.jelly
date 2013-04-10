@@ -118,6 +118,7 @@
   		function generateSelection(id, rosDistroListString) {
   			var selection = document.getElementById(id+'selection');
 	        var option=document.createElement("option");
+	        var selected = document.getElementById(id+'selection').value;
 	        
 	        var len = selection.length;
 	        for(i=0;i&lt;len;i++) {
@@ -141,6 +142,9 @@
 			        	for(i=0;i&lt;list.length;i++) {
 				        	option=document.createElement("option");
 				        	option.text= list[i];
+			        		if (selected==list[i]) {
+			        			option.selected = true;
+				        	}
 				        	selection.add(option, null);
 			        	}
 		        	}
