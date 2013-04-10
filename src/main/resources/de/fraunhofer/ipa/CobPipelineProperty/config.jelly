@@ -120,6 +120,16 @@
 	        var option=document.createElement("option");
 	        var selected = document.getElementById(id+'selection').value;
 	        
+	        if (selected == "") {
+	        	try {
+		        	window[id+'Inst'].getPrioUbuntuDistro(function(t) {
+		        		selected = t.responseObject();
+		        	});
+	        	}
+	        	catch(err) {
+	        	}
+	        }
+	        
 	        var len = selection.length;
 	        for(i=0;i&lt;len;i++) {
 	        	selection.remove(0);
@@ -158,7 +168,7 @@
   			}
   			else  {
   				var head = '<td width="*">
-	  				<table border="1" width="*">
+	  				<table border="0" width="*">
 			      	<td width="100"></td>
 			      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
 			      	<td width="25"></td>

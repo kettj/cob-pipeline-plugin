@@ -221,6 +221,7 @@ public class RootRepository extends Repository {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 	}
 	
+	@JavaScriptMethod
 	public String getPrioUbuntuDistro() {
 		return this.prioUbuntuDistro;
 	}

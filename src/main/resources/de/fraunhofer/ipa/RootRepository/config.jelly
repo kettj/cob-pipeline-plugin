@@ -123,9 +123,13 @@
 	 	var ${genId}Inst = <st:bind value="${instance}"/>;
 	 	
 	 	function ${genId}isChecked(ubuntu, arch) {
-	 		${genId}Inst.isMatrixEntryChecked(ubuntu, arch, function(t) {
-	 			document.getElementById("${genId}matrix"+ubuntu+arch).checked = t.responseObject();
-	 		});
+	 	  	try {
+		 		${genId}Inst.isMatrixEntryChecked(ubuntu, arch, function(t) {
+		 			document.getElementById("${genId}matrix"+ubuntu+arch).checked = t.responseObject();
+		 		});
+		 	}
+		 	catch(err) {
+		 	}
 	 	}
 	 </script>
 </j:jelly>
