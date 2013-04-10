@@ -37,7 +37,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select onclick="updateEnv('${genId}')" style="width:100px;"/>
+   					<f:select id="${genId}arch" onchange="updateEnv('${genId}')" style="width:100px;"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -120,11 +120,10 @@
 	 </f:entry>
 	 
 	 <script>
-	 	var repoInst = <st:bind value="${instance}"/>;
+	 	var ${genId}Inst = <st:bind value="${instance}"/>;
 	 	
 	 	function ${genId}isChecked(ubuntu, arch) {
-	 		repoInst.isMatrixEntryChecked(ubuntu, arch, function(t) {
-	 			document.getElementById('valMsg').innerHTML += "${genId}matrix"+ubuntu+arch + t.responseObject() + "<br/>";
+	 		${genId}Inst.isMatrixEntryChecked(ubuntu, arch, function(t) {
 	 			document.getElementById("${genId}matrix"+ubuntu+arch).checked = t.responseObject();
 	 		});
 	 	}

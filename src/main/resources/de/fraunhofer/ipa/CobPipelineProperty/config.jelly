@@ -104,7 +104,10 @@
 	        	var boxIsChecked = window[id+'isChecked'];
 	        	
 	        	for(i=0;i&lt;inputs.length;i++) {
-	        		if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
+	        		if (inputs[i].name.split("__")[0]==document.getElementById(id+'selection').value &amp;&amp; inputs[i].name.split("__")[1]==document.getElementById(id+'arch').value) {
+	        			document.getElementById(id+"matrix"+inputs[i].name.split("__")[0]+inputs[i].name.split("__")[1]).disabled = true;
+	        		}
+	        		else if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
 	        			boxIsChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
 	        		}
 	        	}
