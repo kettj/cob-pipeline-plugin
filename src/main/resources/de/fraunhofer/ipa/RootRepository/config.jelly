@@ -52,10 +52,9 @@
 			</f:entry>
 			<f:entry title="${%jobs}">
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
-  				<table border="1" width="*">
+  				<table border="0" width="*">
 					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
 						<tr id="${genId}regularBuild" />
-						<tr> <div id="${genId}aux" /> </tr>
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
@@ -121,19 +120,13 @@
 	 </f:entry>
 	 
 	 <script>
-	 	var ${genId}inst = <st:bind value="${instance}"/>;
-	 	var inst2 = <st:bind value="${instance}"/>;
+	 	var repoInst = <st:bind value="${instance}"/>;
 	 	
 	 	function ${genId}isChecked(ubuntu, arch) {
-	 		var checked = false;
-	 		inst2.isMatrixEntryChecked(ubuntu, arch, function(t) {
-	 			document.getElementById("${genId}aux").innerHTML = t.responseObject();
-	 			//document.getElementById('valMsg').innerHTML += ubuntu + arch + t.responseObject();
+	 		repoInst.isMatrixEntryChecked(ubuntu, arch, function(t) {
+	 			document.getElementById('valMsg').innerHTML += "${genId}matrix"+ubuntu+arch + t.responseObject() + "<br/>";
+	 			document.getElementById("${genId}matrix"+ubuntu+arch).checked = t.responseObject();
 	 		});
-	 		
-	 		window.setTimeout(function(){checked = document.getElementById("${genId}aux").innerHTML; }, 500);
-	 		//document.getElementById('valMsg').innerHTML += checked;
-	 		return checked;
 	 	}
 	 </script>
 </j:jelly>

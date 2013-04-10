@@ -99,7 +99,17 @@
   				}
 	        }
 	        generateSelection(id, rosDistroList.toString());
-	        generateMatrix(id, rosDistroList.toString());
+	        generateMatrix(id, rosDistroList.toString(), function() {
+	        	var inputs = document.getElementsByTagName('input');
+	        	var boxIsChecked = window[id+'isChecked'];
+	        	
+	        	for(i=0;i&lt;inputs.length;i++) {
+	        		if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
+	        			boxIsChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
+	        		}
+	        	}
+	        	
+	        });
   		}
   		
   		function generateSelection(id, rosDistroListString) {
@@ -135,9 +145,9 @@
   			}
   		}
   		
-  		function generateMatrix(id, rosDistroListString) {
+  		function generateMatrix(id, rosDistroListString, callback) {
   			if (rosDistroListString.length==0) {
-  				document.getElementById(id+"regularBuild").innerHTML = '<b>Select ${rosDistro} first!</b>';
+  				document.getElementById(id+"regularBuild").innerHTML = '<b>Select ${%rosDistro} first!</b>';
   			}
   			else  {
   				var head = '<td width="*">
@@ -159,35 +169,23 @@
 				var body = '';
 				des.getSupportedUbuntuReleases(rosDistroListString, function(t) {
 		      		var list = t.responseObject();
-		      		var boxIsChecked = window[id+'isChecked'];
-		      		var thisInst = window[id+'inst'];
 		      		
 		      		for (i=0;i&lt;list.length;i++) {
-		      			var amd64 = ''; //boxIsChecked(list[i], 'amd64');
-		      			var i386 = boxIsChecked(list[i], 'i386').toString();
-		      			thisInst.isMatrixEntryChecked(list[i], 'amd64', function(t) {
-			      			body += '<td width="100"></td>
-								<td align="center" width="*">
-				                	<b>' + list[i] + '</b>
-				              	</td>
-			      				<td width="25"></td>
-								<td align="center" width="*">
-				                	<input type="checkbox" id="' + id + list[i] + 'amd64" field="' + list[i] + '__amd64__env" checked="${(' + t.responseObject() + ') ? 'true' : null}"/>
-				              	</td>';
-								
-								thisInst.isMatrixEntryChecked(list[i], 'i386', function(t) {
-			      					body += '<td align="center" width="*">
-					                	<input type="checkbox" field="' + list[i] + '__i386__env" checked="' + t.responseObject() + '"/>
-					              		</td>
-										<tr></tr>';
-		      						document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
-					            });
-				              	document.getElementById('valMsg').innerHTML += t.responseObject();
-						});
+		      			body += '<td width="100"></td>
+							<td align="center" width="*">
+			                	<b>' + list[i] + '</b>
+			              	</td>
+		      				<td width="25"></td>
+							<td align="center" width="*">
+			                	<input type="checkbox" id="' + id + 'matrix' + list[i] + 'amd64" name="' + list[i] + '__amd64__env"/>
+			              	</td><td align="center" width="*">
+		                		<input type="checkbox" id="' + id + 'matrix' + list[i] + 'i386" name="' + list[i] + '__i386__env"/>
+		              		</td>
+							<tr></tr>';
 		      		}
-		      		//document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
-		      	});				
-  				
+		      		document.getElementById(id+"regularBuild").innerHTML = head + body + tail;
+  					callback();
+		      	});
   			}
   		}
   		
