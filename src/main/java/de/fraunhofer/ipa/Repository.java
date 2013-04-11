@@ -36,6 +36,8 @@
 
 package de.fraunhofer.ipa;
 
+import java.io.IOException;
+
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
@@ -50,6 +52,7 @@ import net.sf.json.JSONObject;
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class Repository extends AbstractDescribableImpl<Repository> implements Comparable<Repository> {
