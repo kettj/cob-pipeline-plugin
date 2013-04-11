@@ -156,7 +156,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Dependency Configurations";
+            return "Dependency Configurations"; //TODO
         }
 	    
 	    /**

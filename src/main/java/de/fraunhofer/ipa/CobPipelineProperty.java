@@ -237,7 +237,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckEmail(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length()==0) {
-				return FormValidation.error("Please enter your email address above");
+				return FormValidation.error(Message.Email_Empty());
 			}
 			return FormValidation.ok();
 		}
@@ -375,14 +375,14 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubLogin(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter login name");
+				return FormValidation.error(Message.Github_Login());
 			} 
 			try {
 				UserService githubUserSrv = new UserService();
 				githubUserSrv.getUser(value);
 				return FormValidation.ok();
 			} catch (IOException ex) {
-				return FormValidation.error("Invalid Github user login. User does not exist.\n"+ex.getMessage());
+				return FormValidation.error(Message.Github_LoginInvalid() + "\n" + ex.getMessage());
 			}
 		}
 
@@ -392,7 +392,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubPassword(@QueryParameter String value, @QueryParameter String githubLogin)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter password");
+				return FormValidation.error(Message.Github_Password());
 			}
 			try {
 				GitHubClient client = new GitHubClient();
@@ -402,7 +402,7 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
 						user.getPublicRepos()+" public and "+user.getTotalPrivateRepos()+" private repositories");
 			} catch (Exception ex) {
-				return FormValidation.error("Incorrect Password\n"+ex.getMessage());
+				return FormValidation.error(Message.Github_PasswordIncorrect() + "\n" + ex.getMessage());
 			}
 		}
 
@@ -435,7 +435,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckTargets(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter URL of the target platform yaml file");
+				return FormValidation.warning("Please enter URL of the target platform yaml file"); //TODO
 			}
 			return FormValidation.ok();
 		}
@@ -443,7 +443,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultFork(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter your GitHub login name as default fork/owner.");
+				return FormValidation.error("Please enter your GitHub login name as default fork/owner."); //TODO
 			}
 			
 			this.defaultFork = value;
@@ -458,7 +458,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultBranch(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter default branch.");
+				return FormValidation.error("Please enter default branch."); //TODO
 			}
 			this.defaultBranch = value;
 
@@ -498,7 +498,7 @@ public class CobPipelineProperty extends UserProperty {
 
 	public void save() throws IOException {
 		user.save();
-		LOGGER.log(Level.INFO, "Saved user configuration");
+		LOGGER.log(Level.INFO, "Saved user configuration"); //TODO
 	}
 		
 	@JavaScriptMethod
@@ -556,10 +556,10 @@ public class CobPipelineProperty extends UserProperty {
 			data.put("repositories", repos);
 			Yaml yaml = new Yaml();
 			yaml.dump(data, getPipelineConfigFile());
-			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath());
+			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath()); //TODO
 
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
+			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e); //TODO
 		}
 
 		// clone/pull configuration repository
@@ -574,16 +574,16 @@ public class CobPipelineProperty extends UserProperty {
 					.setURI(configRepoURL)
 					.setDirectory(configRepoFolder)
 					.call();
-				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL);
+				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL); //TODO
 			} catch (Exception ex) {
-				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
+				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex); //TODO
 			}
 		} else {
 			try {
 				git.pull().call();
-				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL);
+				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL); //TODO
 			} catch (Exception ex) {
-				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
+				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex); //TODO
 			}
 		}
 		
@@ -602,34 +602,34 @@ public class CobPipelineProperty extends UserProperty {
 		feedback = "";
 		while ((s = readErr.readLine()) != null) feedback += s+"\n";
 		if (feedback.length()!=0) {
-			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
-			LOGGER.log(Level.WARNING, feedback);
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath()); //TODO
+			LOGGER.log(Level.WARNING, feedback); //TODO
 		}
 		else {
-			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath()); //TODO
 		}
 		
 		// add
 		try {
 			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
-			LOGGER.log(Level.INFO, "Successfully added file to configuration repository");
+			LOGGER.log(Level.INFO, "Successfully added file to configuration repository"); //TODO
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// commit
 		try {
 			git.commit().setMessage("Updated pipeline configuration for "+this.userName).call();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// push
 		try {
 			git.push().call();
-			LOGGER.log(Level.INFO, "Successfully pushed configuration repository");
+			LOGGER.log(Level.INFO, "Successfully pushed configuration repository"); //TODO
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
+			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e); //TODO
 		}
 
 		// trigger Python job generation script
@@ -642,7 +642,7 @@ public class CobPipelineProperty extends UserProperty {
 		feedback = "";
 		while ((s = readErr.readLine()) != null) feedback += s+"\n";
 		if (feedback.length()!=0) {
-			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
+			LOGGER.log(Level.WARNING, "Failed to generate pipeline: "); //TODO
 			LOGGER.log(Level.WARNING, feedback);
 			response.put("message", feedback.replace("\n", "<br/>"));
 			response.put("status", "<font color=\"red\">Pipeline generation failed</font>");
@@ -652,12 +652,12 @@ public class CobPipelineProperty extends UserProperty {
 			while ((s = readIn.readLine()) != null) feedback += s+"\n";
 			if (feedback.length()!=0) {
 				LOGGER.log(Level.INFO, feedback);
-				LOGGER.log(Level.INFO, "Successfully generated pipeline");
+				LOGGER.log(Level.INFO, "Successfully generated pipeline"); //TODO
 				message += feedback;
 			}
 		}
 		response.put("message", message.replace("\n", "<br/>"));
-		response.put("status", "<font color=\"green\">Pipeline generated</font>");
+		response.put("status", "<font color=\"green\">Pipeline generated</font>"); //TODO
 		return response;
 	}
 
@@ -675,7 +675,7 @@ public class CobPipelineProperty extends UserProperty {
 	public static class GlobalAction implements RootAction {
 
 		public String getDisplayName() {
-			return "Pipeline Configuration";
+			return "Pipeline Configuration"; //TODO
 		}
 
 		public String getIconFileName() {
