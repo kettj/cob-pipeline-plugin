@@ -41,12 +41,9 @@ import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-
-import java.io.IOException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;

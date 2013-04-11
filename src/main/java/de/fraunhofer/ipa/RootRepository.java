@@ -120,7 +120,7 @@ public class RootRepository extends Repository {
 		this.suffix = suffix;
 		
 		this.rosDistro = new ArrayList<String>();
-		Iterator iter = rosDistro.keys();
+		Iterator<?> iter = rosDistro.keys();
 		while(iter.hasNext()){
 	        String key = (String)iter.next();
 	        String value = rosDistro.getString(key);
@@ -155,7 +155,7 @@ public class RootRepository extends Repository {
 	private void updateList(List<String> list, JSONObject parent, String name) {
 		if (parent != null) {
 			list.add(name);
-			Iterator iter = parent.keys();
+			Iterator<?> iter = parent.keys();
 			while(iter.hasNext()){
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
