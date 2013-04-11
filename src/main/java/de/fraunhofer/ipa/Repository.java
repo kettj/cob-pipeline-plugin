@@ -41,9 +41,13 @@ import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
+import hudson.util.ComboBoxModel;
+import hudson.util.FormValidation;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
+
+import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
@@ -151,6 +155,51 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
         public String getDisplayName() {
             return "Dependency Configurations";
         }
+	    
+	    /**
+	     * Fills combobox with repository names of organization
+	     */
+	    public ComboBoxModel doFillDepNameItems() {
+	    	return super.doFillNameItems();
+	    }
+	    
+	    /**
+	     * Checks if given repository exists
+	     */
+	    public FormValidation doCheckDepName(@QueryParameter String value)
+	    		throws IOException, ServletException {
+	    	return super.doCheckName(value);
+	    }
+	    
+	    /**
+	     * Fill combobox with forks of repository
+	     */
+	    public ComboBoxModel doFillForkItems(@QueryParameter String depName) {
+	    	return super.doFillForkItems(depName);
+	    }
+	    
+	    /**
+	     * Checks if given fork owner exists
+	     */
+	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
+	    		throws IOException, ServletException {
+	    	return super.doCheckFork(value, depName);
+	    }
+
+	    /**
+	     * Fill combobox with branches of fork
+	     */
+	    public ComboBoxModel doFillBranchItems(@QueryParameter String depName, @QueryParameter String fork) {
+	    	return super.doFillBranchItems(depName, fork);
+	    }
+	    
+	    /**
+	     * Checks if given branch exists
+	     */
+	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
+	    		throws IOException, ServletException {
+	    	return super.doCheckBranch(value, depName, fork);
+	    }
 	}
 	
     public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {

@@ -41,24 +41,26 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
+import hudson.model.User;
+import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
+import java.io.IOException;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.Set;
+
+import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
-import org.kohsuke.stapler.bind.JavaScriptMethod;
+import org.kohsuke.stapler.QueryParameter;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -371,23 +373,57 @@ public class RootRepository extends Repository {
 	    }
 	    
 	    /**
+	     * Fills combobox with repository names of organization
+	     */
+	    public ComboBoxModel doFillRepoNameItems() {
+	    	return super.doFillNameItems();
+	    }
+	    
+	    /**
+	     * Checks if given repository exists
+	     */
+	    public FormValidation doCheckRepoName(@QueryParameter String value)
+	    		throws IOException, ServletException {
+	    	return super.doCheckName(value);
+	    }
+	    
+	    /**
+	     * Fill combobox with forks of repository
+	     */
+	    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
+	    	return super.doFillForkItems(repoName);
+	    }
+	    
+	    /**
+	     * Checks if given fork owner exists
+	     */
+	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
+	    		throws IOException, ServletException {
+	    	return super.doCheckFork(value, repoName);
+	    }
+
+	    /**
+	     * Fill combobox with branches of fork
+	     */
+	    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
+	    	return super.doFillBranchItems(repoName, fork);
+	    }
+	    
+	    /**
+	     * Checks if given branch exists
+	     */
+	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
+	    		throws IOException, ServletException {
+	    	return super.doCheckBranch(value, repoName, fork);
+	    }
+	    
+	    /**
 	     * Returns list of global defined available robots
 	     * @return
 	     */
 	    public List<String> getRobots() {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
-		
-		/*public ListBoxModel doFillPrioUbuntuDistroItems() {
-			ListBoxModel prioDistroItems = new ListBoxModel();
-			
-			List<String> ubuntuDistros = getUbuntuReleases();
-			for (String ubuntuDistro : ubuntuDistros) {
-				prioDistroItems.add(ubuntuDistro + " " + getSupportedROS(ubuntuDistro), ubuntuDistro);
-			}
-			
-			return prioDistroItems;
-		}*/
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();
