@@ -10,7 +10,7 @@
 	<f:entry field="fullName" title="${%fullName}">
    		<f:textbox name="fullName" id="${genId}fullName" readOnly="yes" style="width:500px;"/>
 	</f:entry>
-	<f:entry title="${%ROS Release Version}" help="/plugin/cob-pipeline/help-rosDistros.html">
+	<f:entry title="${%ROSReleaseVersion}" help="/plugin/cob-pipeline/help-rosDistros.html">
 		<j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
@@ -150,8 +150,8 @@
 	        	try {
 	        		${genId}generateSelection();
 	        			        		
-	        		document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">Select ${%rosDistro} first!</font></b>';
-	        		document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">Select ${%rosDistro} first!</font></b>';
+	        		document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
+	        		document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
 	        	}
 	        	finally {
 	        		return;
@@ -189,15 +189,18 @@
 	        }
 	        
 	        if (typeof ubuntuList === 'undefined') {
-	        	option.text="Select ${%rosDistro} first!";
+	        	option.text="${%selectFirstShort}";
 	        	selection.add(option, null);
 	        	return;
 	        }
 
       		if (ubuntuList.length==0) {
       			option=document.createElement("option");
-	        	option.text="No shared Ubuntu Release";
+	        	option.text="${%noSharedUbuntuShort}";
 	        	selection.add(option, null);
+	        	document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">${%noSharedUbuntu}</font></b>';
+	        	document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">${%noSharedUbuntu}</font></b>';
+	        	return;
 	        }
 	        else {
 	        	for(i=0;i&lt;ubuntuList.length;i++) {
@@ -225,44 +228,39 @@
   		}
   		
   		function ${genId}generateMatrix(ubuntuList, callback) {
-  			if (ubuntuList.length==0) {
-  				document.getElementById("${genId}regularBuild").innerHTML = '<b>No shared Ubuntu Release! Change selection.</b>';
-  			}
-  			else  {
-  				var head = '<td width="*">
-	  				<table border="0" width="*">
-			      	<td width="100"></td>
-			      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
-			      	<td width="25"></td>
-			      	<th colspan="2" align="center" width="150"><font size="2px">${%arch}</font></th>
-					<tr/>
-			      	<td width="100"></td>
-			      	<td align="center" width="*"></td>
-			      	<td width="25"></td>
-			      	<td align="center" width="75"><b>${%amd64}</b></td>
-			      	<td align="center" width="75"><b>${%i386}</b></td>
-					<tr></tr>';
-					
-				var tail = '</table></td>';
+			var head = '<td width="*">
+  				<table border="0" width="*">
+		      	<td width="100"></td>
+		      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
+		      	<td width="25"></td>
+		      	<th colspan="2" align="center" width="150"><font size="2px">${%arch}</font></th>
+				<tr/>
+		      	<td width="100"></td>
+		      	<td align="center" width="*"></td>
+		      	<td width="25"></td>
+		      	<td align="center" width="75"><b>${%amd64}</b></td>
+		      	<td align="center" width="75"><b>${%i386}</b></td>
+				<tr></tr>';
 				
-				var body = '';
-		      		
-	      		for (i=0;i&lt;ubuntuList.length;i++) {
-	      			body += '<td width="100"></td>
-						<td align="center" width="*">
-		                	<b>' + ubuntuList[i] + '</b>
-		              	</td>
-	      				<td width="25"></td>
-						<td align="center" width="*">
-		                	<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'amd64" name="' + ubuntuList[i] + '__amd64__env"/>
-		              	</td><td align="center" width="*">
-	                		<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'i386" name="' + ubuntuList[i] + '__i386__env"/>
-	              		</td>
-						<tr></tr>';
-	      		}
-	      		document.getElementById("${genId}regularBuild").innerHTML = head + body + tail;
-				callback();
-  			}
+			var tail = '</table></td>';
+			
+			var body = '';
+	      		
+      		for (i=0;i&lt;ubuntuList.length;i++) {
+      			body += '<td width="100"></td>
+					<td align="center" width="*">
+	                	<b>' + ubuntuList[i] + '</b>
+	              	</td>
+      				<td width="25"></td>
+					<td align="center" width="*">
+	                	<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'amd64" name="' + ubuntuList[i] + '__amd64__env"/>
+	              	</td><td align="center" width="*">
+                		<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'i386" name="' + ubuntuList[i] + '__i386__env"/>
+              		</td>
+					<tr></tr>';
+      		}
+      		document.getElementById("${genId}regularBuild").innerHTML = head + body + tail;
+			callback();
   		}
   		
   		if (typeof ${genId}Inst !== 'undefined') {
