@@ -158,7 +158,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	doFillRepoNameItems();
     	
     	if (value.length() == 0) {
-    		return FormValidation.warning("Please enter repository name. E.g. cob_common");
+    		return FormValidation.warning(Messages.Repository_NoName());
     	}
     	
     	// check if given repository is in repo list
@@ -170,7 +170,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	// if repository was not in list, for example extern repository
     	// TODO if owner is not given, ask for owner and check for repo    	
     	
-    	return FormValidation.error("Repository not found. Check spelling!");
+    	return FormValidation.error(Messages.Repository_NoFound());
     }
     
     public ComboBoxModel doFillDepNameItems() {
