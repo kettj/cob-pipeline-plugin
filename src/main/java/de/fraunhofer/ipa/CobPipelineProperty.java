@@ -98,6 +98,8 @@ public class CobPipelineProperty extends UserProperty {
 	private String defaultFork;
 
 	private String defaultBranch;
+	
+	private boolean committerEmailEnabled;
 
 	/**
 	 * user name
@@ -154,6 +156,14 @@ public class CobPipelineProperty extends UserProperty {
 
 	public String getDefaultBranch() {
 		return this.defaultBranch;
+	}
+	
+	public void setCommitterEmailEnabled(boolean enabled) {
+		this.committerEmailEnabled = enabled;
+	}
+	
+	public boolean getCommitterEmailEnabled() {
+		return this.committerEmailEnabled;
 	}
 
 	private String getMasterName() {
@@ -515,7 +525,7 @@ public class CobPipelineProperty extends UserProperty {
 			data.put("user_name", this.userName);
 			data.put("server_name", this.masterName);
 			data.put("email", this.email);
-			data.put("committer_email_enabled", true);
+			data.put("committer_email_enabled", this.committerEmailEnabled);
 			Map<String, Object> repos = new HashMap<String, Object>();
 			for (RootRepository rootRepo : this.rootRepos) {
 				Map<String, Object> repo = new HashMap<String, Object>();
