@@ -160,40 +160,37 @@
 	        
 	        document.getElementById("${genId}rosDistroWarning").innerHTML = '';
 	        ${genId}Des.getSupportedUbuntuReleases(rosDistroList.toString(), function(t) {
-		        ${genId}getSelected(id, t.responseObject());
-	        });
-  		}
-  		
-  		function ${genId}getSelected(id, ubuntuList) {
-  			var selected = document.getElementById(id+'selection').value;
-	        
-	        if (selected == "" || typeof selected === 'undefined' || selected === null) {
-	        	try {
-		        	${genId}Inst.getPrioUbuntuDistro(function(t) {
-		        		${genId}generateSelection(id, ubuntuList, t.responseObject());
-		        	});
-	        	}
-	        	catch(err) {
-	        		${genId}generateSelection(id, ubuntuList, "");
-	        	}
-	        }
-	        else {
-	        	${genId}generateSelection(id, ubuntuList, selected);
-	        }
-        	
-	        ${genId}generateMatrix(id, ubuntuList, function() {
-	        	var inputs = document.getElementsByTagName('input');
-	        	var boxIsChecked = window[id+'isChecked'];
+	  			var selected = document.getElementById(id+'selection').value;
+	  			var ubuntuList = t.responseObject();
+		        
+		        if (selected == "" || typeof selected === 'undefined' || selected === null) {
+		        	try {
+			        	${genId}Inst.getPrioUbuntuDistro(function(p) {
+			        		${genId}generateSelection(id, ubuntuList, p.responseObject());
+			        	});
+		        	}
+		        	catch(err) {
+		        		${genId}generateSelection(id, ubuntuList, "");
+		        	}
+		        }
+		        else {
+		        	${genId}generateSelection(id, ubuntuList, selected);
+		        }
 	        	
-	        	for(i=0;i&lt;inputs.length;i++) {
-	        		if (inputs[i].name.split("__")[0]==document.getElementById("${genId}selection").value &amp;&amp; inputs[i].name.split("__")[1]==document.getElementById("${genId}arch").value) {
-	        			document.getElementById("${genId}matrix"+inputs[i].name.split("__")[0]+inputs[i].name.split("__")[1]).disabled = true;
-	        		}
-	        		else if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
-	        			boxIsChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
-	        		}
-	        	}	        	
-            });
+		        ${genId}generateMatrix(id, ubuntuList, function() {
+		        	var inputs = document.getElementsByTagName('input');
+		        	var boxIsChecked = window[id+'isChecked'];
+		        	
+		        	for(i=0;i&lt;inputs.length;i++) {
+		        		if (inputs[i].name.split("__")[0]==document.getElementById("${genId}selection").value &amp;&amp; inputs[i].name.split("__")[1]==document.getElementById("${genId}arch").value) {
+		        			document.getElementById("${genId}matrix"+inputs[i].name.split("__")[0]+inputs[i].name.split("__")[1]).disabled = true;
+		        		}
+		        		else if (inputs[i].id.substring(0, (id+'matrix').length)==id+'matrix') {
+		        			boxIsChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
+		        		}
+		        	}	        	
+	            });
+	        });
   		}
   		
   		function ${genId}generateSelection(id, ubuntuList, selected) {
