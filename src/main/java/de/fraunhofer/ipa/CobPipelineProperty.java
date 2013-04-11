@@ -433,11 +433,12 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultFork(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter default fork/owner.");
+				return FormValidation.error("Please enter your GitHub login name as default fork/owner.");
 			}
+			
 			this.defaultFork = value;
-			// TODO check if user exists
-			return FormValidation.ok();
+
+			return doCheckGithubLogin(value);
 		}
 
 		public String getDefaultFork() {
@@ -447,10 +448,10 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultBranch(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter default branch.");
+				return FormValidation.error("Please enter default branch.");
 			}
 			this.defaultBranch = value;
-			// TODO check if user exists
+
 			return FormValidation.ok();
 		}
 

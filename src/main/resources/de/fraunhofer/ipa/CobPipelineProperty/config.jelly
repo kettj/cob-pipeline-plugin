@@ -4,10 +4,10 @@
         <f:textbox id="email" onchange="valid()"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
-        <f:textbox default="${descriptor.getGithubOrg()}"/>
+        <f:textbox id="defaultFork" onchange="valid()"/>
 	</f:entry>
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
-        <f:textbox default="master"/>
+        <f:textbox id="defaultBranch" onchange="valid()"/>
 	</f:entry>
 	<f:block >
 	    <f:hetero-list name="rootRepos" hasHeader="true"
@@ -149,11 +149,29 @@
   		
   		function validEmail() {
 			var email = document.getElementById('email');
-			
+
   			if (email.value.length==0) {
 		    	return document.getElementById('valMsg').innerHTML = "${%noEmail}" + "<br/>";
 		    }
 		    return "";		    
+  		}
+  		
+  		function validDefaultFork() {
+  			var defaultFork = document.getElementById('defaultFork');
+
+  			if (defaultFork.value.length==0) {
+  				return document.getElementById('valMsg').innerHTML = "${%noDefaultFork}" + "<br/>";
+  			}
+  			return "";
+  		}
+  		
+  		function validDefaultBranch() {
+  			var defaultBranch = document.getElementById('defaultBranch');
+
+  			if (defaultBranch.value.length==0) {
+  				return document.getElementById('valMsg').innerHTML = "${%noDefaultBranch}" + "<br/>";
+  			}
+  			return "";
   		}
   		
   		function validRepos() {
@@ -216,6 +234,8 @@
   	
   		function valid() {
 			var result = validEmail();
+			result += validDefaultFork();
+			result += validDefaultBranch();
 			result += validRepos();
 			result += validFullNames();
 			result += validDeps();
@@ -225,7 +245,7 @@
 				return false;
 			}
 			else {
-				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
+				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alForkt="OK" height="22" width="22"/>';
 		        document.getElementById('valMsg').innerHTML = "${%ok}";
 		        return true;
 			}
