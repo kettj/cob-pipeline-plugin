@@ -237,7 +237,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckEmail(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length()==0) {
-				return FormValidation.error(Message.Email_Empty());
+				return FormValidation.error(Messages.Email_Empty());
 			}
 			return FormValidation.ok();
 		}
@@ -375,14 +375,14 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubLogin(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error(Message.Github_Login());
+				return FormValidation.error(Messages.Github_Login());
 			} 
 			try {
 				UserService githubUserSrv = new UserService();
 				githubUserSrv.getUser(value);
 				return FormValidation.ok();
 			} catch (IOException ex) {
-				return FormValidation.error(Message.Github_LoginInvalid() + "\n" + ex.getMessage());
+				return FormValidation.error(Messages.Github_LoginInvalid() + "\n" + ex.getMessage());
 			}
 		}
 
@@ -392,7 +392,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubPassword(@QueryParameter String value, @QueryParameter String githubLogin)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error(Message.Github_Password());
+				return FormValidation.error(Messages.Github_Password());
 			}
 			try {
 				GitHubClient client = new GitHubClient();
@@ -402,7 +402,7 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
 						user.getPublicRepos()+" public and "+user.getTotalPrivateRepos()+" private repositories");
 			} catch (Exception ex) {
-				return FormValidation.error(Message.Github_PasswordIncorrect() + "\n" + ex.getMessage());
+				return FormValidation.error(Messages.Github_PasswordIncorrect() + "\n" + ex.getMessage());
 			}
 		}
 
