@@ -184,10 +184,10 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Checks if given fork owner exists
 	     */
-	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
+	    /*public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
 	    		throws IOException, ServletException {
 	    	return super.doCheckFork(value, depName);
-	    }
+	    }*/
 
 	    /**
 	     * Fill combobox with branches of fork

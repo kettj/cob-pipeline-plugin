@@ -48,6 +48,7 @@ import javax.mail.Message;
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.eclipse.egit.github.core.RepositoryId;
 import org.eclipse.egit.github.core.RepositoryBranch;
@@ -203,10 +204,31 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return this.forkItems = aux;
     }
     
+    @JavaScriptMethod
+    public String checkFork(String fork, String repo) {
+    	String msg = "";
+    	
+    	doFillForkItems(repo);
+    	
+    	if (fork.length() == 0) {
+    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    		msg = Messages.Fork_DefaultUsed(fork);
+    	}
+    	
+    	// check if given fork owner is in fork list
+    	for (String f : this.forkItems) {
+			if (f.equals(fork)) {
+				return msg;
+			}
+		}
+    	
+    	return msg;
+    }
+    
     /**
      * Checks if given fork owner exists
      */
-    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
+    /*public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
     	
     	String msg = "";
@@ -249,8 +271,8 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 		} catch (Exception ex) {
 			return FormValidation.error(Messages.Fork_AuthFailed() + "\n" + ex.getMessage());
 		}
-    }
-    
+    }*/
+        
     /**
      * Fills combobox with branches of given repository fork
      * @param repoName

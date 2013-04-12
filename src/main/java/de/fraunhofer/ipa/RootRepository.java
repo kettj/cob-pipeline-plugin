@@ -401,10 +401,10 @@ public class RootRepository extends Repository {
 	    /**
 	     * Checks if given fork owner exists
 	     */
-	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
+	    /*public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String repoName)
 	    		throws IOException, ServletException {
 	    	return super.doCheckFork(value, repoName);
-	    }
+	    }*/
 
 	    /**
 	     * Fill combobox with branches of fork
