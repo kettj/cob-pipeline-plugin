@@ -41,7 +41,6 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
 import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 import hudson.util.ListBoxModel;
@@ -51,17 +50,21 @@ import net.sf.json.JSONObject;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -123,7 +126,7 @@ public class RootRepository extends Repository {
 		this.suffix = suffix;
 		
 		this.rosDistro = new ArrayList<String>();
-		Iterator iter = rosDistro.keys();
+		Iterator<?> iter = rosDistro.keys();
 		while(iter.hasNext()){
 	        String key = (String)iter.next();
 	        String value = rosDistro.getString(key);
@@ -158,7 +161,7 @@ public class RootRepository extends Repository {
 	private void updateList(List<String> list, JSONObject parent, String name) {
 		if (parent != null) {
 			list.add(name);
-			Iterator iter = parent.keys();
+			Iterator<?> iter = parent.keys();
 			while(iter.hasNext()){
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
@@ -221,6 +224,7 @@ public class RootRepository extends Repository {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 	}
 	
+	@JavaScriptMethod
 	public String getPrioUbuntuDistro() {
 		return this.prioUbuntuDistro;
 	}
@@ -233,6 +237,7 @@ public class RootRepository extends Repository {
 		return this.prioArch;
 	}
 	
+	@JavaScriptMethod
 	public boolean isMatrixEntryChecked(String ubuntu, String arch) {
 		if (this.matrixDistroArch.containsKey(ubuntu)) {
 			if (this.matrixDistroArch.get(ubuntu).contains(arch)) {
@@ -303,7 +308,7 @@ public class RootRepository extends Repository {
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Repository Configurations";
+            return "Repository Configurations"; //TODO
         }
 		
 		@Override
@@ -335,6 +340,25 @@ public class RootRepository extends Repository {
 	    		}
 	    	}
 	    	return ubuntuReleases;
+	    }
+	    
+	    @JavaScriptMethod
+	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
+	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
+	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	
+	    	for (String rosDistro : rosDistroListString.split(",")) {
+	    		for (Map<String, List<String>> ros : targets) {
+	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				for (List<String> ubuntuList : ros.values()) {
+	    					allUbuntuSet.retainAll(ubuntuList);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    	Collections.sort(allUbuntuList);
+	    	return allUbuntuList;
 	    }
 	    
 	    public String getSupportedROS(String ubuntuDistro) {
@@ -404,17 +428,6 @@ public class RootRepository extends Repository {
 	    public List<String> getRobots() {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
-		
-		public ListBoxModel doFillPrioUbuntuDistroItems() {
-			ListBoxModel prioDistroItems = new ListBoxModel();
-			
-			List<String> ubuntuDistros = getUbuntuReleases();
-			for (String ubuntuDistro : ubuntuDistros) {
-				prioDistroItems.add(ubuntuDistro + " " + getSupportedROS(ubuntuDistro), ubuntuDistro);
-			}
-			
-			return prioDistroItems;
-		}
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();

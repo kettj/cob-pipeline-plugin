@@ -10,25 +10,26 @@
 	<f:entry field="fullName" title="${%fullName}">
    		<f:textbox name="fullName" id="${genId}fullName" readOnly="yes" style="width:500px;"/>
 	</f:entry>
-	<f:entry title="${%ROS Release Version}" help="/plugin/cob-pipeline/help-rosDistros.html">
+	<f:entry title="${%ROSReleaseVersion}" help="/plugin/cob-pipeline/help-rosDistros.html">
 		<j:set var="rosDistros" value="${descriptor.allRosDistros}"/>
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<f:rowSet name="rosDistro">
 				<j:forEach var="g" items="${rosDistros}">
 					<td width="*">
-	                	<f:checkbox field="${g}" title="${g}" checked="${instance.isRosDistroChecked(g)}"/>
+	                	<f:checkbox field="${g}" title="${g}" id="${genId}rosDistro" value="${g}" checked="${instance.isRosDistroChecked(g)}" onclick="${genId}updateEnv()"/>
 	              	</td>
 	            </j:forEach>
 				</f:rowSet>		
 			</tr></tbody>
 		</table>
+		<div id="${genId}rosDistroWarning"/>
 	</f:entry>
 	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select />
+   					<select name="prioUbuntuDistro" id="${genId}selection" style="width:150px;" onchange="${genId}updateEnv()"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -37,7 +38,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select />
+   					<f:select id="${genId}arch" onchange="${genId}updateEnv()" style="width:100px;"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -54,28 +55,7 @@
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
   				<table border="0" width="*">
 					<f:optionalBlock field="regularBuild" title="${%regularBuild}">
-				      	<td width="*"></td>
-				      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
-				      	<th colspan="2" align="center" width="200"><font size="2px">${%arch}</font></th>
-						<tr></tr>
-				      	<td width="100"></td>
-				      	<td align="center" width="*"></td>
-				      	<td align="center" width="100"><b>${%amd64}</b></td>
-				      	<td align="center" width="100"><b>${%i386}</b></td>
-						<tr></tr>
-						<j:forEach var="u" items="${ubuntuReleases}">
-				      		<td width="100"></td>
-							<td align="center" width="*">
-			                	<b>${u}</b> ${descriptor.getSupportedROS(u)}
-			              	</td>
-							<td align="center" width="*">
-			                	<f:checkbox field="${u}__amd64__env" checked="${instance.isMatrixEntryChecked(u, 'amd64')}"/>
-			              	</td>
-							<td align="center" width="*">
-			                	<f:checkbox field="${u}__i386__env" checked="${instance.isMatrixEntryChecked(u, 'i386')}"/>
-			              	</td>
-							<tr></tr>
-	            		</j:forEach>
+						<tr id="${genId}regularBuild" />
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
@@ -139,4 +119,152 @@
 	      	</div>    	
 	    </f:repeatable>
 	 </f:entry>
+	 
+	 <script>
+  		var ${genId}Des = <st:bind value="${descriptor}"/>
+	 	var ${genId}Inst = <st:bind value="${instance}"/>;
+	 	
+	 	function ${genId}isChecked(ubuntu, arch) {
+	 	  	try {
+		 		${genId}Inst.isMatrixEntryChecked(ubuntu, arch, function(t) {
+		 			document.getElementById("${genId}matrix"+ubuntu+arch).checked = t.responseObject();
+		 		});
+		 	}
+		 	catch(err) {
+		 	}
+	 	}
+  		
+  		function ${genId}updateEnv() {
+  			var rosDistros = document.getElementsByTagName('input');
+  			var rosDistroList = new Array();
+  			
+  			for(i=0;i&lt;rosDistros.length;i++) {
+  				if (rosDistros[i].id == "${genId}rosDistro") {
+	  				if(rosDistros[i].checked) {
+				        rosDistroList.push(rosDistros[i].value);
+				    }
+  				}
+	        }
+	        
+	        if (rosDistroList.length==0) {
+	        	try {
+	        		${genId}generateSelection();
+	        			        		
+	        		document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
+	        		document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
+	        	}
+	        	finally {
+	        		return;
+	        	}
+	        }
+	        
+	        document.getElementById("${genId}rosDistroWarning").innerHTML = '';
+	        ${genId}Des.getSupportedUbuntuReleases(rosDistroList.toString(), function(t) {
+	  			var selected = document.getElementById("${genId}selection").value;
+	  			var ubuntuList = t.responseObject();
+		        
+		        if (selected == "" || typeof selected === 'undefined' || selected === null) {
+		        	try {
+			        	${genId}Inst.getPrioUbuntuDistro(function(p) {
+			        		${genId}generateSelection(ubuntuList, p.responseObject());
+			        	});
+		        	}
+		        	catch(err) {
+		        		${genId}generateSelection(ubuntuList, "");
+		        	}
+		        }
+		        else {
+		        	${genId}generateSelection(ubuntuList, selected);
+		        }
+	        });
+  		}
+  		
+  		function ${genId}generateSelection(ubuntuList, selected) {
+  			var selection = document.getElementById("${genId}selection");
+	        var option=document.createElement("option");
+	        
+	        var len = selection.length;
+	        for(i=0;i&lt;len;i++) {
+	        	selection.remove(0);
+	        }
+	        
+	        if (typeof ubuntuList === 'undefined') {
+	        	option.text="${%selectFirstShort}";
+	        	selection.add(option, null);
+	        	return;
+	        }
+
+      		if (ubuntuList.length==0) {
+      			option=document.createElement("option");
+	        	option.text="${%noSharedUbuntuShort}";
+	        	selection.add(option, null);
+	        	document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">${%noSharedUbuntu}</font></b>';
+	        	document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">${%noSharedUbuntu}</font></b>';
+	        	return;
+	        }
+	        else {
+	        	for(i=0;i&lt;ubuntuList.length;i++) {
+		        	option=document.createElement("option");
+		        	option.text= ubuntuList[i];
+	        		if (selected==ubuntuList[i]) {
+	        			option.selected = true;
+		        	}
+		        	selection.add(option, null);
+	        	}
+        	}
+	        	
+	        ${genId}generateMatrix(ubuntuList, function() {
+	        	var inputs = document.getElementsByTagName('input');
+	        	
+	        	for(i=0;i&lt;inputs.length;i++) {
+	        		if (inputs[i].name.split("__")[0]==document.getElementById("${genId}selection").value &amp;&amp; inputs[i].name.split("__")[1]==document.getElementById("${genId}arch").value) {
+	        			document.getElementById("${genId}matrix"+inputs[i].name.split("__")[0]+inputs[i].name.split("__")[1]).disabled = true;
+	        		}
+	        		else if (inputs[i].id.substring(0, "${genId}matrix".length)=="${genId}matrix") {
+	        			${genId}isChecked(inputs[i].name.split("__")[0], inputs[i].name.split("__")[1])
+	        		}
+	        	}	        	
+            });
+  		}
+  		
+  		function ${genId}generateMatrix(ubuntuList, callback) {
+			var head = '<td width="*">
+  				<table border="0" width="*">
+		      	<td width="100"></td>
+		      	<th align="center" width="*"><font size="2px">${%ubuntu}</font></th>
+		      	<td width="25"></td>
+		      	<th colspan="2" align="center" width="150"><font size="2px">${%arch}</font></th>
+				<tr/>
+		      	<td width="100"></td>
+		      	<td align="center" width="*"></td>
+		      	<td width="25"></td>
+		      	<td align="center" width="75"><b>${%amd64}</b></td>
+		      	<td align="center" width="75"><b>${%i386}</b></td>
+				<tr></tr>';
+				
+			var tail = '</table></td>';
+			
+			var body = '';
+	      		
+      		for (i=0;i&lt;ubuntuList.length;i++) {
+      			body += '<td width="100"></td>
+					<td align="center" width="*">
+	                	<b>' + ubuntuList[i] + '</b>
+	              	</td>
+      				<td width="25"></td>
+					<td align="center" width="*">
+	                	<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'amd64" name="' + ubuntuList[i] + '__amd64__env"/>
+	              	</td><td align="center" width="*">
+                		<input type="checkbox" id="${genId}matrix' + ubuntuList[i] + 'i386" name="' + ubuntuList[i] + '__i386__env"/>
+              		</td>
+					<tr></tr>';
+      		}
+      		document.getElementById("${genId}regularBuild").innerHTML = head + body + tail;
+			callback();
+  		}
+  		
+  		if (typeof ${genId}Inst !== 'undefined') {
+  			${genId}updateEnv();
+  		}
+	 </script>
 </j:jelly>

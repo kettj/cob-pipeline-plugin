@@ -9,6 +9,13 @@
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
         <f:textbox id="defaultBranch" onchange="valid()"/>
 	</f:entry>
+	<f:entry title="Advanced Options">
+  		<f:advanced>
+			<f:entry field="committerEmailEnabled" title="${%committerEmail}">
+   				<f:checkbox />
+			</f:entry>
+  		</f:advanced>
+  	</f:entry>
 	<f:block >
 	    <f:hetero-list name="rootRepos" hasHeader="true"
 	    			   descriptors="${descriptor.rootRepositoryDescriptors}"
@@ -17,11 +24,11 @@
 	    			   deleteCaption="${%delRepo}"/>
 	</f:block>
 	<f:bottomButtonBar>
-	<f:entry title="${%validation}">
+	<f:entry field="validation" title="${%validation}" >
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="30" style="vertical-align:middle">
-              		<div style="float:left" id="valIcon" help="/plugin/cob-pipeline/help-validation.html" />
+              		<div style="float:left" id="valIcon" />
               	</td>
               	<td width="*" style="vertical-align:middle">
               		<div id="valMsg" />
@@ -39,7 +46,8 @@
 			<tbody><tr>
 				<td width="150">
               		<div style="float:left" help="/plugin/cob-pipeline/help-generateButton.html">
-        				<f:generation />
+        				<input type="hidden" name="core:apply" value="" />
+  						<input type="button" value="${%generate}" class="generation-button generationButton" />
 					</div>
               	</td>
               	<td width="*" style="vertical-align:middle">
@@ -55,6 +63,97 @@
   	</f:block>
     </f:bottomButtonBar>
   	<script>
+  		var inst = <st:bind value="${instance}"/>;
+  		
+  		Behaviour.specify("INPUT.generation-button", 'generation', 0, function (e) {
+	        var id;
+	        var containerId = "container"+(iota++);
+	
+	        var responseDialog = new YAHOO.widget.Panel("wait"+(iota++), {
+	            fixedcenter:true,
+	            close:true,
+	            draggable:true,
+	            zindex:4,
+	            modal:true,
+	            visible:false
+	        });
+	
+	        responseDialog.setHeader("Error");
+	        responseDialog.setBody("&lt;div id='"+containerId+"'&gt;&lt;/iframe&gt;");
+	        responseDialog.render(document.body);
+	        var target; // iframe
+	
+	        function attachIframeOnload(target, f) {
+	            if (target.attachEvent) {
+	                target.attachEvent("onload", f);
+	            } else {
+	                target.onload = f;
+	            }
+	        }
+	
+	        var genButton = makeButton(e,function (e) {
+	            var f = findAncestor(e.target, "FORM");
+	            
+	
+	            // create a throw-away IFRAME to avoid back button from loading the POST result back
+	            id = "iframe"+(iota++);
+	            target = document.createElement("iframe");
+	            target.setAttribute("id",id);
+	            target.setAttribute("name",id);
+	            target.setAttribute("style","height:100%; width:100%");
+	            $(containerId).appendChild(target);
+	
+	            attachIframeOnload(target, function () {
+	                if (target.contentWindow &amp;&amp; target.contentWindow.applyCompletionHandler) {
+	                    // apply-aware server is expected to set this handler
+	                    target.contentWindow.applyCompletionHandler(window);
+	                } /*else {
+	                    // otherwise this is possibly an error from the server, so we need to render the whole content.
+	                    var r = YAHOO.util.Dom.getClientRegion();
+	                    responseDialog.cfg.setProperty("width",r.width*3/4+"px");
+	                    responseDialog.cfg.setProperty("height",r.height*3/4+"px");
+	                    responseDialog.center();
+	                    responseDialog.show();
+	                }*/
+	                window.setTimeout(function() {// otherwise Firefox will fail to leave the "connecting" state
+	                    $(id).remove();
+	                },0)
+	            });
+	
+	            f.target = target.id;
+	            f.elements['core:apply'].value = "true";
+	            try {
+			    	if (valid()!=true) {
+			    		document.getElementById('status').innerHTML = '<b>${%notValid}</b>';
+			    		document.getElementById('msg').innerHTML = '${%notValidMsg}';
+			    		return;
+			    	}
+			    	else {
+		                buildFormTree(f);
+		                f.submit();
+		                generate();
+		            }
+	            } finally {
+	                f.elements['core:apply'].value = null;
+	                f.target = null;
+	            }
+	        });
+	        
+	        function generate() {
+	  			genButton.set('disabled',true,false);
+	  			document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
+	  			document.getElementById('msg').innerHTML = '';
+	  			
+				inst.doGeneratePipeline( function (t) 
+				{
+	  				document.getElementById('status').innerHTML = '<b>' + t.responseObject().status + '</b>';
+	  				document.getElementById('msg').innerHTML = t.responseObject().message;
+	  				genButton.set('disabled',false,false);
+	  			});
+				
+	  		}
+		});
+  		
   		function validEmail() {
 			var email = document.getElementById('email');
 
@@ -158,6 +257,7 @@
 		        return true;
 			}
   		}
+  		
   		valid();
   	</script>
 </j:jelly>

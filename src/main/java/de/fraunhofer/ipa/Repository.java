@@ -36,19 +36,18 @@
 
 package de.fraunhofer.ipa;
 
+import java.io.IOException;
+
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
 import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
-
-import java.io.IOException;
 
 import javax.servlet.ServletException;
 
@@ -157,7 +156,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Dependency Configurations";
+            return "Dependency Configurations"; //TODO
         }
 	    
 	    /**
