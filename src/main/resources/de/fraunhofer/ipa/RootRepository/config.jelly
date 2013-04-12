@@ -2,7 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<j:set var="genId" value="${h.generateId()}"/>
   	<f:entry field="repoName" title="${%repoName}">
-   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}')" style="width:250px;"/>
+   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validFork()" style="width:250px;"/>
 	</f:entry>
 	<f:entry field="suffix" title="${%suffix}">
    		<f:textbox id="${genId}suffix" onchange="generateFullName('${genId}')" onkeyup="generateFullName('${genId}')" style="width:250px;"/>
@@ -46,7 +46,8 @@
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
 		  	<f:entry field="fork" title="${%fork}">
-		   		<f:combobox />
+		   		<f:combobox onchange="${genId}validFork()" id="${genId}fork"/>
+		   		<div id="${genId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
 		   		<f:combobox />
@@ -261,6 +262,13 @@
       		}
       		document.getElementById("${genId}regularBuild").innerHTML = head + body + tail;
 			callback();
+  		}
+  		
+  		function ${genId}validFork() {
+  			${genId}Des.checkFork(document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
+  				document.getElementById("${genId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  				parseResult(t.responseObject(), true);
+  			});
   		}
   		
   		if (typeof ${genId}Inst !== 'undefined') {

@@ -220,6 +220,10 @@
 			return "";
   		}
   		
+  		function validForks() {
+  			 parseResult("called validForks", true);
+  		}
+  		
   		function validDeps() {
   			var deps = document.getElementsByName('depName');
   			
@@ -246,15 +250,32 @@
 			result += validRepos();
 			result += validFullNames();
 			result += validDeps();
-			if (result.length!=0) {
-				document.getElementById('valMsg').innerHTML = result;
-				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
-				return false;
+			parseResult(result, false);
+			validForks();
+			return (document.getElementById('valIcon').innerHTML.indexOf("accept") != -1);
+		}
+			
+		function parseResult(result, addResult) {
+			if (addResult == true &amp;&amp; result.length != 0) {
+				if (document.getElementById('valIcon').innerHTML.indexOf("error") != -1) {
+					document.getElementById('valMsg').innerHTML += '<br/>' + result;
+				}
+				else if (document.getElementById('valIcon').innerHTML.indexOf("accept") != -1) {
+					document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
+					document.getElementById('valMsg').innerHTML = result;
+				}
 			}
 			else {
-				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alForkt="OK" height="22" width="22"/>';
-		        document.getElementById('valMsg').innerHTML = "${%ok}";
-		        return true;
+				if (result.length != 0) {
+					document.getElementById('valMsg').innerHTML = result;
+					document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
+					return false;
+				}
+				else {
+					document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
+			        document.getElementById('valMsg').innerHTML = "${%ok}";
+			        return true;
+				}
 			}
   		}
   		

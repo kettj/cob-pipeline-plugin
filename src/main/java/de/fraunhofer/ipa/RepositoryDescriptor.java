@@ -222,7 +222,30 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 			}
 		}
     	
-    	return msg;
+    	// if fork owner was not in list
+    	try {
+    		// check if user exists
+			try {
+				UserService githubUserSrv = new UserService(this.githubClient);
+				githubUserSrv.getUser(fork);
+			} catch (Exception ex) {
+				return msg + Messages.Fork_OwnerNotFound() + "\n" + ex.getMessage();
+			}
+			// check if user has public repository with given name
+			try {
+				RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
+				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(fork);
+				for (org.eclipse.egit.github.core.Repository r : repos) {
+					if (r.getName().equals(repo))
+						return msg + Messages.Fork_Found();
+				}
+			} catch (Exception ex) {
+				return msg + Messages.Fork_GetReposFailed() + "\n" + ex.getMessage();
+			}
+			return msg + Messages.Fork_NotFound(repo, fork);
+		} catch (Exception ex) {
+			return Messages.Fork_AuthFailed() + "\n" + ex.getMessage();
+		}
     }
     
     /**

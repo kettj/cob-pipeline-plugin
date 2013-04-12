@@ -1,12 +1,14 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<j:set var="genDepId" value="${h.generateId()}"/>
   	<f:entry field="depName" title="${%depName}">
-   		<f:combobox name="depName" id="${genId}dep" onchange="valid()"/>
+   		<f:combobox name="depName" id="${genId}dep" onchange="valid(); ${genDepId}validFork()"/>
 	</f:entry>
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
     		<f:entry field="fork" title="${%fork}">
-   				<f:combobox />
+   				<f:combobox onchange="${genDepId}validFork()" id="${genDepId}fork"/>
+		   		<div id="${genDepId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
    				<f:combobox />
@@ -16,4 +18,12 @@
 			</f:entry>
   		</f:advanced>
   	</f:entry>
+  	<script>
+  		function ${genDepId}validFork(parse) {
+  			${genId}Des.checkFork(document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
+  				document.getElementById("${genDepId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  				parseResult(t.responseObject(), true);
+  			});
+  		}
+  	</script>
 </j:jelly>
