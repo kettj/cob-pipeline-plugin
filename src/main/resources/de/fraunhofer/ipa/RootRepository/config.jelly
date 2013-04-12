@@ -46,7 +46,7 @@
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
 		  	<f:entry field="fork" title="${%fork}">
-		   		<f:combobox onchange="${genId}validFork()" id="${genId}fork"/>
+		   		<f:combobox name="fork" onchange="${genId}validFork()" id="${genId}fork"/>
 		   		<div id="${genId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">

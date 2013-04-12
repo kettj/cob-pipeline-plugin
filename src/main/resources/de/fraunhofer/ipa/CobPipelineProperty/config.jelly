@@ -222,6 +222,14 @@
   		
   		function validForks() {
   			 parseResult("called validForks", true);
+  			 var forks = document.getElementsByName('fork');
+  			
+  			 if (forks.length!=0) {
+  			 	for (i=0;i&lt;forks.length;i++) {
+  			 		var valFork = window[forks[i].id.replace('fork', '')+'validFork'];
+  			 		valFork();
+  			 	}
+  			 }
   		}
   		
   		function validDeps() {

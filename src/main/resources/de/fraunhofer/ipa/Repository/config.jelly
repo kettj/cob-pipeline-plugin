@@ -7,7 +7,7 @@
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
     		<f:entry field="fork" title="${%fork}">
-   				<f:combobox onchange="${genDepId}validFork()" id="${genDepId}fork"/>
+   				<f:combobox name="fork" onchange="${genDepId}validFork()" id="${genDepId}fork"/>
 		   		<div id="${genDepId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
@@ -20,8 +20,9 @@
   		</f:advanced>
   	</f:entry>
   	<script>
+  		var ${genDepId}Des = <st:bind value="${descriptor}"/>
   		function ${genDepId}validFork(parse) {
-  			${genId}Des.checkFork(document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
+  			${genDepId}Des.checkFork(document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
   				document.getElementById("${genDepId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
   				parseResult(t.responseObject(), true);
   				${genDepId}validBranch();
@@ -29,7 +30,7 @@
   		}
   		
   		function ${genDepId}validBranch() {
-  			${genId}Des.checkBranch(document.getElementById("${genDepId}branch").value, document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
+  			${genDepId}Des.checkBranch(document.getElementById("${genDepId}branch").value, document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
   				document.getElementById("${genDepId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
   				parseResult(t.responseObject(), true);
   			});
