@@ -329,10 +329,31 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return this.branchItems = aux;
     }
     
+    @JavaScriptMethod
+    public String checkBranch(String branch, String fork, String repo) {
+    	String msg = "";
+    	
+    	doFillBranchItems(repo, fork);
+    	
+    	if (branch.length() == 0) {
+    		branch = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
+    		msg = Messages.Branch_DefaultUsed(branch);
+    	}
+    	
+    	// check if given branch is in branch list
+    	for (String b : this.branchItems) {
+			if (b.equals(branch)) {
+				return msg;
+			}
+		}
+    	    	
+    	return msg + Messages.Branch_NotFound();
+    }
+    
     /**
      * Checks if given branch exists
      */
-    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
+    /*public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
     		throws IOException, ServletException {
     	
     	String msg = "";
@@ -352,5 +373,5 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 		}
     	    	
     	return FormValidation.error(msg + Messages.Branch_NotFound());
-    }
+    }*/
 }

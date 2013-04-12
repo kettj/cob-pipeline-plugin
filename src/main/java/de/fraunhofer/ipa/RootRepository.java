@@ -416,10 +416,10 @@ public class RootRepository extends Repository {
 	    /**
 	     * Checks if given branch exists
 	     */
-	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
+	    /*public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String repoName, @QueryParameter String fork)
 	    		throws IOException, ServletException {
 	    	return super.doCheckBranch(value, repoName, fork);
-	    }
+	    }*/
 	    
 	    /**
 	     * Returns list of global defined available robots

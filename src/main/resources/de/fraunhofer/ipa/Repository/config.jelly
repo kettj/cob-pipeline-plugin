@@ -11,7 +11,8 @@
 		   		<div id="${genDepId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
-   				<f:combobox />
+   				<f:combobox onchange="${genDepId}validBranch()" id="${genDepId}branch"/>
+		   		<div id="${genDepId}branchWarning"/>
 			</f:entry>
 			<f:entry field="poll" title="${%poll}">
    				<f:checkbox />
@@ -22,6 +23,14 @@
   		function ${genDepId}validFork(parse) {
   			${genId}Des.checkFork(document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
   				document.getElementById("${genDepId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  				parseResult(t.responseObject(), true);
+  				${genDepId}validBranch();
+  			});
+  		}
+  		
+  		function ${genDepId}validBranch() {
+  			${genId}Des.checkBranch(document.getElementById("${genDepId}branch").value, document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
+  				document.getElementById("${genDepId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
   				parseResult(t.responseObject(), true);
   			});
   		}

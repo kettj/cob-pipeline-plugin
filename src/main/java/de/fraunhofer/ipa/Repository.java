@@ -199,10 +199,10 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Checks if given branch exists
 	     */
-	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
+	    /*public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
 	    		throws IOException, ServletException {
 	    	return super.doCheckBranch(value, depName, fork);
-	    }
+	    }*/
 	}
 	
     public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {

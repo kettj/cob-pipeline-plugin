@@ -50,7 +50,8 @@
 		   		<div id="${genId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
-		   		<f:combobox />
+		   		<f:combobox onchange="${genId}validBranch()" id="${genId}branch"/>
+		   		<div id="${genId}branchWarning"/>
 			</f:entry>
 			<f:entry title="${%jobs}">
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
@@ -267,6 +268,14 @@
   		function ${genId}validFork() {
   			${genId}Des.checkFork(document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
   				document.getElementById("${genId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  				parseResult(t.responseObject(), true);
+  				${genId}validBranch();
+  			});
+  		}
+  		
+  		function ${genId}validBranch() {
+  			${genId}Des.checkBranch(document.getElementById("${genId}branch").value, document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
+  				document.getElementById("${genId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
   				parseResult(t.responseObject(), true);
   			});
   		}
