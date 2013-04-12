@@ -162,17 +162,17 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Fills combobox with repository names of organization
 	     */
-	    public ComboBoxModel doFillDepNameItems() {
-	    	return super.doFillNameItems();
+	    public ComboBoxModel doFillDepNameItems(@QueryParameter String fork) {
+	    	return super.doFillNameItems(fork);
 	    }
 	    
 	    /**
 	     * Checks if given repository exists
 	     */
-	    public FormValidation doCheckDepName(@QueryParameter String value)
+	    /*public FormValidation doCheckDepName(@QueryParameter String value)
 	    		throws IOException, ServletException {
 	    	return super.doCheckName(value);
-	    }
+	    }*/
 	    
 	    /**
 	     * Fill combobox with forks of repository

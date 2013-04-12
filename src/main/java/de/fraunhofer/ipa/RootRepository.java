@@ -379,17 +379,17 @@ public class RootRepository extends Repository {
 	    /**
 	     * Fills combobox with repository names of organization
 	     */
-	    public ComboBoxModel doFillRepoNameItems() {
-	    	return super.doFillNameItems();
+	    public ComboBoxModel doFillRepoNameItems(@QueryParameter String fork) {
+	    	return super.doFillNameItems(fork);
 	    }
 	    
 	    /**
 	     * Checks if given repository exists
 	     */
-	    public FormValidation doCheckRepoName(@QueryParameter String value)
+	    /*public FormValidation doCheckRepoName(@QueryParameter String value)
 	    		throws IOException, ServletException {
 	    	return super.doCheckName(value);
-	    }
+	    }*/
 	    
 	    /**
 	     * Fill combobox with forks of repository

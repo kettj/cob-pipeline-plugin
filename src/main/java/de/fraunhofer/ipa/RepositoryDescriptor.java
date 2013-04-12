@@ -130,17 +130,20 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Fills combobox with repository names of organization
      */
-    public ComboBoxModel doFillNameItems() {
+    public ComboBoxModel doFillNameItems(@QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
 
     	if (this.githubClient.getUser() == "") {
     		setGithubConfig();
     	}
     	
+    	if (fork.length() == 0) {
+    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    	}    	
+    	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
-    		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(
-    				Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork());
+    		List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(fork);
     		for (org.eclipse.egit.github.core.Repository repo : repos) {
     			if (!aux.contains(repo.getName()))
 					aux.add(0, repo.getName());
@@ -152,10 +155,35 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	return this.repoNameItems = aux;
     }
     
+    @JavaScriptMethod
+    public String checkName(String repo, String fork) {
+    	
+    	doFillNameItems(fork);
+    	
+    	if (fork.length() == 0) {
+    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    	}  
+    	
+    	if (repo.length() == 0) {
+    		return Messages.Repository_NoName();
+    	}
+    	
+    	// check if given repository is in repo list
+    	for (String repoName : this.repoNameItems) {
+			if (repoName.equals(repo)) {
+				return "";
+			}
+		}
+    	// if repository was not in list, for example extern repository
+    	// TODO if owner is not given, ask for owner and check for repo    	
+    	
+    	return Messages.Repository_NoFound();
+    }
+    
     /**
      * Checks if given repository exists
      */
-    public FormValidation doCheckName(@QueryParameter String value)
+    /*public FormValidation doCheckName(@QueryParameter String value)
     		throws IOException, ServletException {
     	
     	doFillNameItems();
@@ -174,7 +202,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	// TODO if owner is not given, ask for owner and check for repo    	
     	
     	return FormValidation.error(Messages.Repository_NoFound());
-    }
+    }*/
     
     
     /**
