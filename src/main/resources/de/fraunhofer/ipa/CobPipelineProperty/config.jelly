@@ -200,7 +200,7 @@
   			else {
   				document.getElementById(id+'fullName').value = repoName.value + '__' + suffix.value;
   			}
-  			validFullNames();
+  			valid();
   		}
   		
   		function validFullNames() {
@@ -211,15 +211,17 @@
 			    	for (j=0;j&lt;fullNames.length;j++) {
 			    		if(i!=j) {
 			    			if(fullNames[i].value == fullNames[j].value) {
-			    				parseResult("${%duplicateFullNames}: " + fullNames[i].value, true);
+			    				return document.getElementById('valMsg').innerHTML = "${%duplicateFullNames}: " + fullNames[i].value + "<br/>";
 			    			}
 			    		}
 			    	}
 			    }
 			}
+			return "";
   		}
   		
   		function validForks() {
+  			 parseResult("called validForks", true);
   			 var forks = document.getElementsByName('fork');
   			
   			 if (forks.length!=0) {
@@ -237,15 +239,16 @@
 			    for (i=0;i&lt;deps.length;i++) {
 			    	for (j=0;j&lt;deps.length;j++) {
 			    		if(i!=j) {
-			    			if (deps[i].id.split('dep')[0] == deps[j].id.split('dep')[0]) {
+			    			if (deps[i].id == deps[j].id) {
 				    			if(deps[i].value == deps[j].value) {
-				    				parseResult("${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.split('dep')[0]+"repoName").value, true);
+				    				return document.getElementById('valMsg').innerHTML = "${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.replace("dep", "repoName")).value;
 				    			}
 				    		}
 			    		}
 			    	}
 			    }
 			}
+			return "";
   		}
   	
   		function valid() {
@@ -253,10 +256,10 @@
 			result += validDefaultFork();
 			result += validDefaultBranch();
 			result += validRepos();
+			result += validFullNames();
+			result += validDeps();
 			parseResult(result, false);
-			validFullNames();
 			validForks();
-			validDeps();
 			return (document.getElementById('valIcon').innerHTML.indexOf("accept") != -1);
 		}
 			

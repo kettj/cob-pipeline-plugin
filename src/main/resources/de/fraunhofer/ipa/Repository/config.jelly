@@ -1,49 +1,19 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
-	<j:set var="genDepId" value="${h.generateId()}"/>
   	<f:entry field="depName" title="${%depName}">
-   		<f:combobox name="depName" id="${genId}dep" onchange="validDeps(); ${genDepId}validName()"/>
-   		<div id="${genDepId}nameWarning"/>
+   		<f:combobox name="depName" id="${genId}dep" onchange="valid()"/>
 	</f:entry>
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
     		<f:entry field="fork" title="${%fork}">
-   				<f:combobox name="fork" onchange="${genDepId}validName()" id="${genDepId}fork"/>
-		   		<div id="${genDepId}forkWarning"/>
+   				<f:combobox /> <!--checkUrl="'descriptorByName/de.fraunhofer.ipa.Repository/checkDepName'+qs(this).addThis().toString()"/-->
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
-   				<f:combobox onchange="${genDepId}validBranch()" id="${genDepId}branch"/>
-		   		<div id="${genDepId}branchWarning"/>
+   				<f:combobox />
 			</f:entry>
 			<f:entry field="poll" title="${%poll}">
    				<f:checkbox />
 			</f:entry>
   		</f:advanced>
   	</f:entry>
-  	<script>
-  		var ${genDepId}Des = <st:bind value="${descriptor}"/>
-  		
-  		function ${genDepId}validName() {
-  			${genDepId}Des.checkName(document.getElementById("${genId}dep").value, document.getElementById("${genDepId}fork").value, function(t) {
-  				document.getElementById("${genDepId}nameWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
-  				${genDepId}validFork();
-  			});
-  		}
-  		
-  		function ${genDepId}validFork(parse) {
-  			${genDepId}Des.checkFork(document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
-  				document.getElementById("${genDepId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
-  				${genDepId}validBranch();
-  			});
-  		}
-  		
-  		function ${genDepId}validBranch() {
-  			${genDepId}Des.checkBranch(document.getElementById("${genDepId}branch").value, document.getElementById("${genDepId}fork").value, document.getElementById("${genId}dep").value, function(t) {
-  				document.getElementById("${genDepId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
-  			});
-  		}
-  	</script>
 </j:jelly>

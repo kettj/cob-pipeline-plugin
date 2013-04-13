@@ -169,10 +169,10 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Checks if given repository exists
 	     */
-	    /*public FormValidation doCheckDepName(@QueryParameter String value)
+	    public FormValidation doCheckDepName(@QueryParameter String value, @QueryParameter String fork)
 	    		throws IOException, ServletException {
-	    	return super.doCheckName(value);
-	    }*/
+	    	return super.checkDepName(value, fork);
+	    }
 	    
 	    /**
 	     * Fill combobox with forks of repository
@@ -184,10 +184,10 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Checks if given fork owner exists
 	     */
-	    /*public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
+	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
 	    		throws IOException, ServletException {
-	    	return super.doCheckFork(value, depName);
-	    }*/
+	    	return super.checkDepFork(value, depName);
+	    }
 
 	    /**
 	     * Fill combobox with branches of fork
@@ -199,10 +199,10 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Checks if given branch exists
 	     */
-	    /*public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
+	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
 	    		throws IOException, ServletException {
-	    	return super.doCheckBranch(value, depName, fork);
-	    }*/
+	    	return super.checkDepBranch(value, depName, fork);
+	    }
 	}
 	
     public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {
