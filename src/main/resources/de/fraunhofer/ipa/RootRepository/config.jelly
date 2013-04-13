@@ -2,7 +2,7 @@
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<j:set var="genId" value="${h.generateId()}"/>
   	<f:entry field="repoName" title="${%repoName}">
-   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validName()" style="width:250px;"/>
+   		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validateName()" style="width:250px;"/>
 		<div id="${genId}nameWarning"/>
 	</f:entry>
 	<f:entry field="suffix" title="${%suffix}">
@@ -47,11 +47,11 @@
 	<f:entry title="Advanced Repository Options">
   		<f:advanced>
 		  	<f:entry field="fork" title="${%fork}">
-		   		<f:combobox name="fork" onchange="${genId}validName()" id="${genId}fork"/>
+		   		<f:combobox name="fork" onchange="${genId}validateName()" id="${genId}fork"/>
 		   		<div id="${genId}forkWarning"/>
 			</f:entry>
 			<f:entry field="branch" title="${%branch}">
-		   		<f:combobox onchange="${genId}validBranch()" id="${genId}branch"/>
+		   		<f:combobox onchange="${genId}validateBranch()" id="${genId}branch"/>
 		   		<div id="${genId}branchWarning"/>
 			</f:entry>
 			<f:entry title="${%jobs}">
@@ -266,26 +266,26 @@
 			callback();
   		}
   		
-  		function ${genId}validName() {
+  		function ${genId}validateName() {
   			${genId}Des.checkName(document.getElementById("${genId}repoName").value, document.getElementById("${genId}fork").value, function(t) {
   				document.getElementById("${genId}nameWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
-  				${genId}validFork();
+  				validationOutput(t.responseObject(), "${genId}repoName");
+  				${genId}validateFork();
   			});
   		}
   		
-  		function ${genId}validFork() {
+  		function ${genId}validateFork() {
   			${genId}Des.checkFork(document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
   				document.getElementById("${genId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
-  				${genId}validBranch();
+  				validationOutput(t.responseObject(), "${genId}fork");
+  				${genId}validateBranch();
   			});
   		}
   		
-  		function ${genId}validBranch() {
+  		function ${genId}validateBranch() {
   			${genId}Des.checkBranch(document.getElementById("${genId}branch").value, document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
   				document.getElementById("${genId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				parseResult(t.responseObject(), true);
+  				validationOutput(t.responseObject(), "${genId}branch");
   			});
   		}
   		
