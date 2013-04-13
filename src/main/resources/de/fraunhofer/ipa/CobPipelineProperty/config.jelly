@@ -269,7 +269,7 @@
   			else {
 	  			if (typeof msgDiv === 'undefined' || msgDiv === null) {
 	  				var div=document.createElement('div');
-  					div.appendChild(document.createTextNode(msg+" "+msgId));
+  					div.appendChild(document.createTextNode("• " + msg+" "+msgId));
   					div.id = 'errorMsg' + msgId;
 	  				document.getElementById('errorMsgs').appendChild(div);
 	  			}
@@ -285,12 +285,12 @@
   			
   			if (children.length == 0) {
 				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
-		        document.getElementById('valMsg').innerHTML = "${%ok}";
+		        document.getElementById('valMsg').innerHTML = "<b>${%ok}</b>";
 		        return true;
   			}
   			else {
 				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
-  				document.getElementById('valMsg').innerHTML = "${%error}";
+  				document.getElementById('valMsg').innerHTML = "<b>${%error}</b>";
   				return false;
   			}
   		}

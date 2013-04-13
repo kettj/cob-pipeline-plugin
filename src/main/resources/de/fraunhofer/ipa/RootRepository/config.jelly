@@ -161,7 +161,10 @@
 	        		return;
 	        	}
 	        }
-	        validationOutput("", "${genId}rosDistro");
+	        try {
+	        	validationOutput("", "${genId}rosDistro");
+	        }
+	        catch(err) {}
 	        document.getElementById("${genId}rosDistroWarning").innerHTML = '';
 	        ${genId}Des.getSupportedUbuntuReleases(rosDistroList.toString(), function(t) {
 	  			var selected = document.getElementById("${genId}selection").value;
