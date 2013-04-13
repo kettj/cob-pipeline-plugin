@@ -155,12 +155,13 @@
 	        			        		
 	        		document.getElementById("${genId}rosDistroWarning").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
 	        		document.getElementById("${genId}regularBuild").innerHTML = '<b><font color="red">${%selectFirst}</font></b>';
+	        		validationOutput("${%selectFirst}", "${genId}rosDistro");
 	        	}
 	        	finally {
 	        		return;
 	        	}
 	        }
-	        
+	        validationOutput("", "${genId}rosDistro");
 	        document.getElementById("${genId}rosDistroWarning").innerHTML = '';
 	        ${genId}Des.getSupportedUbuntuReleases(rosDistroList.toString(), function(t) {
 	  			var selected = document.getElementById("${genId}selection").value;
