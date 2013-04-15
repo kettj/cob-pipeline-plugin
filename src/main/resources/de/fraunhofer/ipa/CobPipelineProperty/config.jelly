@@ -1,13 +1,13 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:entry title="${%email}" field="email">
-        <f:textbox id="email" onchange="validate()"/>
+        <f:textbox id="email" onchange="validateEmail()"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
-        <f:textbox id="defaultFork" onchange="validate()"/>
+        <f:textbox id="defaultFork" onchange="validateDefaultFork()"/>
 	</f:entry>
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
-        <f:textbox id="defaultBranch" onchange="validate()"/>
+        <f:textbox id="defaultBranch" onchange="validateDefaultBranch()"/>
 	</f:entry>
 	<f:entry title="Advanced Options">
   		<f:advanced>
