@@ -13,9 +13,6 @@
     	<f:entry title="${%passwd}" field="githubPassword">
     		<f:password />
     	</f:entry>
-    	<f:entry title="${%team}" field="githubTeam">
-    		<f:textbox />
-    	</f:entry>
     	<f:entry title="${%rosDistros}" field="allRosDistrosString">
     		<f:expandableTextbox />
     	</f:entry>

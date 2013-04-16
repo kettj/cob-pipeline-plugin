@@ -197,8 +197,6 @@ public class CobPipelineProperty extends UserProperty {
 
 		private String githubOrg;
 
-		private String githubTeam;
-
 		private String githubLogin;
 
 		private String githubPassword;
@@ -248,14 +246,6 @@ public class CobPipelineProperty extends UserProperty {
 
 		public String getGithubOrg() {
 			return githubOrg;
-		}
-
-		public void setGithubTeam(String githubTeam) {
-			this.githubTeam = githubTeam;
-		}
-
-		public String getGithubTeam() {
-			return githubTeam;
 		}
 
 		public void setGithubLogin(String githubLogin) {
@@ -403,32 +393,6 @@ public class CobPipelineProperty extends UserProperty {
 						user.getPublicRepos()+" public and "+user.getTotalPrivateRepos()+" private repositories");
 			} catch (Exception ex) {
 				return FormValidation.error(Messages.Github_PasswordIncorrect() + "\n" + ex.getMessage());
-			}
-		}
-
-		/**
-		 * Checks if team exists in given organization
-		 * and given user belongs to team
-		 */
-		public FormValidation doCheckGithubTeam(@QueryParameter String value, @QueryParameter String githubLogin,
-				@QueryParameter String githubPassword, @QueryParameter String githubOrg)
-						throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error("Please enter team name");
-			}
-			try {
-				GitHubClient client = new GitHubClient();
-				client.setCredentials(githubLogin, githubPassword);
-				TeamService githubTeamSrv = new TeamService(client);
-				List<Team> teams = githubTeamSrv.getTeams(githubOrg);
-				for (Team team : teams) {
-					if (value.equals(team.getName())) {
-						return FormValidation.ok("Team ownes "+Integer.toString(team.getReposCount())+" repositories.");
-					}
-				}
-				return FormValidation.error("Invalid Github team. Team not found. Make sure the given user is a member of this team");
-			} catch (IOException ex) {
-				return FormValidation.error("Error occured while checking team existenz: "+ex.getMessage());
 			}
 		}
 
