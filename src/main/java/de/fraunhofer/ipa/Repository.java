@@ -162,16 +162,16 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Fills combobox with repository names of organization
 	     */
-	    public ComboBoxModel doFillDepNameItems() {
-	    	return super.doFillNameItems();
+	    public ComboBoxModel doFillDepNameItems(@QueryParameter String fork) {
+	    	return super.doFillNameItems(fork);
 	    }
 	    
 	    /**
 	     * Checks if given repository exists
 	     */
-	    public FormValidation doCheckDepName(@QueryParameter String value)
+	    public FormValidation doCheckDepName(@QueryParameter String value, @QueryParameter String fork)
 	    		throws IOException, ServletException {
-	    	return super.doCheckName(value);
+	    	return super.checkDepName(value, fork);
 	    }
 	    
 	    /**
@@ -186,7 +186,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	     */
 	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
 	    		throws IOException, ServletException {
-	    	return super.doCheckFork(value, depName);
+	    	return super.checkDepFork(value, depName);
 	    }
 
 	    /**
@@ -201,7 +201,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	     */
 	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
 	    		throws IOException, ServletException {
-	    	return super.doCheckBranch(value, depName, fork);
+	    	return super.checkDepBranch(value, depName, fork);
 	    }
 	}
 	

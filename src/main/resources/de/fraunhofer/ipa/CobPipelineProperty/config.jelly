@@ -1,13 +1,13 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:entry title="${%email}" field="email">
-        <f:textbox id="email" onchange="valid()"/>
+        <f:textbox id="email" onchange="validateEmail()"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
-        <f:textbox id="defaultFork" onchange="valid()"/>
+        <f:textbox id="defaultFork" onchange="validateDefaultFork()"/>
 	</f:entry>
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
-        <f:textbox id="defaultBranch" onchange="valid()"/>
+        <f:textbox id="defaultBranch" onchange="validateDefaultBranch()"/>
 	</f:entry>
 	<f:entry title="Advanced Options">
   		<f:advanced>
@@ -25,7 +25,7 @@
 	</f:block>
 	<f:bottomButtonBar>
 	<f:entry field="validation" title="${%validation}" >
-		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+		<table align="center" border="1" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="30" style="vertical-align:middle">
               		<div style="float:left" id="valIcon" />
@@ -35,9 +35,15 @@
               	</td>
               	<td width="*" style="vertical-align:middle">
               		<div tooltip="${%validate}">
-              		  	<img src="${rootURL}/images/48x48/refresh.png" alt="${%validate}" style="cursor: pointer;" onclick="valid()" height="22" width="22"/>
+              		  	<img src="${rootURL}/images/48x48/refresh.png" alt="${%validate}" style="cursor: pointer;" onclick="validate()" height="22" width="22"/>
               		</div>
               	</td>
+			</tr><tr>
+				<td width="30" ></td>
+				<td width="*" style="vertical-align:middle">
+					<div id="errorMsgs" />
+				</td>
+				<td width="* " ></td>
 			</tr></tbody>
 		</table>
 	</f:entry>
@@ -56,7 +62,7 @@
             </tr><tr>
             	<td width="150"></td>
             	<td width="*">
-              		<div id="msg" />
+              		<div id="msg"/>
               	</td>
 			</tr></tbody>
 		</table>
@@ -154,40 +160,42 @@
 	  		}
 		});
   		
-  		function validEmail() {
+  		function validateEmail() {
 			var email = document.getElementById('email');
 
   			if (email.value.length==0) {
-		    	return document.getElementById('valMsg').innerHTML = "${%noEmail}" + "<br/>";
+  				validationOutput("${%noEmail}", "email");
 		    }
-		    return "";		    
   		}
   		
-  		function validDefaultFork() {
+  		function validateDefaultFork() {
   			var defaultFork = document.getElementById('defaultFork');
 
   			if (defaultFork.value.length==0) {
-  				return document.getElementById('valMsg').innerHTML = "${%noDefaultFork}" + "<br/>";
+  				validationOutput("${%noDefaultFork}", "defaultFork");
   			}
-  			return "";
   		}
   		
-  		function validDefaultBranch() {
+  		function validateDefaultBranch() {
   			var defaultBranch = document.getElementById('defaultBranch');
 
   			if (defaultBranch.value.length==0) {
-  				return document.getElementById('valMsg').innerHTML = "${%noDefaultBranch}" + "<br/>";
+  				validationOutput("${%noDefaultBranch}", "defaultBranch");
   			}
-  			return "";
   		}
   		
-  		function validRepos() {
+  		function validateRepos() {
   			var repos = document.getElementsByName('repoName');
   			
   			if (repos.length==0) {
-		      	return document.getElementById('valMsg').innerHTML = "${%noRepo}" + "<br/>";
+		      	validationOutput("${%noRepo}", "noRepo");
 		    }
-		    return "";
+		    else {
+		    	for (i=0;i&lt;repos.length;i++) {
+  			 		var valName= window[repos[i].id.replace('repoName', '')+'validateName'];
+  			 		valName();
+  			 	}
+		    }
   		}
   		
   		function generateFullName(id) {
@@ -200,10 +208,10 @@
   			else {
   				document.getElementById(id+'fullName').value = repoName.value + '__' + suffix.value;
   			}
-  			valid();
+  			validateFullNames();
   		}
   		
-  		function validFullNames() {
+  		function validateFullNames() {
   			var fullNames = document.getElementsByName('fullName');
   			
   			if (fullNames.length!=0) {
@@ -211,16 +219,15 @@
 			    	for (j=0;j&lt;fullNames.length;j++) {
 			    		if(i!=j) {
 			    			if(fullNames[i].value == fullNames[j].value) {
-			    				return document.getElementById('valMsg').innerHTML = "${%duplicateFullNames}: " + fullNames[i].value + "<br/>";
+			    				validationOutput("${%duplicateFullNames}: " + fullNames[i].value + "<br/>", fullNames[i].value+"double");
 			    			}
 			    		}
 			    	}
 			    }
 			}
-			return "";
   		}
   		
-  		function validDeps() {
+  		function validateDeps() {
   			var deps = document.getElementsByName('depName');
   			
   			if (deps.length!=0) {
@@ -229,35 +236,72 @@
 			    		if(i!=j) {
 			    			if (deps[i].id == deps[j].id) {
 				    			if(deps[i].value == deps[j].value) {
-				    				return document.getElementById('valMsg').innerHTML = "${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.replace("dep", "repoName")).value;
+				    				validationOutput("${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.replace("dep", "repoName")).value, deps[i].id+"double");
 				    			}
 				    		}
 			    		}
 			    	}
 			    }
 			}
-			return "";
   		}
   	
-  		function valid() {
-			var result = validEmail();
-			result += validDefaultFork();
-			result += validDefaultBranch();
-			result += validRepos();
-			result += validFullNames();
-			result += validDeps();
-			if (result.length!=0) {
-				document.getElementById('valMsg').innerHTML = result;
-				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
-				return false;
-			}
-			else {
-				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alForkt="OK" height="22" width="22"/>';
-		        document.getElementById('valMsg').innerHTML = "${%ok}";
-		        return true;
-			}
+  		function validate() {
+  			reset();
+  			
+  			validateEmail();
+			validateDefaultFork();
+			validateDefaultBranch();
+			validateRepos();
+			validateFullNames();
+			validateDeps();
+
+			return valid();
+		}
+  		
+  		function validationOutput(msg, msgId) {
+  			var msgDiv = document.getElementById('errorMsg'+msgId);
+  			
+  			if (msg.length == 0) {
+  				if (typeof msgDiv !== 'undefined' &amp;&amp; msgDiv !== null) {
+  					document.getElementById('errorMsgs').removeChild(msgDiv);
+  				}
+  			}
+  			else {
+	  			if (typeof msgDiv === 'undefined' || msgDiv === null) {
+	  				var div=document.createElement('div');
+  					div.appendChild(document.createTextNode("• " + msg+" "+msgId));
+  					div.id = 'errorMsg' + msgId;
+	  				document.getElementById('errorMsgs').appendChild(div);
+	  			}
+	  			else {
+	  				msgDiv.innerHtml = msg;
+	  			}
+  			}
+  			valid();
   		}
   		
-  		valid();
+  		function valid() {
+  			var children = document.getElementById('errorMsgs').childNodes;
+  			
+  			if (children.length == 0) {
+				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
+		        document.getElementById('valMsg').innerHTML = "<b>${%ok}</b>";
+		        return true;
+  			}
+  			else {
+				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
+  				document.getElementById('valMsg').innerHTML = "<b>${%error}</b>";
+  				return false;
+  			}
+  		}
+  		
+  		function reset() {
+  			var children = document.getElementById('errorMsgs').childNodes;
+  			for (i=children.length-1;i&gt;=0;i--) {
+  				document.getElementById('errorMsgs').removeChild(children[i]);
+  			}
+  		}
+  		
+  		validate();
   	</script>
 </j:jelly>
