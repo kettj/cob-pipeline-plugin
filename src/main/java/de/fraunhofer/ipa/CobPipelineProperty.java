@@ -195,8 +195,6 @@ public class CobPipelineProperty extends UserProperty {
 	@Extension
 	public static class DescriptorImpl extends UserPropertyDescriptor {
 
-		private String githubOrg;
-
 		private String githubLogin;
 
 		private String githubPassword;
@@ -238,14 +236,6 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.error(Messages.Email_Empty());
 			}
 			return FormValidation.ok();
-		}
-
-		public void setGithubOrg(String githubOrg) {
-			this.githubOrg = githubOrg;
-		}
-
-		public String getGithubOrg() {
-			return githubOrg;
 		}
 
 		public void setGithubLogin(String githubLogin) {
@@ -338,25 +328,6 @@ public class CobPipelineProperty extends UserProperty {
 
 		public String getConfigRepoURL() {
 			return this.configRepoURL;
-		}
-
-		//TODO enhance output and order
-		/**
-		 * Checks if organization exists
-		 */
-		public FormValidation doCheckGithubOrg(@QueryParameter String value)
-				throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error("Please enter organization name");
-			}
-			try {
-				OrganizationService githubOrgSrv = new OrganizationService();
-				org.eclipse.egit.github.core.User org = githubOrgSrv.getOrganization(value);
-				return FormValidation.ok("Organization ownes "+
-						org.getPublicRepos()+" public and "+org.getTotalPrivateRepos()+" private repositories");
-			} catch (IOException ex) {
-				return FormValidation.error("Invalid Github organization. Organization does not exist.\n"+ex.getMessage());
-			}
 		}
 
 		/**

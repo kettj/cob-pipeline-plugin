@@ -3,9 +3,6 @@
     	This Jelly script is used to produce the global configuration option.
   	-->
   	<f:section title="Cob Pipeline Configuration">
-    	<f:entry title="${%org}" field="githubOrg">
-    		<f:textbox />
-    	</f:entry>
     	<f:entry title="${%login}" field="githubLogin"
       		description="Enter login name of GitHub user which has read/write access for all repositories">
       		<f:textbox />

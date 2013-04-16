@@ -66,7 +66,8 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
         super(clazz);
     }
     
-    private String githubOrg;
+    //private String githubOrg;
+    private String githubLogin;
     
     private GitHubClient githubClient = new GitHubClient();
     
@@ -119,12 +120,12 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      * Sets the globally given GitHub configurations
      */
     private void setGithubConfig() {
-    	String githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
+    	this.githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
     	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
     	
-    	this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
+    	//this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
     	
-    	this.githubClient.setCredentials(githubLogin, githubPassword);
+    	this.githubClient.setCredentials(this.githubLogin, githubPassword);
     }
     
     /**
@@ -217,20 +218,24 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
-    	if (this.githubOrg == null) {
+    	if (this.githubClient.getUser() == "") {
     		setGithubConfig();
     	}
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
-    		RepositoryId repoId = new RepositoryId(this.githubOrg, name);
-    		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(repoId);
+    		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(new RepositoryId(this.githubLogin, name));
+    		for (org.eclipse.egit.github.core.Repository fork : forks) {
+    			org.eclipse.egit.github.core.User user = fork.getOwner();
+    			aux.add(0, user.getLogin());
+    		}    		
     		
+    		forks = githubRepoSrv.getForks(new RepositoryId(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
+    				getDefaultFork(), name));
     		for (org.eclipse.egit.github.core.Repository fork : forks) {
     			org.eclipse.egit.github.core.User user = fork.getOwner();
     			aux.add(0, user.getLogin());
     		}
-    		aux.add(0, this.githubOrg);
     		
     	} catch (Exception ex) {
 			// TODO: handle exception
@@ -341,7 +346,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
-    	if (this.githubOrg == null) {
+    	if (this.githubClient.getUser() == "") {
     		setGithubConfig();
     	}
     	
