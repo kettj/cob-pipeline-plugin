@@ -26,7 +26,7 @@
 		</table>
 		<div id="${genId}rosDistroWarning"/>
 	</f:entry>
-	<f:entry field="prioUbuntuDistro" title="${%Priority Ubuntu Release}">
+	<f:entry field="prioUbuntuDistro" title="${%prioUbuntuDistro}">
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
@@ -35,7 +35,7 @@
 			</tr></tbody>
    		</table>
 	</f:entry>
-	<f:entry field="prioArch" title="${%Priority Architecture}">
+	<f:entry field="prioArch" title="${%prioArch}">
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
@@ -44,7 +44,7 @@
 			</tr></tbody>
    		</table>
 	</f:entry>
-	<f:entry title="Advanced Repository Options">
+	<f:entry title="${%advanced}">
   		<f:advanced>
 		  	<f:entry field="fork" title="${%fork}">
 		   		<f:combobox name="fork" onchange="${genId}validateName()" id="${genId}fork"/>

@@ -304,7 +304,7 @@ public class RootRepository extends Repository {
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Repository Configurations"; //TODO
+            return Messages.Repository_DisplayName();
         }
 		
 		@Override

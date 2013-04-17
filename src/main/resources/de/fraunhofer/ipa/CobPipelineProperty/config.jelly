@@ -9,7 +9,7 @@
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
         <f:textbox id="defaultBranch" onchange="validateDefaultBranch()"/>
 	</f:entry>
-	<f:entry title="Advanced Options">
+	<f:entry title="${%advanced}">
   		<f:advanced>
 			<f:entry field="committerEmailEnabled" title="${%committerEmail}">
    				<f:checkbox />

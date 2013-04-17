@@ -415,7 +415,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 			}
 		}
     	    	
-    	return msg + Messages.Branch_NotFound();
+    	return msg + Messages.Branch_NotFound(branch);
     }
     
     /**
@@ -442,6 +442,6 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 			}
 		}
     	    	
-    	return FormValidation.error(msg + Messages.Branch_NotFound());
+    	return FormValidation.error(msg + Messages.Branch_NotFound(value));
     }
 }

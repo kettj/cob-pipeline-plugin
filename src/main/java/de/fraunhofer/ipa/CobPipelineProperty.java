@@ -370,7 +370,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckTargets(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter URL of the target platform yaml file"); //TODO
+				return FormValidation.warning(Messages.Targets_Empty());
 			}
 			return FormValidation.ok();
 		}
@@ -378,7 +378,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultFork(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter your GitHub login name as default fork/owner."); //TODO
+				return FormValidation.error(Messages.DefaultFork_Empty());
 			}
 			
 			this.defaultFork = value;
@@ -393,7 +393,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultBranch(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter default branch."); //TODO
+				return FormValidation.error(Messages.DefaultBranch_Empty());
 			}
 			this.defaultBranch = value;
 
@@ -580,7 +580,7 @@ public class CobPipelineProperty extends UserProperty {
 			LOGGER.log(Level.WARNING, "Failed to generate pipeline: "); //TODO
 			LOGGER.log(Level.WARNING, feedback);
 			response.put("message", feedback.replace("\n", "<br/>"));
-			response.put("status", "<font color=\"red\">Pipeline generation failed</font>");
+			response.put("status", "<font color=\"red\">" + Messages.Pipeline_GenerationFailure() + "</font>");
 			return response;
 		} else {
 			feedback = "";
@@ -592,7 +592,7 @@ public class CobPipelineProperty extends UserProperty {
 			}
 		}
 		response.put("message", message.replace("\n", "<br/>"));
-		response.put("status", "<font color=\"green\">Pipeline generated</font>"); //TODO
+		response.put("status", "<font color=\"green\">" + Messages.Pipeline_GenerationSuccess() + "</font>");
 		return response;
 	}
 
@@ -610,7 +610,7 @@ public class CobPipelineProperty extends UserProperty {
 	public static class GlobalAction implements RootAction {
 
 		public String getDisplayName() {
-			return "Pipeline Configuration"; //TODO
+			return Messages.Pipeline_DisplayName();
 		}
 
 		public String getIconFileName() {

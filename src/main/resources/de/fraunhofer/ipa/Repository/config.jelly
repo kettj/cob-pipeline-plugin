@@ -3,7 +3,7 @@
   	<f:entry field="depName" title="${%depName}">
    		<f:combobox name="depName" id="${genId}dep" onchange="validateDeps()"/>
 	</f:entry>
-	<f:entry title="Advanced Repository Options">
+	<f:entry title="${%advanced}">
   		<f:advanced>
     		<f:entry field="fork" title="${%fork}">
    				<f:combobox /> <!--checkUrl="'descriptorByName/de.fraunhofer.ipa.Repository/checkDepName'+qs(this).addThis().toString()"/-->
