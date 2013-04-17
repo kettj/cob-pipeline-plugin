@@ -42,9 +42,9 @@ import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
-import javax.mail.Message;
 import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.QueryParameter;
@@ -134,7 +134,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public ComboBoxModel doFillNameItems(@QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
 
-    	if (this.githubClient.getUser() == "") {
+    	if (this.githubClient.getUser() == null) {
     		setGithubConfig();
     	}
     	
@@ -152,7 +152,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 		} catch (IOException ex) {
 			// TODO: handle exception
 		}  
-    	
+    	Collections.sort(aux);    	
     	return this.repoNameItems = aux;
     }
     
@@ -218,28 +218,55 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public ComboBoxModel doFillForkItems(@QueryParameter String name) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
-    	if (this.githubClient.getUser() == "") {
+    	if (this.githubClient.getUser() == null) {
     		setGithubConfig();
     	}
     	
     	try {
     		RepositoryService githubRepoSrv = new RepositoryService(this.githubClient);
-    		List<org.eclipse.egit.github.core.Repository> forks = githubRepoSrv.getForks(new RepositoryId(this.githubLogin, name));
-    		for (org.eclipse.egit.github.core.Repository fork : forks) {
-    			org.eclipse.egit.github.core.User user = fork.getOwner();
-    			aux.add(0, user.getLogin());
-    		}    		
+    		List<org.eclipse.egit.github.core.Repository> forks;
     		
-    		forks = githubRepoSrv.getForks(new RepositoryId(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
-    				getDefaultFork(), name));
-    		for (org.eclipse.egit.github.core.Repository fork : forks) {
-    			org.eclipse.egit.github.core.User user = fork.getOwner();
-    			aux.add(0, user.getLogin());
-    		}
+    		try {
+    			//get parent repository if repository itself is forked
+	    		org.eclipse.egit.github.core.Repository parent = githubRepoSrv.getRepository(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
+    				getDefaultFork(), name).getParent();
+	    		
+	    		if (parent != null) {
+		    		//get fork of parent repository
+		    		forks = githubRepoSrv.getForks(parent);
+		    		for (org.eclipse.egit.github.core.Repository fork : forks) {
+		    			org.eclipse.egit.github.core.User user = fork.getOwner();
+		    			aux.add(user.getLogin());
+		    		}
+	    		}
+	    		
+	    		if (aux.isEmpty()) {
+		    		//add forks of repository
+		    		forks = githubRepoSrv.getForks(new RepositoryId(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
+		    				getDefaultFork(), name));
+		    		for (org.eclipse.egit.github.core.Repository fork : forks) {
+		    			org.eclipse.egit.github.core.User user = fork.getOwner();
+		    			aux.add(user.getLogin());
+		    		}
+	    		}
+	    		aux.add(0, Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork());
+    		} catch (Exception ex) {}
+    		
+    		try {
+    			//try to use global githubLogin, find repository and add forks
+	    		forks = githubRepoSrv.getForks(new RepositoryId(this.githubLogin, name));
+	    		for (org.eclipse.egit.github.core.Repository fork : forks) {
+	    			org.eclipse.egit.github.core.User user = fork.getOwner();
+	    			if (!aux.contains(user.getLogin())) {
+	    				aux.add(user.getLogin());
+	    			}
+	    		}
+    		} catch (Exception ex) {}
     		
     	} catch (Exception ex) {
 			// TODO: handle exception
-		}      	
+		}
+    	Collections.sort(aux);
     	return this.forkItems = aux;
     }
     
@@ -346,7 +373,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     public ComboBoxModel doFillBranchItems(@QueryParameter String name, @QueryParameter String fork) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
-    	if (this.githubClient.getUser() == "") {
+    	if (this.githubClient.getUser() == null) {
     		setGithubConfig();
     	}
     	
@@ -366,7 +393,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-
+    	Collections.sort(aux);
     	return this.branchItems = aux;
     }
     
