@@ -284,7 +284,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	// check if given fork owner is in fork list
     	for (String f : this.forkItems) {
 			if (f.equals(fork)) {
-				return msg;
+				return msg + "__succeeded";
 			}
 		}
     	
@@ -303,7 +303,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(fork);
 				for (org.eclipse.egit.github.core.Repository r : repos) {
 					if (r.getName().equals(repo))
-						return msg + Messages.Fork_Found();
+						return msg + Messages.Fork_Found() + "__succeeded";
 				}
 			} catch (Exception ex) {
 				return msg + Messages.Fork_GetReposFailed() + "\n" + ex.getMessage();
@@ -411,7 +411,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	// check if given branch is in branch list
     	for (String b : this.branchItems) {
 			if (b.equals(branch)) {
-				return msg;
+				return msg + "__succeeded";
 			}
 		}
     	    	

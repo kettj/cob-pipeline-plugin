@@ -280,16 +280,28 @@
   		
   		function ${genId}validateFork() {
   			${genId}Des.checkFork(document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
-  				document.getElementById("${genId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				validationOutput(t.responseObject(), "${genId}fork");
+  				if (t.responseObject().indexOf('__succeeded') != -1) {
+	  				document.getElementById("${genId}forkWarning").innerHTML = t.responseObject().replace('__succeeded', '');
+	  				validationOutput("", "${genId}fork");
+  				}
+  				else {
+	  				document.getElementById("${genId}forkWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+	  				validationOutput(t.responseObject(), "${genId}fork");
+  				}
   				${genId}validateBranch();
   			});
   		}
   		
   		function ${genId}validateBranch() {
   			${genId}Des.checkBranch(document.getElementById("${genId}branch").value, document.getElementById("${genId}fork").value, document.getElementById("${genId}repoName").value, function(t) {
-  				document.getElementById("${genId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				validationOutput(t.responseObject(), "${genId}branch");
+  				if (t.responseObject().indexOf('__succeeded') != -1) {
+	  				document.getElementById("${genId}branchWarning").innerHTML = t.responseObject().replace('__succeeded', '');
+  					validationOutput("", "${genId}branch");
+  				}
+  				else {
+  					document.getElementById("${genId}branchWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  					validationOutput(t.responseObject(), "${genId}branch");
+  				}
   			});
   		}
   		
