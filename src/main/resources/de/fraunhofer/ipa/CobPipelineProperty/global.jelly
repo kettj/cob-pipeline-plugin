@@ -3,11 +3,22 @@
     	This Jelly script is used to produce the global configuration option.
   	-->
   	<f:section title="Cob Pipeline Configuration">
-    	<f:entry title="${%login}" field="githubLogin"
-      		description="Enter login name of GitHub user which has read/write access for all repositories">
+  		<f:entry title="${%jenkinsLogin}" field="jenkinsLogin"
+      		description="${%jenkinsDescription}">
       		<f:textbox />
     	</f:entry>
-    	<f:entry title="${%passwd}" field="githubPassword">
+    	<f:entry title="${%jenkinsPasswd}" field="jenkinsPassword">
+    		<f:password />
+    	</f:entry>
+  		<f:entry title="${%tarballLocation}" field="tarballLocation"
+      		description="${%tarballLocationDescription}">
+      		<f:textbox />
+    	</f:entry>
+    	<f:entry title="${%githubLogin}" field="githubLogin"
+      		description="${%githubDescription}">
+      		<f:textbox />
+    	</f:entry>
+    	<f:entry title="${%githubPasswd}" field="githubPassword">
     		<f:password />
     	</f:entry>
     	<f:entry title="${%rosDistros}" field="allRosDistrosString">

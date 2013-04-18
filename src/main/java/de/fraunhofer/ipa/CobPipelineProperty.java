@@ -75,7 +75,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
-import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 import org.eclipse.jgit.api.Git;
@@ -195,6 +194,12 @@ public class CobPipelineProperty extends UserProperty {
 	@Extension
 	public static class DescriptorImpl extends UserPropertyDescriptor {
 
+		private String jenkinsLogin;
+
+		private String jenkinsPassword;
+		
+		private String tarballLocation;
+
 		private String githubLogin;
 
 		private String githubPassword;
@@ -236,6 +241,31 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.error(Messages.Email_Empty());
 			}
 			return FormValidation.ok();
+		}
+
+		public void setJenkinsLogin(String jenkinsLogin) {
+			this.jenkinsLogin = jenkinsLogin;
+		}
+
+		public String getJenkinsLogin() {
+			return jenkinsLogin;
+		}
+
+		//TODO save password encrypted
+		public void setJenkinsPassword(String jenkinsPassword) {
+			this.jenkinsPassword = jenkinsPassword;
+		}
+
+		public String getJenkinsPassword() {
+			return jenkinsPassword;
+		}
+		
+		public void setTarballLocation(String tarballLocation) {
+			this.tarballLocation = tarballLocation;
+		}
+		
+		public String getTarballLocation() {
+			return this.tarballLocation;
 		}
 
 		public void setGithubLogin(String githubLogin) {
@@ -328,6 +358,30 @@ public class CobPipelineProperty extends UserProperty {
 
 		public String getConfigRepoURL() {
 			return this.configRepoURL;
+		}
+
+		/**
+		 * Checks if given String is valid Jenkins user
+		 */
+		public FormValidation doCheckJenkinsLogin(@QueryParameter String value) {
+			//TODO
+			return FormValidation.ok();
+		}
+
+		/**
+		 * Checks if given password String is fits to Jenkins user
+		 */
+		public FormValidation doCheckJenkinsPassword(@QueryParameter String value, @QueryParameter String jenkinsLogin) {
+			//TODO
+			return FormValidation.ok();			
+		}
+		
+		/**
+		 * Checks if given URL exists
+		 */
+		public FormValidation doCheckTarballLocation(@QueryParameter String value) {
+			//TODO
+			return FormValidation.ok();			
 		}
 
 		/**
@@ -569,7 +623,12 @@ public class CobPipelineProperty extends UserProperty {
 
 		// trigger Python job generation script
 		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
-				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(), this.userName};
+				"-m", Jenkins.getInstance().getRootUrl(),
+				"-l", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsLogin(),
+				"-p", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsPassword(),
+				"-c", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(),
+				"-t", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTarballLocation(),
+				"-u", this.userName};
 		
 		proc = rt.exec(generationCall);
 		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
