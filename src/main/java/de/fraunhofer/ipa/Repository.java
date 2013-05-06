@@ -102,7 +102,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 		}
 		this.type = "git"; // right now only supported VCS is Git
 		if (this.type.equals("git")) {
-			this.url = "git@github.com:"+fork+"/"+depName+".git";
+			this.url = "git@github.com:"+this.fork+"/"+depName+".git";
 		} else {
 			throw new Exception("Given VCS type '"+type+"' is not supported");
 		}
