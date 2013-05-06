@@ -25,7 +25,7 @@
 	</f:block>
 	<f:bottomButtonBar>
 	<f:entry field="validation" title="${%validation}" >
-		<table align="center" border="1" cellpadding="0" cellspacing="0" width="100%">
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="30" style="vertical-align:middle">
               		<div style="float:left" id="valIcon" />
@@ -269,7 +269,7 @@
   			else {
 	  			if (typeof msgDiv === 'undefined' || msgDiv === null) {
 	  				var div=document.createElement('div');
-  					div.appendChild(document.createTextNode("• " + msg+" "+msgId));
+  					div.appendChild(document.createTextNode("• " + msg));
   					div.id = 'errorMsg' + msgId;
 	  				document.getElementById('errorMsgs').appendChild(div);
 	  			}
