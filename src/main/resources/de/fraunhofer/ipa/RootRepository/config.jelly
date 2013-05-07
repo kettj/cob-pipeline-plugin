@@ -101,7 +101,7 @@
 		    	</table>
   				<table border="0" width="*">
 					<td valign="top" width="*">
-		    			<f:checkbox field="release" title="${%release}"/>
+		    			<f:checkbox field="release" title="${%release}" help="/plugin/cob-pipeline/help-release.html"/>
 		    		</td>
 		    	</table>
 		    </f:entry>
