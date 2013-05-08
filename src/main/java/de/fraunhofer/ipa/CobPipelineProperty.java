@@ -116,11 +116,7 @@ public class CobPipelineProperty extends UserProperty {
 	private volatile RootRepositoryList rootRepos = new RootRepositoryList();
 
 	@DataBoundConstructor
-	public CobPipelineProperty(String id) {
-		this.userName = id;
-		if (masterName == null) {
-			this.masterName = getMasterName();
-		}
+	public CobPipelineProperty() {
 		this.rootRepos = rootRepos;
 	}
 	
@@ -198,6 +194,8 @@ public class CobPipelineProperty extends UserProperty {
 
 		private String jenkinsPassword;
 		
+		private String pipelineDir;
+		
 		private String tarballLocation;
 
 		private String githubLogin;
@@ -229,7 +227,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		@Override
 		public UserProperty newInstance(User user) {
-			return new CobPipelineProperty(user.getId());
+			return new CobPipelineProperty();
 		}
 
 		/**
@@ -260,6 +258,14 @@ public class CobPipelineProperty extends UserProperty {
 			return jenkinsPassword;
 		}
 		
+		public void setPipelineDir(String pipelineDir) {
+			this.pipelineDir = pipelineDir;
+		}
+		
+		public String getPipelineDir() {
+			return this.pipelineDir;
+		}
+		
 		public void setTarballLocation(String tarballLocation) {
 			this.tarballLocation = tarballLocation;
 		}
@@ -283,6 +289,14 @@ public class CobPipelineProperty extends UserProperty {
 
 		public String getGithubPassword() {
 			return githubPassword;
+		}
+
+		public void setConfigRepoURL(String configRepoURL) {
+			this.configRepoURL = configRepoURL;
+		}
+
+		public String getConfigRepoURL() {
+			return this.configRepoURL;
 		}
 
 		public void setAllRosDistrosString(String rosDistrosString) {
@@ -352,14 +366,6 @@ public class CobPipelineProperty extends UserProperty {
 			return this.targets;
 		}
 
-		public void setConfigRepoURL(String configRepoURL) {
-			this.configRepoURL = configRepoURL;
-		}
-
-		public String getConfigRepoURL() {
-			return this.configRepoURL;
-		}
-
 		/**
 		 * Checks if given String is valid Jenkins user
 		 */
@@ -374,6 +380,39 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckJenkinsPassword(@QueryParameter String value, @QueryParameter String jenkinsLogin) {
 			//TODO
 			return FormValidation.ok();			
+		}
+		
+		/**
+		 * Checks if folder and jenkins_setup repository exist
+		 */
+		public FormValidation doCheckPipelineDir(@QueryParameter String value) {
+			File pipeDir = new File(value);
+			
+			if (!pipeDir.exists()) {
+				return FormValidation.error(Messages.PipelineDir_NotExistent());
+			}
+			if (!pipeDir.isDirectory()) {
+				return FormValidation.error(Messages.PipelineDir_NotADirectory());
+			}
+			
+			for (String inPipeDir : pipeDir.list()) {
+				if (inPipeDir.equals("jenkins_setup")) {
+					File setupDir = new File(value, inPipeDir);
+					if (!setupDir.isDirectory()) {
+						return FormValidation.error(Messages.PipelineDir_NoSetupDir(inPipeDir));
+					}
+					if (setupDir.list().length == 0) {
+						return FormValidation.error(Messages.PipelineDir_RepoEmpty(inPipeDir));
+					}
+					File gitRepo = new File(setupDir, "/.git");
+					if (!gitRepo.exists()) {
+						return FormValidation.error(Messages.PipelineDir_NoGitRepo(inPipeDir));
+					}
+					return FormValidation.ok(Messages.PipelineDir_Ok());
+				}
+			}
+			
+			return FormValidation.error(Messages.PipelineDir_NoSetupRepo());
 		}
 		
 		/**
@@ -511,8 +550,8 @@ public class CobPipelineProperty extends UserProperty {
 				
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("user_name", this.userName);
-			data.put("server_name", this.masterName);
+			data.put("user_name", user.getId());
+			data.put("server_name", getMasterName());
 			data.put("email", this.email);
 			data.put("committer_email_enabled", this.committerEmailEnabled);
 			Map<String, Object> repos = new HashMap<String, Object>();
@@ -552,7 +591,7 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// clone/pull configuration repository
-		File configRepoFolder = new File(Jenkins.getInstance().getRootDir(), "pipeline/jenkins_config");
+		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_config");
 		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
@@ -577,7 +616,7 @@ public class CobPipelineProperty extends UserProperty {
 		}
 		
 		// copy pipeline-config.yaml into repository
-		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
+		File configRepoFile = new File(configRepoFolder, getMasterName()+"/"+user.getId()+"/");
 		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
 		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()};
 
@@ -600,17 +639,17 @@ public class CobPipelineProperty extends UserProperty {
 		
 		// add
 		try {
-			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
+			git.add().addFilepattern(getMasterName()+"/"+user.getId()+"/pipeline_config.yaml").call();
 			LOGGER.log(Level.INFO, "Successfully added file to configuration repository"); //TODO
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e); //TODO
+			LOGGER.log(Level.WARNING, "Failed to add "+getMasterName()+"/"+user.getId()+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// commit
 		try {
-			git.commit().setMessage("Updated pipeline configuration for "+this.userName).call();
+			git.commit().setMessage("Updated pipeline configuration for "+user.getId()).call();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e); //TODO
+			LOGGER.log(Level.WARNING, "Failed to commit change in "+getMasterName()+"/"+user.getId()+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// push
@@ -622,13 +661,13 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// trigger Python job generation script
-		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
+		String[] generationCall = {new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_setup/scripts/generate_buildpipeline.py").toString(),
 				"-m", Jenkins.getInstance().getRootUrl(),
 				"-l", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsLogin(),
 				"-p", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsPassword(),
 				"-c", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(),
 				"-t", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTarballLocation(),
-				"-u", this.userName};
+				"-u", user.getId()};
 		
 		proc = rt.exec(generationCall);
 		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));

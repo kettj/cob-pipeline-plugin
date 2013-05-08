@@ -10,6 +10,10 @@
     	<f:entry title="${%jenkinsPasswd}" field="jenkinsPassword">
     		<f:password />
     	</f:entry>
+  		<f:entry title="${%pipelineDir}" field="pipelineDir"
+      		description="${%pipelineDirDescription}">
+      		<f:textbox />
+    	</f:entry>
   		<f:entry title="${%tarballLocation}" field="tarballLocation"
       		description="${%tarballLocationDescription}">
       		<f:textbox />
@@ -21,6 +25,9 @@
     	<f:entry title="${%githubPasswd}" field="githubPassword">
     		<f:password />
     	</f:entry>
+    	<f:entry title="${%configRepoURL}" field="configRepoURL">
+    		<f:textbox />
+    	</f:entry>
     	<f:entry title="${%rosDistros}" field="allRosDistrosString">
     		<f:expandableTextbox />
     	</f:entry>
@@ -29,9 +36,6 @@
     	</f:entry>
     	<f:entry title="${%targetsURL}" field="targetsURL">
     		<f:textbox default="https://raw.github.com/ros/rosdistro/master/releases/targets.yaml"/>
-    	</f:entry>
-    	<f:entry title="${%configRepoURL}" field="configRepoURL">
-    		<f:textbox />
     	</f:entry>
   	</f:section>
 </j:jelly>
