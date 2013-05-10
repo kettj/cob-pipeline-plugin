@@ -202,6 +202,8 @@ public class CobPipelineProperty extends UserProperty {
 
 		private String githubPassword;
 
+		private String pipelineReposOwner;
+
 		private ArrayList<String> allRosDistros;
 
 		private ArrayList<String> robots;
@@ -213,8 +215,6 @@ public class CobPipelineProperty extends UserProperty {
 		private String defaultFork;
 
 		private String defaultBranch;
-
-		private String configRepoURL;
 
 		public DescriptorImpl() {
 			load();
@@ -291,12 +291,12 @@ public class CobPipelineProperty extends UserProperty {
 			return githubPassword;
 		}
 
-		public void setConfigRepoURL(String configRepoURL) {
-			this.configRepoURL = configRepoURL;
+		public void setPipelineReposOwner(String pipelineReposOwner) {
+			this.pipelineReposOwner = pipelineReposOwner;
 		}
 
-		public String getConfigRepoURL() {
-			return this.configRepoURL;
+		public String getPipelineReposOwner() {
+			return this.pipelineReposOwner;
 		}
 
 		public void setAllRosDistrosString(String rosDistrosString) {
@@ -459,6 +459,11 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.error(Messages.Github_PasswordIncorrect() + "\n" + ex.getMessage());
 			}
 		}
+		
+		public FormValidation doCheckPipelineReposOwner(@QueryParameter String value)
+				throws IOException, ServletException {
+			return doCheckGithubLogin(value);
+		}
 
 		public FormValidation doCheckTargets(@QueryParameter String value)
 				throws IOException, ServletException {
@@ -592,7 +597,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		// clone/pull configuration repository
 		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_config");
-		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
+		String configRepoURL = "git@github.com:" + Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner() + "/jenkins-config.git";
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
 		// check if configuration repository exists
@@ -665,7 +670,7 @@ public class CobPipelineProperty extends UserProperty {
 				"-m", Jenkins.getInstance().getRootUrl(),
 				"-l", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsLogin(),
 				"-p", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsPassword(),
-				"-c", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(),
+				"-o", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner(),
 				"-t", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTarballLocation(),
 				"-u", user.getId()};
 		
