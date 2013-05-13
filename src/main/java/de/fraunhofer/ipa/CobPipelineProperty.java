@@ -597,7 +597,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		// clone/pull configuration repository
 		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_config");
-		String configRepoURL = "git@github.com:" + Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner() + "/jenkins-config.git";
+		String configRepoURL = "git@github.com:" + Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner() + "/jenkins_config.git";
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
 		// check if configuration repository exists
