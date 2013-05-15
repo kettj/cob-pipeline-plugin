@@ -36,19 +36,23 @@
 
 package de.fraunhofer.ipa;
 
+import java.io.IOException;
+
 import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
+import hudson.util.ComboBoxModel;
+import hudson.util.FormValidation;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
-import java.io.IOException;
+import javax.servlet.ServletException;
 
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 
 public class Repository extends AbstractDescribableImpl<Repository> implements Comparable<Repository> {
@@ -56,7 +60,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	/**
 	 * name of repository
 	 */
-	protected String repoName;
+	protected String name;
 	
 	/**
 	 * name of fork owner
@@ -69,7 +73,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected String branch = null;
 	
 	/**
-	 * whether the repository should be pollod be SCM
+	 * whether the repository should be polled be SCM
 	 */
 	protected Boolean poll;
 	
@@ -84,8 +88,8 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected String type;
 	
 	@DataBoundConstructor
-	public Repository(String repoName, String fork, String branch, Boolean poll) throws Exception {
-		this.repoName = repoName;
+	public Repository(String depName, String fork, String branch, Boolean poll) throws Exception {
+		this.name = depName;
 		if (fork.length() == 0) {
 			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
 		} else {
@@ -98,19 +102,19 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 		}
 		this.type = "git"; // right now only supported VCS is Git
 		if (this.type.equals("git")) {
-			this.url = "git@github.com:"+fork+"/"+repoName+".git";
+			this.url = "git@github.com:"+this.fork+"/"+depName+".git";
 		} else {
 			throw new Exception("Given VCS type '"+type+"' is not supported");
 		}
 		this.poll = poll;
 	}
 	
-	public void setRepoName(String repoName){
-		this.repoName = repoName;
+	public void setDepName(String depName){
+		this.name = depName;
 	}
 	
-	public String getRepoName() {
-		return this.repoName;
+	public String getDepName() {
+		return this.name;
 	}
 	
 	public void setFork(String fork){
@@ -152,8 +156,53 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Repository Configurations";
+            return Messages.Dependency_DisplayName();
         }
+	    
+	    /**
+	     * Fills combobox with repository names of organization
+	     */
+	    public ComboBoxModel doFillDepNameItems(@QueryParameter String fork) {
+	    	return super.doFillNameItems(fork);
+	    }
+	    
+	    /**
+	     * Checks if given repository exists
+	     */
+	    public FormValidation doCheckDepName(@QueryParameter String value, @QueryParameter String fork)
+	    		throws IOException, ServletException {
+	    	return super.checkDepName(value, fork);
+	    }
+	    
+	    /**
+	     * Fill combobox with forks of repository
+	     */
+	    public ComboBoxModel doFillForkItems(@QueryParameter String depName) {
+	    	return super.doFillForkItems(depName);
+	    }
+	    
+	    /**
+	     * Checks if given fork owner exists
+	     */
+	    public FormValidation doCheckFork(@QueryParameter String value, @QueryParameter String depName)
+	    		throws IOException, ServletException {
+	    	return super.checkDepFork(value, depName);
+	    }
+
+	    /**
+	     * Fill combobox with branches of fork
+	     */
+	    public ComboBoxModel doFillBranchItems(@QueryParameter String depName, @QueryParameter String fork) {
+	    	return super.doFillBranchItems(depName, fork);
+	    }
+	    
+	    /**
+	     * Checks if given branch exists
+	     */
+	    public FormValidation doCheckBranch(@QueryParameter String value, @QueryParameter String depName, @QueryParameter String fork)
+	    		throws IOException, ServletException {
+	    	return super.checkDepBranch(value, depName, fork);
+	    }
 	}
 	
     public Repository reconfigure(StaplerRequest req, JSONObject form) throws FormException {
@@ -169,6 +218,6 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
     }
     
     public int	compareTo(Repository that) {
-		return this.repoName.compareTo(that.repoName);
+		return this.name.compareTo(that.name);
 	}
 }

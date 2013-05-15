@@ -41,26 +41,26 @@ import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor.FormException;
 import hudson.model.Hudson;
-import hudson.model.User;
-import hudson.util.FormValidation;
+import hudson.util.ComboBoxModel;
 import hudson.util.ListBoxModel;
 
 import jenkins.model.Jenkins;
 import net.sf.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
-
-import javax.servlet.ServletException;
+import java.util.Set;
 
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
+import org.kohsuke.stapler.bind.JavaScriptMethod;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -117,12 +117,12 @@ public class RootRepository extends Repository {
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
-			this.fullName = this.repoName+"__"+suffix;
+			this.fullName = this.name+"__"+suffix;
 		}
 		this.suffix = suffix;
 		
 		this.rosDistro = new ArrayList<String>();
-		Iterator iter = rosDistro.keys();
+		Iterator<?> iter = rosDistro.keys();
 		while(iter.hasNext()){
 	        String key = (String)iter.next();
 	        String value = rosDistro.getString(key);
@@ -157,7 +157,7 @@ public class RootRepository extends Repository {
 	private void updateList(List<String> list, JSONObject parent, String name) {
 		if (parent != null) {
 			list.add(name);
-			Iterator iter = parent.keys();
+			Iterator<?> iter = parent.keys();
 			while(iter.hasNext()){
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
@@ -188,9 +188,12 @@ public class RootRepository extends Repository {
 		} 
 	}
 		
-	@Override
 	public void setRepoName(String repoName) {
-		this.repoName = repoName;
+		this.name = repoName;
+	}
+	
+	public String getRepoName() {
+		return this.name;
 	}
 	
 	public String getFullName() {
@@ -217,6 +220,7 @@ public class RootRepository extends Repository {
 		this.prioUbuntuDistro = prioUbuntuDistro;
 	}
 	
+	@JavaScriptMethod
 	public String getPrioUbuntuDistro() {
 		return this.prioUbuntuDistro;
 	}
@@ -229,6 +233,7 @@ public class RootRepository extends Repository {
 		return this.prioArch;
 	}
 	
+	@JavaScriptMethod
 	public boolean isMatrixEntryChecked(String ubuntu, String arch) {
 		if (this.matrixDistroArch.containsKey(ubuntu)) {
 			if (this.matrixDistroArch.get(ubuntu).contains(arch)) {
@@ -299,7 +304,7 @@ public class RootRepository extends Repository {
     public static class DescriptorImpl extends RepositoryDescriptor {
 		@Override
         public String getDisplayName() {
-            return "Root Repository Configurations";
+            return Messages.Repository_DisplayName();
         }
 		
 		@Override
@@ -333,6 +338,25 @@ public class RootRepository extends Repository {
 	    	return ubuntuReleases;
 	    }
 	    
+	    @JavaScriptMethod
+	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
+	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
+	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	
+	    	for (String rosDistro : rosDistroListString.split(",")) {
+	    		for (Map<String, List<String>> ros : targets) {
+	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				for (List<String> ubuntuList : ros.values()) {
+	    					allUbuntuSet.retainAll(ubuntuList);
+	    				}
+	    			}
+	    		}
+	    	}
+	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    	Collections.sort(allUbuntuList);
+	    	return allUbuntuList;
+	    }
+	    
 	    public String getSupportedROS(String ubuntuDistro) {
 	    	List<String> rosDistros = new ArrayList<String>();	    	
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
@@ -349,34 +373,33 @@ public class RootRepository extends Repository {
 	    }
 	    
 	    /**
+	     * Fills combobox with repository names of organization
+	     */
+	    public ComboBoxModel doFillRepoNameItems(@QueryParameter String fork) {
+	    	return super.doFillNameItems(fork);
+	    }
+	    
+	    /**
+	     * Fill combobox with forks of repository
+	     */
+	    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
+	    	return super.doFillForkItems(repoName);
+	    }
+
+	    /**
+	     * Fill combobox with branches of fork
+	     */
+	    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
+	    	return super.doFillBranchItems(repoName, fork);
+	    }
+	    
+	    /**
 	     * Returns list of global defined available robots
 	     * @return
 	     */
 	    public List<String> getRobots() {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
-		
-		public FormValidation doCheckSuffix(@QueryParameter String value, @QueryParameter String repoName)
-				throws IOException, ServletException {
-			//TODO check if other repo with the same name exists
-			
-			if (value.length() != 0) { 
-				return FormValidation.ok("Full name: "+repoName+"__"+value);
-			} else {
-				return FormValidation.ok("Full name: "+repoName);
-			}
-		}
-		
-		public ListBoxModel doFillPrioUbuntuDistroItems() {
-			ListBoxModel prioDistroItems = new ListBoxModel();
-			
-			List<String> ubuntuDistros = getUbuntuReleases();
-			for (String ubuntuDistro : ubuntuDistros) {
-				prioDistroItems.add(ubuntuDistro + " " + getSupportedROS(ubuntuDistro), ubuntuDistro);
-			}
-			
-			return prioDistroItems;
-		}
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();

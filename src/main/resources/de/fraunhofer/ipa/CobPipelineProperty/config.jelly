@@ -1,14 +1,21 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
 	<f:entry title="${%email}" field="email">
-        <f:textbox id="email" onchange="updateGenButton(this.form)"/>
+        <f:textbox id="email" onchange="validateEmail()"/>
 	</f:entry>
 	<f:entry title="${%defaultFork}" field="defaultFork">
-        <f:textbox default="${descriptor.getGithubOrg()}"/>
+        <f:textbox id="defaultFork" onchange="validateDefaultFork()"/>
 	</f:entry>
 	<f:entry title="${%defaultBranch}" field="defaultBranch">
-        <f:textbox default="master"/>
+        <f:textbox id="defaultBranch" onchange="validateDefaultBranch()"/>
 	</f:entry>
+	<f:entry title="${%advanced}">
+  		<f:advanced>
+			<f:entry field="committerEmailEnabled" title="${%committerEmail}">
+   				<f:checkbox />
+			</f:entry>
+  		</f:advanced>
+  	</f:entry>
 	<f:block >
 	    <f:hetero-list name="rootRepos" hasHeader="true"
 	    			   descriptors="${descriptor.rootRepositoryDescriptors}"
@@ -16,12 +23,37 @@
 	    			   addCaption="${%addRepo}"
 	    			   deleteCaption="${%delRepo}"/>
 	</f:block>
+	<f:bottomButtonBar>
+	<f:entry field="validation" title="${%validation}" >
+		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tbody><tr>
+				<td width="30" style="vertical-align:middle">
+              		<div style="float:left" id="valIcon" />
+              	</td>
+              	<td width="*" style="vertical-align:middle">
+              		<div id="valMsg" />
+              	</td>
+              	<td width="*" style="vertical-align:middle">
+              		<div tooltip="${%validate}">
+              		  	<img src="${rootURL}/images/48x48/refresh.png" alt="${%validate}" style="cursor: pointer;" onclick="validate()" height="22" width="22"/>
+              		</div>
+              	</td>
+			</tr><tr>
+				<td width="30" ></td>
+				<td width="*" style="vertical-align:middle">
+					<div id="errorMsgs" />
+				</td>
+				<td width="* " ></td>
+			</tr></tbody>
+		</table>
+	</f:entry>
 	<f:block>
 		<table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
 			<tbody><tr>
 				<td width="150">
               		<div style="float:left" help="/plugin/cob-pipeline/help-generateButton.html">
-        				<f:generation />
+        				<input type="hidden" name="core:apply" value="" />
+  						<input type="button" value="${%generate}" class="generation-button generationButton" />
 					</div>
               	</td>
               	<td width="*" style="vertical-align:middle">
@@ -30,9 +62,246 @@
             </tr><tr>
             	<td width="150"></td>
             	<td width="*">
-              		<div id="msg" />
+              		<div id="msg"/>
               	</td>
 			</tr></tbody>
 		</table>
   	</f:block>
+    </f:bottomButtonBar>
+  	<script>
+  		var inst = <st:bind value="${instance}"/>;
+  		
+  		Behaviour.specify("INPUT.generation-button", 'generation', 0, function (e) {
+	        var id;
+	        var containerId = "container"+(iota++);
+	
+	        var responseDialog = new YAHOO.widget.Panel("wait"+(iota++), {
+	            fixedcenter:true,
+	            close:true,
+	            draggable:true,
+	            zindex:4,
+	            modal:true,
+	            visible:false
+	        });
+	
+	        responseDialog.setHeader("Error");
+	        responseDialog.setBody("&lt;div id='"+containerId+"'&gt;&lt;/iframe&gt;");
+	        responseDialog.render(document.body);
+	        var target; // iframe
+	
+	        function attachIframeOnload(target, f) {
+	            if (target.attachEvent) {
+	                target.attachEvent("onload", f);
+	            } else {
+	                target.onload = f;
+	            }
+	        }
+	
+	        var genButton = makeButton(e,function (e) {
+	            var f = findAncestor(e.target, "FORM");
+	            
+	
+	            // create a throw-away IFRAME to avoid back button from loading the POST result back
+	            id = "iframe"+(iota++);
+	            target = document.createElement("iframe");
+	            target.setAttribute("id",id);
+	            target.setAttribute("name",id);
+	            target.setAttribute("style","height:100%; width:100%");
+	            $(containerId).appendChild(target);
+	
+	            attachIframeOnload(target, function () {
+	                if (target.contentWindow &amp;&amp; target.contentWindow.applyCompletionHandler) {
+	                    // apply-aware server is expected to set this handler
+	                    target.contentWindow.applyCompletionHandler(window);
+	                } /*else {
+	                    // otherwise this is possibly an error from the server, so we need to render the whole content.
+	                    var r = YAHOO.util.Dom.getClientRegion();
+	                    responseDialog.cfg.setProperty("width",r.width*3/4+"px");
+	                    responseDialog.cfg.setProperty("height",r.height*3/4+"px");
+	                    responseDialog.center();
+	                    responseDialog.show();
+	                }*/
+	                window.setTimeout(function() {// otherwise Firefox will fail to leave the "connecting" state
+	                    $(id).remove();
+	                },0)
+	            });
+	
+	            f.target = target.id;
+	            f.elements['core:apply'].value = "true";
+	            try {
+			    	if (valid()!=true) {
+			    		document.getElementById('status').innerHTML = '<b>${%notValid}</b>';
+			    		document.getElementById('msg').innerHTML = '${%notValidMsg}';
+			    		return;
+			    	}
+			    	else {
+		                buildFormTree(f);
+		                f.submit();
+		                generate();
+		            }
+	            } finally {
+	                f.elements['core:apply'].value = null;
+	                f.target = null;
+	            }
+	        });
+	        
+	        function generate() {
+	  			genButton.set('disabled',true,false);
+	  			document.getElementById('status').innerHTML = '<img src="${imagesURL}/spinner.gif" /> <b>${%generating}</b>';
+	  			document.getElementById('msg').innerHTML = '';
+	  			
+				inst.doGeneratePipeline( function (t) 
+				{
+	  				document.getElementById('status').innerHTML = '<b>' + t.responseObject().status + '</b>';
+	  				document.getElementById('msg').innerHTML = t.responseObject().message;
+	  				genButton.set('disabled',false,false);
+	  			});
+				
+	  		}
+		});
+  		
+  		function validateEmail() {
+			var email = document.getElementById('email');
+
+  			if (email.value.length==0) {
+  				validationOutput("${%noEmail}", "email");
+		    }
+  		}
+  		
+  		function validateDefaultFork() {
+  			var defaultFork = document.getElementById('defaultFork');
+
+  			if (defaultFork.value.length==0) {
+  				validationOutput("${%noDefaultFork}", "defaultFork");
+  			}
+  		}
+  		
+  		function validateDefaultBranch() {
+  			var defaultBranch = document.getElementById('defaultBranch');
+
+  			if (defaultBranch.value.length==0) {
+  				validationOutput("${%noDefaultBranch}", "defaultBranch");
+  			}
+  		}
+  		
+  		function validateRepos() {
+  			var repos = document.getElementsByName('repoName');
+  			
+  			if (repos.length==0) {
+		      	validationOutput("${%noRepo}", "noRepo");
+		    }
+		    else {
+		    	for (i=0;i&lt;repos.length;i++) {
+  			 		var valName= window[repos[i].id.replace('repoName', '')+'validateName'];
+  			 		valName();
+  			 	}
+		    }
+  		}
+  		
+  		function generateFullName(id) {
+  			var repoName = document.getElementById(id+"repoName");
+  			var suffix = document.getElementById(id+"suffix");
+  			
+  			if (suffix.value.length==0) {
+  				document.getElementById(id+'fullName').value = repoName.value;
+  			}
+  			else {
+  				document.getElementById(id+'fullName').value = repoName.value + '__' + suffix.value;
+  			}
+  			validateFullNames();
+  		}
+  		
+  		function validateFullNames() {
+  			var fullNames = document.getElementsByName('fullName');
+  			
+  			if (fullNames.length!=0) {
+			    for (i=0;i&lt;fullNames.length;i++) {
+			    	for (j=0;j&lt;fullNames.length;j++) {
+			    		if(i!=j) {
+			    			if(fullNames[i].value == fullNames[j].value) {
+			    				validationOutput("${%duplicateFullNames}: " + fullNames[i].value + "<br/>", fullNames[i].value+"double");
+			    			}
+			    		}
+			    	}
+			    }
+			}
+  		}
+  		
+  		function validateDeps() {
+  			var deps = document.getElementsByName('depName');
+  			
+  			if (deps.length!=0) {
+			    for (i=0;i&lt;deps.length;i++) {
+			    	for (j=0;j&lt;deps.length;j++) {
+			    		if(i!=j) {
+			    			if (deps[i].id == deps[j].id) {
+				    			if(deps[i].value == deps[j].value) {
+				    				validationOutput("${%duplicateDeps}: " + deps[i].value + "<br/>in repository: " + document.getElementById(deps[i].id.replace("dep", "repoName")).value, deps[i].id+"double");
+				    			}
+				    		}
+			    		}
+			    	}
+			    }
+			}
+  		}
+  	
+  		function validate() {
+  			reset();
+  			
+  			validateEmail();
+			validateDefaultFork();
+			validateDefaultBranch();
+			validateRepos();
+			validateFullNames();
+			validateDeps();
+
+			return valid();
+		}
+  		
+  		function validationOutput(msg, msgId) {
+  			var msgDiv = document.getElementById('errorMsg'+msgId);
+  			
+  			if (msg.length == 0) {
+  				if (typeof msgDiv !== 'undefined' &amp;&amp; msgDiv !== null) {
+  					document.getElementById('errorMsgs').removeChild(msgDiv);
+  				}
+  			}
+  			else {
+	  			if (typeof msgDiv === 'undefined' || msgDiv === null) {
+	  				var div=document.createElement('div');
+  					div.appendChild(document.createTextNode("• " + msg));
+  					div.id = 'errorMsg' + msgId;
+	  				document.getElementById('errorMsgs').appendChild(div);
+	  			}
+	  			else {
+	  				msgDiv.innerHtml = msg;
+	  			}
+  			}
+  			valid();
+  		}
+  		
+  		function valid() {
+  			var children = document.getElementById('errorMsgs').childNodes;
+  			
+  			if (children.length == 0) {
+				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/accept.png" alt="OK" height="22" width="22"/>';
+		        document.getElementById('valMsg').innerHTML = "<b>${%ok}</b>";
+		        return true;
+  			}
+  			else {
+				document.getElementById('valIcon').innerHTML = '<img src="${rootURL}/images/48x48/error.png" alt="${%invalid}" height="22" width="22"/>';
+  				document.getElementById('valMsg').innerHTML = "<b>${%error}</b>";
+  				return false;
+  			}
+  		}
+  		
+  		function reset() {
+  			var children = document.getElementById('errorMsgs').childNodes;
+  			for (i=children.length-1;i&gt;=0;i--) {
+  				document.getElementById('errorMsgs').removeChild(children[i]);
+  			}
+  		}
+  		
+  		validate();
+  	</script>
 </j:jelly>

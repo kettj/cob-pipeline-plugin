@@ -36,14 +36,12 @@
 
 package de.fraunhofer.ipa;
 
-import hudson.BulkChange;
 import hudson.Extension;
 import hudson.Util;
 import hudson.model.Descriptor;
 import hudson.model.Descriptor.FormException;
 import hudson.model.RootAction;
 import hudson.model.User;
-import hudson.model.listeners.SaveableListener;
 import hudson.model.UserProperty;
 import hudson.model.UserPropertyDescriptor;
 //import hudson.tasks.Mailer;
@@ -67,8 +65,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
 import javax.servlet.ServletException;
 
 import jenkins.model.Jenkins;
@@ -79,7 +75,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.bind.JavaScriptMethod;
 
-import org.eclipse.egit.github.core.*;
 import org.eclipse.egit.github.core.client.GitHubClient;
 import org.eclipse.egit.github.core.service.*;
 import org.eclipse.jgit.api.Git;
@@ -102,6 +97,8 @@ public class CobPipelineProperty extends UserProperty {
 	private String defaultFork;
 
 	private String defaultBranch;
+	
+	private boolean committerEmailEnabled;
 
 	/**
 	 * user name
@@ -119,11 +116,7 @@ public class CobPipelineProperty extends UserProperty {
 	private volatile RootRepositoryList rootRepos = new RootRepositoryList();
 
 	@DataBoundConstructor
-	public CobPipelineProperty(String id) {
-		this.userName = id;
-		if (masterName == null) {
-			this.masterName = getMasterName();
-		}
+	public CobPipelineProperty() {
 		this.rootRepos = rootRepos;
 	}
 	
@@ -159,6 +152,14 @@ public class CobPipelineProperty extends UserProperty {
 	public String getDefaultBranch() {
 		return this.defaultBranch;
 	}
+	
+	public void setCommitterEmailEnabled(boolean enabled) {
+		this.committerEmailEnabled = enabled;
+	}
+	
+	public boolean getCommitterEmailEnabled() {
+		return this.committerEmailEnabled;
+	}
 
 	private String getMasterName() {
 		String url = Jenkins.getInstance().getRootUrl();
@@ -189,13 +190,19 @@ public class CobPipelineProperty extends UserProperty {
 	@Extension
 	public static class DescriptorImpl extends UserPropertyDescriptor {
 
-		private String githubOrg;
+		private String jenkinsLogin;
 
-		private String githubTeam;
+		private String jenkinsPassword;
+		
+		private String pipelineDir;
+		
+		private String tarballLocation;
 
 		private String githubLogin;
 
 		private String githubPassword;
+
+		private String pipelineReposOwner;
 
 		private ArrayList<String> allRosDistros;
 
@@ -209,8 +216,6 @@ public class CobPipelineProperty extends UserProperty {
 
 		private String defaultBranch;
 
-		private String configRepoURL;
-
 		public DescriptorImpl() {
 			load();
 		}
@@ -222,7 +227,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		@Override
 		public UserProperty newInstance(User user) {
-			return new CobPipelineProperty(user.getId());
+			return new CobPipelineProperty();
 		}
 
 		/**
@@ -231,25 +236,42 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckEmail(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length()==0) {
-				return FormValidation.error("Please enter your email address above");
+				return FormValidation.error(Messages.Email_Empty());
 			}
 			return FormValidation.ok();
 		}
 
-		public void setGithubOrg(String githubOrg) {
-			this.githubOrg = githubOrg;
+		public void setJenkinsLogin(String jenkinsLogin) {
+			this.jenkinsLogin = jenkinsLogin;
 		}
 
-		public String getGithubOrg() {
-			return githubOrg;
+		public String getJenkinsLogin() {
+			return jenkinsLogin;
 		}
 
-		public void setGithubTeam(String githubTeam) {
-			this.githubTeam = githubTeam;
+		//TODO save password encrypted
+		public void setJenkinsPassword(String jenkinsPassword) {
+			this.jenkinsPassword = jenkinsPassword;
 		}
 
-		public String getGithubTeam() {
-			return githubTeam;
+		public String getJenkinsPassword() {
+			return jenkinsPassword;
+		}
+		
+		public void setPipelineDir(String pipelineDir) {
+			this.pipelineDir = pipelineDir;
+		}
+		
+		public String getPipelineDir() {
+			return this.pipelineDir;
+		}
+		
+		public void setTarballLocation(String tarballLocation) {
+			this.tarballLocation = tarballLocation;
+		}
+		
+		public String getTarballLocation() {
+			return this.tarballLocation;
 		}
 
 		public void setGithubLogin(String githubLogin) {
@@ -267,6 +289,14 @@ public class CobPipelineProperty extends UserProperty {
 
 		public String getGithubPassword() {
 			return githubPassword;
+		}
+
+		public void setPipelineReposOwner(String pipelineReposOwner) {
+			this.pipelineReposOwner = pipelineReposOwner;
+		}
+
+		public String getPipelineReposOwner() {
+			return this.pipelineReposOwner;
 		}
 
 		public void setAllRosDistrosString(String rosDistrosString) {
@@ -336,31 +366,61 @@ public class CobPipelineProperty extends UserProperty {
 			return this.targets;
 		}
 
-		public void setConfigRepoURL(String configRepoURL) {
-			this.configRepoURL = configRepoURL;
-		}
-
-		public String getConfigRepoURL() {
-			return this.configRepoURL;
-		}
-
-		//TODO enhance output and order
 		/**
-		 * Checks if organization exists
+		 * Checks if given String is valid Jenkins user
 		 */
-		public FormValidation doCheckGithubOrg(@QueryParameter String value)
-				throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error("Please enter organization name");
+		public FormValidation doCheckJenkinsLogin(@QueryParameter String value) {
+			//TODO
+			return FormValidation.ok();
+		}
+
+		/**
+		 * Checks if given password String is fits to Jenkins user
+		 */
+		public FormValidation doCheckJenkinsPassword(@QueryParameter String value, @QueryParameter String jenkinsLogin) {
+			//TODO
+			return FormValidation.ok();			
+		}
+		
+		/**
+		 * Checks if folder and jenkins_setup repository exist
+		 */
+		public FormValidation doCheckPipelineDir(@QueryParameter String value) {
+			File pipeDir = new File(value);
+			
+			if (!pipeDir.exists()) {
+				return FormValidation.error(Messages.PipelineDir_NotExistent());
 			}
-			try {
-				OrganizationService githubOrgSrv = new OrganizationService();
-				org.eclipse.egit.github.core.User org = githubOrgSrv.getOrganization(value);
-				return FormValidation.ok("Organization ownes "+
-						org.getPublicRepos()+" public and "+org.getTotalPrivateRepos()+" private repositories");
-			} catch (IOException ex) {
-				return FormValidation.error("Invalid Github organization. Organization does not exist.\n"+ex.getMessage());
+			if (!pipeDir.isDirectory()) {
+				return FormValidation.error(Messages.PipelineDir_NotADirectory());
 			}
+			
+			for (String inPipeDir : pipeDir.list()) {
+				if (inPipeDir.equals("jenkins_setup")) {
+					File setupDir = new File(value, inPipeDir);
+					if (!setupDir.isDirectory()) {
+						return FormValidation.error(Messages.PipelineDir_NoSetupDir(inPipeDir));
+					}
+					if (setupDir.list().length == 0) {
+						return FormValidation.error(Messages.PipelineDir_RepoEmpty(inPipeDir));
+					}
+					File gitRepo = new File(setupDir, "/.git");
+					if (!gitRepo.exists()) {
+						return FormValidation.error(Messages.PipelineDir_NoGitRepo(inPipeDir));
+					}
+					return FormValidation.ok(Messages.PipelineDir_Ok());
+				}
+			}
+			
+			return FormValidation.error(Messages.PipelineDir_NoSetupRepo());
+		}
+		
+		/**
+		 * Checks if given URL exists
+		 */
+		public FormValidation doCheckTarballLocation(@QueryParameter String value) {
+			//TODO
+			return FormValidation.ok();			
 		}
 
 		/**
@@ -369,14 +429,14 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubLogin(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter login name");
+				return FormValidation.error(Messages.Github_Login());
 			} 
 			try {
 				UserService githubUserSrv = new UserService();
 				githubUserSrv.getUser(value);
 				return FormValidation.ok();
 			} catch (IOException ex) {
-				return FormValidation.error("Invalid Github user login. User does not exist.\n"+ex.getMessage());
+				return FormValidation.error(Messages.Github_LoginInvalid() + "\n" + ex.getMessage());
 			}
 		}
 
@@ -386,7 +446,7 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckGithubPassword(@QueryParameter String value, @QueryParameter String githubLogin)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.error("Please enter password");
+				return FormValidation.error(Messages.Github_Password());
 			}
 			try {
 				GitHubClient client = new GitHubClient();
@@ -396,40 +456,19 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.ok("GitHub user name: "+user.getName()+"\nUser ownes "+
 						user.getPublicRepos()+" public and "+user.getTotalPrivateRepos()+" private repositories");
 			} catch (Exception ex) {
-				return FormValidation.error("Incorrect Password\n"+ex.getMessage());
+				return FormValidation.error(Messages.Github_PasswordIncorrect() + "\n" + ex.getMessage());
 			}
 		}
-
-		/**
-		 * Checks if team exists in given organization
-		 * and given user belongs to team
-		 */
-		public FormValidation doCheckGithubTeam(@QueryParameter String value, @QueryParameter String githubLogin,
-				@QueryParameter String githubPassword, @QueryParameter String githubOrg)
-						throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error("Please enter team name");
-			}
-			try {
-				GitHubClient client = new GitHubClient();
-				client.setCredentials(githubLogin, githubPassword);
-				TeamService githubTeamSrv = new TeamService(client);
-				List<Team> teams = githubTeamSrv.getTeams(githubOrg);
-				for (Team team : teams) {
-					if (value.equals(team.getName())) {
-						return FormValidation.ok("Team ownes "+Integer.toString(team.getReposCount())+" repositories.");
-					}
-				}
-				return FormValidation.error("Invalid Github team. Team not found. Make sure the given user is a member of this team");
-			} catch (IOException ex) {
-				return FormValidation.error("Error occured while checking team existenz: "+ex.getMessage());
-			}
+		
+		public FormValidation doCheckPipelineReposOwner(@QueryParameter String value)
+				throws IOException, ServletException {
+			return doCheckGithubLogin(value);
 		}
 
 		public FormValidation doCheckTargets(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter URL of the target platform yaml file");
+				return FormValidation.warning(Messages.Targets_Empty());
 			}
 			return FormValidation.ok();
 		}
@@ -437,11 +476,12 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultFork(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter default fork/owner.");
+				return FormValidation.error(Messages.DefaultFork_Empty());
 			}
+			
 			this.defaultFork = value;
-			// TODO check if user exists
-			return FormValidation.ok();
+
+			return doCheckGithubLogin(value);
 		}
 
 		public String getDefaultFork() {
@@ -451,10 +491,10 @@ public class CobPipelineProperty extends UserProperty {
 		public FormValidation doCheckDefaultBranch(@QueryParameter String value)
 				throws IOException, ServletException {
 			if (value.length() == 0) {
-				return FormValidation.warning("Please enter default branch.");
+				return FormValidation.error(Messages.DefaultBranch_Empty());
 			}
 			this.defaultBranch = value;
-			// TODO check if user exists
+
 			return FormValidation.ok();
 		}
 
@@ -491,7 +531,7 @@ public class CobPipelineProperty extends UserProperty {
 
 	public void save() throws IOException {
 		user.save();
-		LOGGER.log(Level.INFO, "Saved user configuration");
+		LOGGER.log(Level.INFO, "Saved user configuration"); //TODO
 	}
 		
 	@JavaScriptMethod
@@ -515,10 +555,10 @@ public class CobPipelineProperty extends UserProperty {
 				
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
-			data.put("user_name", this.userName);
-			data.put("server_name", this.masterName);
+			data.put("user_name", user.getId());
+			data.put("server_name", getMasterName());
 			data.put("email", this.email);
-			data.put("committer_email_enabled", true);
+			data.put("committer_email_enabled", this.committerEmailEnabled);
 			Map<String, Object> repos = new HashMap<String, Object>();
 			for (RootRepository rootRepo : this.rootRepos) {
 				Map<String, Object> repo = new HashMap<String, Object>();
@@ -540,7 +580,7 @@ public class CobPipelineProperty extends UserProperty {
 					dep.put("url", repoDep.url);
 					dep.put("version", repoDep.branch);
 					dep.put("poll", repoDep.poll);
-					deps.put(repoDep.repoName, dep);
+					deps.put(repoDep.name, dep);
 				}
 				repo.put("dependencies", deps);
 
@@ -549,15 +589,15 @@ public class CobPipelineProperty extends UserProperty {
 			data.put("repositories", repos);
 			Yaml yaml = new Yaml();
 			yaml.dump(data, getPipelineConfigFile());
-			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath());
+			LOGGER.log(Level.INFO, "Created "+getPipelineConfigFilePath().getAbsolutePath()); //TODO
 
 		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e);
+			LOGGER.log(Level.WARNING, "Failed to save "+getPipelineConfigFilePath().getAbsolutePath(),e); //TODO
 		}
 
 		// clone/pull configuration repository
-		File configRepoFolder = new File(Jenkins.getInstance().getRootDir(), "pipeline/jenkins_config");
-		String configRepoURL = Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL();
+		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_config");
+		String configRepoURL = "git@github.com:" + Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner() + "/jenkins_config.git";
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
 		// check if configuration repository exists
@@ -567,21 +607,21 @@ public class CobPipelineProperty extends UserProperty {
 					.setURI(configRepoURL)
 					.setDirectory(configRepoFolder)
 					.call();
-				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL);
+				LOGGER.log(Level.INFO, "Successfully cloned configuration repository from "+configRepoURL); //TODO
 			} catch (Exception ex) {
-				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex);
+				LOGGER.log(Level.WARNING, "Failed to clone configuration repository", ex); //TODO
 			}
 		} else {
 			try {
 				git.pull().call();
-				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL);
+				LOGGER.log(Level.INFO, "Successfully pulled configuration repository from "+configRepoURL); //TODO
 			} catch (Exception ex) {
-				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex);
+				LOGGER.log(Level.WARNING, "Failed to pull configuration repository", ex); //TODO
 			}
 		}
 		
 		// copy pipeline-config.yaml into repository
-		File configRepoFile = new File(configRepoFolder, this.masterName+"/"+this.userName+"/");
+		File configRepoFile = new File(configRepoFolder, getMasterName()+"/"+user.getId()+"/");
 		if (!configRepoFile.isDirectory()) configRepoFile.mkdirs();
 		String[] cpCommand = {"cp", "-f", getPipelineConfigFilePath().getAbsolutePath(), configRepoFile.getAbsolutePath()};
 
@@ -595,39 +635,44 @@ public class CobPipelineProperty extends UserProperty {
 		feedback = "";
 		while ((s = readErr.readLine()) != null) feedback += s+"\n";
 		if (feedback.length()!=0) {
-			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
-			LOGGER.log(Level.WARNING, feedback);
+			LOGGER.log(Level.WARNING, "Failed to copy "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath()); //TODO
+			LOGGER.log(Level.WARNING, feedback); //TODO
 		}
 		else {
-			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath());
+			LOGGER.log(Level.INFO, "Successfully copied "+getPipelineConfigFilePath().getAbsolutePath()+" to config repository: "+configRepoFile.getAbsolutePath()); //TODO
 		}
 		
 		// add
 		try {
-			git.add().addFilepattern(this.masterName+"/"+this.userName+"/pipeline_config.yaml").call();
-			LOGGER.log(Level.INFO, "Successfully added file to configuration repository");
+			git.add().addFilepattern(getMasterName()+"/"+user.getId()+"/pipeline_config.yaml").call();
+			LOGGER.log(Level.INFO, "Successfully added file to configuration repository"); //TODO
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to add "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+			LOGGER.log(Level.WARNING, "Failed to add "+getMasterName()+"/"+user.getId()+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// commit
 		try {
-			git.commit().setMessage("Updated pipeline configuration for "+this.userName).call();
+			git.commit().setMessage("Updated pipeline configuration for "+user.getId()).call();
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to commit change in "+this.masterName+"/"+this.userName+"/pipeline_config.yaml",e);
+			LOGGER.log(Level.WARNING, "Failed to commit change in "+getMasterName()+"/"+user.getId()+"/pipeline_config.yaml",e); //TODO
 		}
 
 		// push
 		try {
 			git.push().call();
-			LOGGER.log(Level.INFO, "Successfully pushed configuration repository");
+			LOGGER.log(Level.INFO, "Successfully pushed configuration repository"); //TODO
 		} catch (Exception e) {
-			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e);
+			LOGGER.log(Level.WARNING, "Failed to push configuration repository",e); //TODO
 		}
 
 		// trigger Python job generation script
-		String[] generationCall = {Jenkins.getInstance().getRootDir()+"/pipeline/jenkins_setup/scripts/generate_buildpipeline.py",
-				Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigRepoURL(), this.userName};
+		String[] generationCall = {new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_setup/scripts/generate_buildpipeline.py").toString(),
+				"-m", Jenkins.getInstance().getRootUrl(),
+				"-l", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsLogin(),
+				"-p", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsPassword(),
+				"-o", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner(),
+				"-t", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTarballLocation(),
+				"-u", user.getId()};
 		
 		proc = rt.exec(generationCall);
 		readIn = new BufferedReader(new InputStreamReader(proc.getInputStream()));
@@ -635,22 +680,22 @@ public class CobPipelineProperty extends UserProperty {
 		feedback = "";
 		while ((s = readErr.readLine()) != null) feedback += s+"\n";
 		if (feedback.length()!=0) {
-			LOGGER.log(Level.WARNING, "Failed to generate pipeline: ");
+			LOGGER.log(Level.WARNING, "Failed to generate pipeline: "); //TODO
 			LOGGER.log(Level.WARNING, feedback);
 			response.put("message", feedback.replace("\n", "<br/>"));
-			response.put("status", "<font color=\"red\">Pipeline generation failed</font>");
+			response.put("status", "<font color=\"red\">" + Messages.Pipeline_GenerationFailure() + "</font>");
 			return response;
 		} else {
 			feedback = "";
 			while ((s = readIn.readLine()) != null) feedback += s+"\n";
 			if (feedback.length()!=0) {
 				LOGGER.log(Level.INFO, feedback);
-				LOGGER.log(Level.INFO, "Successfully generated pipeline");
+				LOGGER.log(Level.INFO, "Successfully generated pipeline"); //TODO
 				message += feedback;
 			}
 		}
 		response.put("message", message.replace("\n", "<br/>"));
-		response.put("status", "<font color=\"green\">Pipeline generated</font>");
+		response.put("status", "<font color=\"green\">" + Messages.Pipeline_GenerationSuccess() + "</font>");
 		return response;
 	}
 
@@ -668,7 +713,7 @@ public class CobPipelineProperty extends UserProperty {
 	public static class GlobalAction implements RootAction {
 
 		public String getDisplayName() {
-			return "Pipeline Configuration";
+			return Messages.Pipeline_DisplayName();
 		}
 
 		public String getIconFileName() {
