@@ -535,13 +535,14 @@ public class CobPipelineProperty extends UserProperty {
 	}
 		
 	@JavaScriptMethod
-	public JSONObject doGeneratePipeline() throws IOException {
+	public JSONObject doGeneratePipeline() throws Exception {
 		JSONObject response  = new JSONObject();
 		String message = "";
 		
 		// wait until config.xml is updated
 		File configFile = new File(Jenkins.getInstance().getRootDir() + "users", user.getId() + "/config.xml");
-		Date modDate;
+		Date modDate = new Date();
+		Date start = modDate;
 		Date now;
 		do {
 			try { 
@@ -549,9 +550,17 @@ public class CobPipelineProperty extends UserProperty {
 			} catch(InterruptedException ex) {
 			    Thread.currentThread().interrupt();
 			}
-			modDate = new Date(configFile.lastModified());
 			now = new Date();
-		} while (modDate.getTime() - now.getTime() > 30000);
+			try {
+				modDate = new Date(configFile.lastModified());
+			} catch(Exception ex) {
+				//if file was not created yet
+				continue;
+			}
+			if (now.getTime() - start.getTime() > 30000) {
+				throw new Exception("Timeout");
+			}
+		} while (now.getTime() - modDate.getTime() > 15000 || now.getTime() - modDate.getTime() <= 0);
 				
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
