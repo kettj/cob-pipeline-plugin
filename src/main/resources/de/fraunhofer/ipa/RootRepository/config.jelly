@@ -1,5 +1,8 @@
 <?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+	<td>
+	<div style="background-color:#F1F0F0;border:2px solid gray">
+	<table border="0" with="100%">
 	<j:set var="genId" value="${h.generateId()}"/>
   	<f:entry field="repoName" title="${%repoName}">
    		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validateName()" style="width:250px;"/>
@@ -144,7 +147,7 @@
   	</f:entry>
   	<f:entry title="${%repoDeps}" field="repoDeps">
 	    <f:repeatable field="repoDeps" noAddButton="false" minimum="0" header="${%repoDep}">
-			<div style="border:2px solid gray">
+			<div style="background-color:#E5E5E5;border:2px solid gray">
 	     	<table width="100%">
 	        	<st:include class="${descriptor.clazz}" page="config.jelly" />
 	
@@ -157,6 +160,9 @@
 	      	</div>    	
 	    </f:repeatable>
 	 </f:entry>
+	</table>
+	</div>
+	</td>
 	 
 	 <script>
   		var ${genId}Des = <st:bind value="${descriptor}"/>
