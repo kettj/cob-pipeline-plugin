@@ -403,8 +403,8 @@ public class RootRepository extends Repository {
 		
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();
-			prioArchItems.add("amd64");
-			prioArchItems.add("i386");
+			prioArchItems.add("64bit", "amd64");
+			prioArchItems.add("32bit", "i386");
 			
 			return prioArchItems;
 		}
