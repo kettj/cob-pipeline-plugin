@@ -540,9 +540,9 @@ public class CobPipelineProperty extends UserProperty {
 		String message = "";
 		
 		// wait until config.xml is updated
-		File configFile = new File(Jenkins.getInstance().getRootDir() + "users", user.getId() + "/config.xml");
+		File configFile = new File(Jenkins.getInstance().getRootDir(), "users/" + user.getId() + "/config.xml");
 		Date mod = new Date();
-		Date start = mod;
+		Long start = mod.getTime();
 		Date now;
 		do {
 			try { 
@@ -550,14 +550,15 @@ public class CobPipelineProperty extends UserProperty {
 			} catch(InterruptedException ex) {
 			    Thread.currentThread().interrupt();
 			}
-			if (configFile.exists()) {
+			try {
 				mod = new Date(configFile.lastModified());
-			}
+			} catch(Exception ex) {}
+			
 			now = new Date();
-			if (now.getTime() - start.getTime() > 30000) {
+			if (now.getTime() - start > 30000) {
 				throw new Exception("Timeout");
 			}
-		} while (start.getTime() == mod.getTime() || now.getTime() - mod.getTime() > 15000);
+		} while (start.equals(mod.getTime()) || now.getTime() - mod.getTime() > 15000);
 				
 		try {
 			Map<String, Object> data = new HashMap<String, Object>();
