@@ -90,16 +90,8 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	@DataBoundConstructor
 	public Repository(String depName, String fork, String branch, Boolean poll) throws Exception {
 		this.name = depName;
-		if (fork.length() == 0) {
-			this.fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
-		} else {
-			this.fork = fork;
-		}
-		if (branch.length() == 0) {
-			this.branch = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
-		} else {
-			this.branch = branch;
-		}
+		this.fork = fork;
+		this.branch = branch;
 		this.type = "git"; // right now only supported VCS is Git
 		if (this.type.equals("git")) {
 			this.url = "git@github.com:"+this.fork+"/"+depName+".git";
@@ -177,8 +169,8 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	    /**
 	     * Fill combobox with forks of repository
 	     */
-	    public ComboBoxModel doFillForkItems(@QueryParameter String depName) {
-	    	return super.doFillForkItems(depName);
+	    public ComboBoxModel doFillForkItems(@QueryParameter String value, @QueryParameter String depName) {
+	    	return super.doFillForkItems(value, depName);
 	    }
 	    
 	    /**

@@ -93,10 +93,6 @@ public class CobPipelineProperty extends UserProperty {
 	 * user email address
 	 */
 	private String email = null;
-
-	private String defaultFork;
-
-	private String defaultBranch;
 	
 	private boolean committerEmailEnabled;
 
@@ -135,22 +131,6 @@ public class CobPipelineProperty extends UserProperty {
             }
         }*/
         return "";
-	}
-
-	public void setDefaultFork(String fork) {
-		this.defaultFork = fork;
-	}
-
-	public String getDefaultFork() {
-		return this.defaultFork;
-	}
-
-	public void setDefaultBranch(String branch) {
-		this.defaultBranch = branch;
-	}
-
-	public String getDefaultBranch() {
-		return this.defaultBranch;
 	}
 	
 	public void setCommitterEmailEnabled(boolean enabled) {
@@ -471,35 +451,6 @@ public class CobPipelineProperty extends UserProperty {
 				return FormValidation.warning(Messages.Targets_Empty());
 			}
 			return FormValidation.ok();
-		}
-
-		public FormValidation doCheckDefaultFork(@QueryParameter String value)
-				throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error(Messages.DefaultFork_Empty());
-			}
-			
-			this.defaultFork = value;
-
-			return doCheckGithubLogin(value);
-		}
-
-		public String getDefaultFork() {
-			return this.defaultFork;
-		}
-
-		public FormValidation doCheckDefaultBranch(@QueryParameter String value)
-				throws IOException, ServletException {
-			if (value.length() == 0) {
-				return FormValidation.error(Messages.DefaultBranch_Empty());
-			}
-			this.defaultBranch = value;
-
-			return FormValidation.ok();
-		}
-
-		public String getDefaultBranch() {
-			return this.defaultBranch;
 		}
 
 		@Override

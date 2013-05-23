@@ -139,7 +139,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	}
     	
     	if (fork.length() == 0) {
-    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    		return aux;
     	}    	
     	
     	try {
@@ -162,7 +162,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	doFillNameItems(fork);
     	
     	if (fork.length() == 0) {
-    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    		return Messages.Repository_NoFork();
     	}  
     	
     	if (repo.length() == 0) {
@@ -186,13 +186,11 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      */
     public FormValidation checkDepName(@QueryParameter String value, @QueryParameter String fork)
     		throws IOException, ServletException {
-    	String msg = "";
     	
     	doFillNameItems(fork);
     	
     	if (fork.length() == 0) {
-    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
-    		msg = Messages.Fork_DefaultUsed(fork);
+    		return FormValidation.error(Messages.Dependency_NoFork());
     	} 
     	
     	if (value.length() == 0) {
@@ -202,7 +200,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	// check if given repository is in repo list
     	for (String repoName : this.repoNameItems) {
 			if (repoName.equals(value)) {
-				return FormValidation.ok(msg);
+				return FormValidation.ok();
 			}
 		}
     	// if repository was not in list, for example extern repository
@@ -215,7 +213,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     /**
      * Fill combobox with forks of repository
      */
-    public ComboBoxModel doFillForkItems(@QueryParameter String name) {
+    public ComboBoxModel doFillForkItems(@QueryParameter String value, @QueryParameter String name) {
     	ComboBoxModel aux = new ComboBoxModel();
     	
     	if (this.githubClient.getUser() == null) {
@@ -228,8 +226,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     		
     		try {
     			//get parent repository if repository itself is forked
-	    		org.eclipse.egit.github.core.Repository parent = githubRepoSrv.getRepository(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
-    				getDefaultFork(), name).getParent();
+	    		org.eclipse.egit.github.core.Repository parent = githubRepoSrv.getRepository(value, name).getParent();
 	    		
 	    		if (parent != null) {
 		    		//get fork of parent repository
@@ -242,14 +239,13 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 	    		
 	    		if (aux.isEmpty()) {
 		    		//add forks of repository
-		    		forks = githubRepoSrv.getForks(new RepositoryId(Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).
-		    				getDefaultFork(), name));
+		    		forks = githubRepoSrv.getForks(new RepositoryId(value, name));
 		    		for (org.eclipse.egit.github.core.Repository fork : forks) {
 		    			org.eclipse.egit.github.core.User user = fork.getOwner();
 		    			aux.add(user.getLogin());
 		    		}
 	    		}
-	    		aux.add(0, Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork());
+	    		aux.add(0, value);
     		} catch (Exception ex) {}
     		
     		try {
@@ -272,19 +268,17 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     
     @JavaScriptMethod
     public String checkFork(String fork, String repo) {
-    	String msg = "";
     	
-    	doFillForkItems(repo);
+    	doFillForkItems(fork, repo);
     	
     	if (fork.length() == 0) {
-    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
-    		msg = Messages.Fork_DefaultUsed(fork);
+    		return Messages.Fork_NoFork();
     	}
     	
     	// check if given fork owner is in fork list
     	for (String f : this.forkItems) {
 			if (f.equals(fork)) {
-				return msg + "__succeeded";
+				return "__succeeded";
 			}
 		}
     	
@@ -295,7 +289,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				UserService githubUserSrv = new UserService(this.githubClient);
 				githubUserSrv.getUser(fork);
 			} catch (Exception ex) {
-				return msg + Messages.Fork_OwnerNotFound() + "\n" + ex.getMessage();
+				return Messages.Fork_OwnerNotFound() + "\n" + ex.getMessage();
 			}
 			// check if user has public repository with given name
 			try {
@@ -303,12 +297,12 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(fork);
 				for (org.eclipse.egit.github.core.Repository r : repos) {
 					if (r.getName().equals(repo))
-						return msg + Messages.Fork_Found() + "__succeeded";
+						return Messages.Fork_Found() + "__succeeded";
 				}
 			} catch (Exception ex) {
-				return msg + Messages.Fork_GetReposFailed() + "\n" + ex.getMessage();
+				return Messages.Fork_GetReposFailed() + "\n" + ex.getMessage();
 			}
-			return msg + Messages.Fork_NotFound(repo, fork);
+			return "__succeeded";
 		} catch (Exception ex) {
 			return Messages.Fork_AuthFailed() + "\n" + ex.getMessage();
 		}
@@ -319,17 +313,12 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      */
     public FormValidation checkDepFork(@QueryParameter String value, @QueryParameter String name)
     		throws IOException, ServletException {
-    	
-    	
-    	String msg = "";
-    	
-    	doFillForkItems(name);
+    	    	
+    	doFillForkItems(value, name);
     	    	
     	if (value.length() == 0) {
-    		value = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
-    		msg = Messages.Fork_DefaultUsed(value);
+    		return FormValidation.error(Messages.Fork_NoFork());
     	}
-    	if (name.length() == 0) return FormValidation.ok(msg);
     	
     	// check if given fork owner is in fork list
     	/*for (String fork : this.forkItems) {
@@ -345,7 +334,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				UserService githubUserSrv = new UserService(this.githubClient);
 				githubUserSrv.getUser(value);
 			} catch (Exception ex) {
-				return FormValidation.error(msg + Messages.Fork_OwnerNotFound() + "\n" + ex.getMessage());
+				return FormValidation.error(Messages.Fork_OwnerNotFound() + "\n" + ex.getMessage());
 			}
 			// check if user has public repository with given name
 			try {
@@ -353,12 +342,12 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 				List<org.eclipse.egit.github.core.Repository> repos = githubRepoSrv.getRepositories(value);
 				for (org.eclipse.egit.github.core.Repository repo : repos) {
 					if (repo.getName().equals(name))
-						return FormValidation.ok(msg + Messages.Fork_Found());
+						return FormValidation.ok(Messages.Fork_Found());
 				}
 			} catch (Exception ex) {
-				return FormValidation.error(msg + Messages.Fork_GetReposFailed() + "\n" + ex.getMessage());
+				return FormValidation.error(Messages.Fork_GetReposFailed() + "\n" + ex.getMessage());
 			}
-			return FormValidation.error(msg + Messages.Fork_NotFound(name, value));
+			return FormValidation.ok();
 		} catch (Exception ex) {
 			return FormValidation.error(Messages.Fork_AuthFailed() + "\n" + ex.getMessage());
 		}
@@ -378,7 +367,7 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	}
     	
     	if (fork.length() == 0) {
-    		fork = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
+    		return aux;
     	}
     	
     	try {
@@ -399,23 +388,21 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     
     @JavaScriptMethod
     public String checkBranch(String branch, String fork, String repo) {
-    	String msg = "";
     	
     	doFillBranchItems(repo, fork);
     	
     	if (branch.length() == 0) {
-    		branch = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
-    		msg = Messages.Branch_DefaultUsed(branch);
+    		return Messages.Branch_NoBranch();
     	}
     	
     	// check if given branch is in branch list
     	for (String b : this.branchItems) {
 			if (b.equals(branch)) {
-				return msg + "__succeeded";
+				return "__succeeded";
 			}
 		}
     	    	
-    	return msg + Messages.Branch_NotFound(branch);
+    	return Messages.Branch_NotFound(branch);
     }
     
     /**
@@ -423,25 +410,20 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
      */
     public FormValidation checkDepBranch(@QueryParameter String value, @QueryParameter String name, @QueryParameter String fork)
     		throws IOException, ServletException {
-    	
-    	
-    	String msg = "";
-    	
+    	    	
     	doFillBranchItems(name, fork);
     	
     	if (value.length() == 0) {
-    		value = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultBranch();
-    		msg = Messages.Branch_DefaultUsed(value);
+    		return FormValidation.error(Messages.Branch_NoBranch());
     	}
-    	if (name.length() == 0) return FormValidation.ok(msg);
     	
     	// check if given branch is in branch list
     	for (String branch : this.branchItems) {
 			if (branch.equals(value)) {
-				return (msg.length()==0) ? FormValidation.ok(Messages.Branch_Found()) : FormValidation.ok(msg);
+				return FormValidation.ok();
 			}
 		}
     	    	
-    	return FormValidation.error(msg + Messages.Branch_NotFound(value));
+    	return FormValidation.error(Messages.Branch_NotFound(value));
     }
 }

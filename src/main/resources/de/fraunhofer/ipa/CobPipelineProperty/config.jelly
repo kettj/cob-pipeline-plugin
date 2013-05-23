@@ -3,12 +3,6 @@
 	<f:entry title="${%email}" field="email">
         <f:textbox id="email" onchange="validateEmail()"/>
 	</f:entry>
-	<f:entry title="${%defaultFork}" field="defaultFork">
-        <f:textbox id="defaultFork" onchange="validateDefaultFork()"/>
-	</f:entry>
-	<f:entry title="${%defaultBranch}" field="defaultBranch">
-        <f:textbox id="defaultBranch" onchange="validateDefaultBranch()"/>
-	</f:entry>
 	<f:entry title="${%advanced}">
   		<f:advanced>
 			<f:entry field="committerEmailEnabled" title="${%committerEmail}">

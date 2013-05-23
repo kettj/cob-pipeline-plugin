@@ -382,8 +382,8 @@ public class RootRepository extends Repository {
 	    /**
 	     * Fill combobox with forks of repository
 	     */
-	    public ComboBoxModel doFillForkItems(@QueryParameter String repoName) {
-	    	return super.doFillForkItems(repoName);
+	    public ComboBoxModel doFillForkItems(@QueryParameter String value, @QueryParameter String repoName) {
+	    	return super.doFillForkItems(value, repoName);
 	    }
 
 	    /**
@@ -408,11 +408,7 @@ public class RootRepository extends Repository {
 			
 			return prioArchItems;
 		}
-		
-		public String getDefaultFork() {
-			return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getDefaultFork();
-		}
-        
+		        
         /**
          * All {@link RepositoryDescriptor}s
          */

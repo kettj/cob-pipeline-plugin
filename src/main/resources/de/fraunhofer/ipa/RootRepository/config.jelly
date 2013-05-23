@@ -4,9 +4,17 @@
 	<div style="background-color:#F6F6F6;border:2px solid gray">
 	<table border="0" with="100%">
 	<j:set var="genId" value="${h.generateId()}"/>
+  	<f:entry field="fork" title="${%fork}">
+   		<f:combobox name="fork" onchange="${genId}validateName()" id="${genId}fork"/>
+   		<div id="${genId}forkWarning"/>
+	</f:entry>
   	<f:entry field="repoName" title="${%repoName}">
    		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validateName()" style="width:250px;"/>
 		<div id="${genId}nameWarning"/>
+	</f:entry>
+	<f:entry field="branch" title="${%branch}">
+   		<f:combobox onchange="${genId}validateBranch()" id="${genId}branch"/>
+   		<div id="${genId}branchWarning"/>
 	</f:entry>
 	<f:entry field="suffix" title="${%suffix}">
    		<f:textbox id="${genId}suffix" onchange="generateFullName('${genId}')" onkeyup="generateFullName('${genId}')" style="width:250px;"/>
@@ -49,14 +57,6 @@
 	</f:entry>
 	<f:entry title="${%advanced}">
   		<f:advanced>
-		  	<f:entry field="fork" title="${%fork}">
-		   		<f:combobox name="fork" onchange="${genId}validateName()" id="${genId}fork"/>
-		   		<div id="${genId}forkWarning"/>
-			</f:entry>
-			<f:entry field="branch" title="${%branch}">
-		   		<f:combobox onchange="${genId}validateBranch()" id="${genId}branch"/>
-		   		<div id="${genId}branchWarning"/>
-			</f:entry>
 			<f:entry title="${%jobs}">
 				<j:set var="ubuntuReleases" value="${descriptor.ubuntuReleases}"/>
   				<table border="0" width="*">
