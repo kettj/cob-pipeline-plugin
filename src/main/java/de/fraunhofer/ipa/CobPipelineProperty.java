@@ -192,10 +192,6 @@ public class CobPipelineProperty extends UserProperty {
 
 		private List<Map<String, List<String>>> targets;
 
-		private String defaultFork;
-
-		private String defaultBranch;
-
 		public DescriptorImpl() {
 			load();
 		}

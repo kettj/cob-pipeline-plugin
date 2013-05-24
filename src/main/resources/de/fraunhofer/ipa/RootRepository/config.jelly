@@ -6,7 +6,7 @@
 	<j:set var="genId" value="${h.generateId()}"/>
   	<f:entry field="fork" title="${%fork}">
    		<f:combobox name="fork" onchange="${genId}validateName()" id="${genId}fork"/>
-   		<div id="${genId}forkWarning"/>
+   		<div id="${genId}forkWarning" > <b><font color="red">${%noFork}</font></b> </div>
 	</f:entry>
   	<f:entry field="repoName" title="${%repoName}">
    		<f:combobox name="repoName" id="${genId}repoName" onchange="generateFullName('${genId}'); ${genId}validateName()" style="width:250px;"/>

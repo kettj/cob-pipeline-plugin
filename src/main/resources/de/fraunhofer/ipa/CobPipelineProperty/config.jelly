@@ -162,22 +162,6 @@
 		    }
   		}
   		
-  		function validateDefaultFork() {
-  			var defaultFork = document.getElementById('defaultFork');
-
-  			if (defaultFork.value.length==0) {
-  				validationOutput("${%noDefaultFork}", "defaultFork");
-  			}
-  		}
-  		
-  		function validateDefaultBranch() {
-  			var defaultBranch = document.getElementById('defaultBranch');
-
-  			if (defaultBranch.value.length==0) {
-  				validationOutput("${%noDefaultBranch}", "defaultBranch");
-  			}
-  		}
-  		
   		function validateRepos() {
   			var repos = document.getElementsByName('repoName');
   			
@@ -243,8 +227,6 @@
   			reset();
   			
   			validateEmail();
-			validateDefaultFork();
-			validateDefaultBranch();
 			validateRepos();
 			validateFullNames();
 			validateDeps();
