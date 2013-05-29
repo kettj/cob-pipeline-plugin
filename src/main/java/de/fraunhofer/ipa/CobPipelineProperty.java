@@ -530,6 +530,21 @@ public class CobPipelineProperty extends UserProperty {
 				Map<String, Object> deps = new HashMap<String, Object>();
 				for (Repository repoDep : rootRepo.getRepoDeps()) {
 					Map<String, Object> dep = new HashMap<String, Object>();
+					if (repoDep.fork.equals("") || repoDep.fork.equals(null)) {
+						response.put("message", Messages.Pipeline_GenerationNoFork(rootRepo.fullName));
+						response.put("status", "<font color=\"red\">" + Messages.Pipeline_GenerationFailure() + "</font>");
+						return response;
+					}
+					if (repoDep.name.equals("") || repoDep.name.equals(null)) {
+						response.put("message", Messages.Pipeline_GenerationNoDepName(rootRepo.fullName));
+						response.put("status", "<font color=\"red\">" + Messages.Pipeline_GenerationFailure() + "</font>");
+						return response;
+					}
+					if (repoDep.branch.equals("") || repoDep.branch.equals(null)) {
+						response.put("message", Messages.Pipeline_GenerationNoBranch(rootRepo.fullName));
+						response.put("status", "<font color=\"red\">" + Messages.Pipeline_GenerationFailure() + "</font>");
+						return response;
+					}
 					dep.put("type", repoDep.type);
 					dep.put("url", repoDep.url);
 					dep.put("version", repoDep.branch);
