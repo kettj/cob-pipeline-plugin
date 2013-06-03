@@ -176,7 +176,18 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 			}
 		}
     	// if repository was not in list, for example extern repository
-    	// TODO if owner is not given, ask for owner and check for repo    	
+    	try {
+    		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
+    		org.eclipse.egit.github.core.Repository selectedRepo = githubRepoSrv.getRepository(fork, repo);
+    		if (selectedRepo != null) {
+    			if (selectedRepo.isPrivate()) {
+    				return Messages.Repository_PrivateFound() + "__succeeded";
+    			}
+    			return "__succeeded";
+    		}
+    	} catch (IOException ex) {
+			// TODO: handle exception
+		}
     	
     	return Messages.Repository_NotFound(repo, fork);
     }
@@ -204,7 +215,18 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
 			}
 		}
     	// if repository was not in list, for example extern repository
-    	// TODO if owner is not given, ask for owner and check for repo
+    	try {
+    		RepositoryService githubRepoSrv = new RepositoryService(githubClient);
+    		org.eclipse.egit.github.core.Repository selectedRepo = githubRepoSrv.getRepository(fork, value);
+    		if (selectedRepo != null) {
+    			if (selectedRepo.isPrivate()) {
+    				return FormValidation.ok(Messages.Dependency_PrivateFound());
+    			}
+    			return FormValidation.ok();
+    		}
+    	} catch (IOException ex) {
+			// TODO: handle exception
+		}
     	
     	return FormValidation.warning(Messages.Dependency_NotFound(value, fork));//error(Messages.Repository_NoFound());
     }

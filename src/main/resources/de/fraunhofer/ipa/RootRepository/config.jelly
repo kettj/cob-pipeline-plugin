@@ -313,8 +313,14 @@
   		
   		function ${genId}validateName() {
   			${genId}Des.checkName(document.getElementById("${genId}repoName").value, document.getElementById("${genId}fork").value, function(t) {
-  				document.getElementById("${genId}nameWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
-  				validationOutput(t.responseObject(), "${genId}repoName");
+  				if (t.responseObject().indexOf('__succeeded') != -1) {
+  					document.getElementById("${genId}nameWarning").innerHTML = t.responseObject().replace('__succeeded', '');
+  					validationOutput("", "${genId}repoName");
+  				}
+  				else {
+  					document.getElementById("${genId}nameWarning").innerHTML = '<b><font color="red">' + t.responseObject() + '</font></b>';
+  					validationOutput(t.responseObject(), "${genId}repoName");
+  				}
   				${genId}validateFork();
   			});
   		}
