@@ -497,9 +497,11 @@ public class CobPipelineProperty extends UserProperty {
 			} catch(InterruptedException ex) {
 			    Thread.currentThread().interrupt();
 			}
-			try {
-				mod = new Date(configFile.lastModified());
-			} catch(Exception ex) {}
+			if (configFile.exists()) {
+				try {
+					mod = new Date(configFile.lastModified());
+				} catch(Exception ex) {}
+			}
 			
 			now = new Date();
 			if (now.getTime() - start > 30000) {
