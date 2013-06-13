@@ -97,16 +97,6 @@ public class CobPipelineProperty extends UserProperty {
 	private boolean committerEmailEnabled;
 
 	/**
-	 * user name
-	 */
-	private String userName = null;
-
-	/**
-	 * Jenkins master name
-	 */
-	private String masterName = null;
-
-	/**
 	 * Build repositories
 	 */
 	private volatile RootRepositoryList rootRepos = new RootRepositoryList();
@@ -174,7 +164,7 @@ public class CobPipelineProperty extends UserProperty {
 
 		private String jenkinsPassword;
 		
-		private String pipelineDir;
+		private String configFolder;
 		
 		private String tarballLocation;
 
@@ -234,12 +224,12 @@ public class CobPipelineProperty extends UserProperty {
 			return jenkinsPassword;
 		}
 		
-		public void setPipelineDir(String pipelineDir) {
-			this.pipelineDir = pipelineDir;
+		public void setConfigFolder(String configFolder) {
+			this.configFolder = configFolder;
 		}
 		
-		public String getPipelineDir() {
-			return this.pipelineDir;
+		public String getConfigFolder() {
+			return this.configFolder;
 		}
 		
 		public void setTarballLocation(String tarballLocation) {
@@ -315,6 +305,7 @@ public class CobPipelineProperty extends UserProperty {
 			return Collections.unmodifiableList(robots);
 		}
 
+		@SuppressWarnings("unchecked")
 		public void setTargetsURL(String url) throws Exception{
 			this.targetsURL = url;
 			URL targets = new URL(url);
@@ -361,34 +352,34 @@ public class CobPipelineProperty extends UserProperty {
 		/**
 		 * Checks if folder and jenkins_setup repository exist
 		 */
-		public FormValidation doCheckPipelineDir(@QueryParameter String value) {
+		public FormValidation doCheckConfigFolder(@QueryParameter String value) {
 			File pipeDir = new File(value);
 			
 			if (!pipeDir.exists()) {
-				return FormValidation.error(Messages.PipelineDir_NotExistent());
+				return FormValidation.error(Messages.ConfigFolder_NotExistent());
 			}
 			if (!pipeDir.isDirectory()) {
-				return FormValidation.error(Messages.PipelineDir_NotADirectory());
+				return FormValidation.error(Messages.ConfigFolder_NotADirectory());
 			}
 			
 			for (String inPipeDir : pipeDir.list()) {
 				if (inPipeDir.equals("jenkins_setup")) {
 					File setupDir = new File(value, inPipeDir);
 					if (!setupDir.isDirectory()) {
-						return FormValidation.error(Messages.PipelineDir_NoSetupDir(inPipeDir));
+						return FormValidation.error(Messages.ConfigFolder_NoSetupDir(inPipeDir));
 					}
 					if (setupDir.list().length == 0) {
-						return FormValidation.error(Messages.PipelineDir_RepoEmpty(inPipeDir));
+						return FormValidation.error(Messages.ConfigFolder_RepoEmpty(inPipeDir));
 					}
 					File gitRepo = new File(setupDir, "/.git");
 					if (!gitRepo.exists()) {
-						return FormValidation.error(Messages.PipelineDir_NoGitRepo(inPipeDir));
+						return FormValidation.error(Messages.ConfigFolder_NoGitRepo(inPipeDir));
 					}
-					return FormValidation.ok(Messages.PipelineDir_Ok());
+					return FormValidation.ok(Messages.ConfigFolder_Ok());
 				}
 			}
 			
-			return FormValidation.error(Messages.PipelineDir_NoSetupRepo());
+			return FormValidation.error(Messages.ConfigFolder_NoSetupRepo());
 		}
 		
 		/**
@@ -567,7 +558,7 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// clone/pull configuration repository
-		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_config");
+		File configRepoFolder = new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigFolder(), "jenkins_config");
 		String configRepoURL = "git@github.com:" + Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner() + "/jenkins_config.git";
 		Git git = new Git(new FileRepository(configRepoFolder + "/.git"));
 
@@ -637,10 +628,11 @@ public class CobPipelineProperty extends UserProperty {
 		}
 
 		// trigger Python job generation script
-		String[] generationCall = {new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineDir(), "jenkins_setup/scripts/generate_buildpipeline.py").toString(),
+		String[] generationCall = {new File(Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigFolder(), "jenkins_setup/scripts/generate_buildpipeline.py").toString(),
 				"-m", Jenkins.getInstance().getRootUrl(),
 				"-l", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsLogin(),
 				"-p", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getJenkinsPassword(),
+				"-c", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getConfigFolder(),
 				"-o", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getPipelineReposOwner(),
 				"-t", Jenkins.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTarballLocation(),
 				"-u", user.getId()};

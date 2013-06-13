@@ -42,7 +42,6 @@ import hudson.DescriptorExtensionList;
 import hudson.Extension;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.Descriptor.FormException;
-import hudson.model.Hudson;
 import hudson.util.ComboBoxModel;
 import hudson.util.FormValidation;
 
