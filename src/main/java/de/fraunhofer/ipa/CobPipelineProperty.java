@@ -516,7 +516,7 @@ public class CobPipelineProperty extends UserProperty {
 				repo.put("ros_distro", rootRepo.getRosDistro());
 				repo.put("prio_ubuntu_distro", rootRepo.getPrioUbuntuDistro());
 				repo.put("prio_arch", rootRepo.getPrioArch());
-				repo.put("matrix_distro_arch", rootRepo.getMatrixDistroArch());
+				repo.put("regular_matrix", rootRepo.getMatrixDistroArch());
 				repo.put("jobs", rootRepo.getJobs());
 				repo.put("robots", rootRepo.getRobots());
 
