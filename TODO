@@ -1,0 +1,42 @@
+==========
+= TODOs: =
+==========
+
+Configuration:
+- enabled private repositories: merge
+- give opportunity to insert rosinstall file to define dependencies
+- only one robot can be selected: radion-buttons
+- Help messages for: Release, GenerationButton and all global configurations
+- Disable releas if no preceding job is selected
+- let user choose when email will be send
+
+Validation:
+- disable generation button until site is fully loaded and validated
+- stabilize branch validation
+- speed up global validation
+- validation robots
+- validate if global configuration is set correctly
+- error message if rosDistro and robots are not globally defined: inform
+  admin
+
+View:
+- automatically initialize MyView for each user with pipeline job list
+  and pipeline view
+
+Generation:
+- only reconfigure changed repositories during generation
+- stop generation if pull/push failes
+
+Email Notification:
+- avoid dead links
+- different generation scripts for test and build jobs
+- include build/test error log not only link
+
+Global Configurations:
+- Update button for jenkins_setup repository
+- automatically generate supplementary jobs
+- validate if robots are nodes
+- validate jenkins_config: is given..
+
+General:
+- one single system
