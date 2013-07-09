@@ -37,6 +37,7 @@ Global Configurations:
 - automatically generate supplementary jobs
 - validate if robots are nodes
 - validate jenkins_config: is given..
+- multiple target.yaml files
 
 General:
 - one single system
