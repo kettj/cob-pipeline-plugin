@@ -68,17 +68,6 @@
 					<f:optionalBlock field="downstreamBuild" title="${%downstreamBuild}">
 						<td valign="top" width="150"></td>
 			      		<td valign="top" width="*">
-							<f:checkbox title="${%nongraphicsTest} (not supported yet)"/>
-						</td>
-						<tr></tr>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="*">
-							<f:checkbox title="${%graphicsTest} (not supported yet)"/>
-						</td>
-		    		</f:optionalBlock>
-					<!--f:optionalBlock field="downstreamBuild" title="${%downstreamBuild}">
-						<td valign="top" width="150"></td>
-			      		<td valign="top" width="*">
 							<f:checkbox field="nongraphicsTest" title="${%nongraphicsTest}"/>
 						</td>
 						<tr></tr>
@@ -86,7 +75,7 @@
 						<td valign="top" width="*">
 							<f:checkbox field="graphicsTest" title="${%graphicsTest}"/>
 						</td>
-		    		</f:optionalBlock-->
+		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
 					<f:optionalBlock title="${%hardwareBuild} (not supported yet)">
