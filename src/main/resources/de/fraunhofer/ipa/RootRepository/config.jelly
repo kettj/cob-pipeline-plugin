@@ -81,16 +81,6 @@
 					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
 						<j:set var="robots" value="${descriptor.Robots}"/>
 						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox field="automaticHwTest" title="${%automaticHwTest}"/>
-						</td>
-						<tr></tr>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox field="interactiveHwTest" title="${%interactiveHwTest}"/>
-						</td>
-						<tr></tr>
-						<td width="*"></td>
 						<td width="200">${%robots}</td>
 						<j:forEach var="r" items="${robots}">
 							<td align="left" width="*">
