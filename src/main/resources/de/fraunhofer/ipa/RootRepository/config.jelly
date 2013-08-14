@@ -41,7 +41,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<select name="prioUbuntuDistro" id="${genId}selection" style="width:150px;" onchange="${genId}updateEnv()"/>
+   					<select name="prioUbuntuDistro" id="${genId}selection" style="padding-right: 2px;" onchange="${genId}updateEnv()"/>
 				</td>
 			</tr></tbody>
    		</table>
@@ -50,7 +50,7 @@
 		<table align="left" border="0" cellpadding="5" cellspacing="0" width="*">
 			<tbody><tr>
 				<td valign="top">
-   					<f:select id="${genId}arch" onchange="${genId}updateEnv()" style="width:100px;"/>
+   					<f:select id="${genId}arch" onchange="${genId}updateEnv()" style="padding-right: 2px;"/>
 				</td>
 			</tr></tbody>
    		</table>
