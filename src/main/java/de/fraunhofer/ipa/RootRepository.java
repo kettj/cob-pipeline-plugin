@@ -99,9 +99,9 @@ public class RootRepository extends Repository {
 	private final ArrayList<String> jobs;
 	
 	/**
-	 * Hardware/robots to build code and run tests on
+	 * Hardware/robot to build code and run tests on
 	 */
-	private final ArrayList<String> robots;
+	protected String robot;
 	
 	/**
 	 * Repository dependencies
@@ -135,7 +135,6 @@ public class RootRepository extends Repository {
 		this.prioArch = prioArch;
 		
 		this.matrixDistroArch = new HashMap<String, List<String>>();
-		this.robots = new ArrayList<String>();
 		this.jobs = new ArrayList<String>();
 		updateList(jobs, regularBuild, "regular_build");
 		updateList(jobs, downstreamBuild, "downstream_build");
@@ -161,10 +160,10 @@ public class RootRepository extends Repository {
 			while(iter.hasNext()){
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
-		        if (value.equals("true")) {
-		        	if (key.endsWith("__robot")) {
-		        		this.robots.add(key.replace("__robot", ""));
-		        	} else if (key.endsWith("__env")) {
+		        if (key.equals("robot")) {
+		        	this.robot = value;
+		        } else if (value.equals("true")) {
+		        	if (key.endsWith("__env")) {
 		        		List<String> archs = new ArrayList<String>();
 		        		String start = key.split("__")[0];
 		        		if (parent.getString(start+"__amd64__env").equals("true")) {
@@ -283,12 +282,12 @@ public class RootRepository extends Repository {
 		return this.jobs;
 	}
 	
-	public boolean isRobotChecked(String robot) {
-		return this.robots.contains(robot);
+	public void setRobot(String robot) {
+		this.robot = robot;
 	}
 	
-	public List<String> getRobots() {
-		return this.robots;
+	public String getRobot() {
+		return this.robot;
 	}
 	
 	public List<Repository> getRepoDeps() {
@@ -392,6 +391,14 @@ public class RootRepository extends Repository {
 	    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
 	    	return super.doFillBranchItems(repoName, fork);
 	    }
+		
+		public ListBoxModel doFillPrioArchItems() {
+			ListBoxModel prioArchItems = new ListBoxModel();
+			prioArchItems.add("64bit", "amd64");
+			prioArchItems.add("32bit", "i386");
+			
+			return prioArchItems;
+		}
 	    
 	    /**
 	     * Returns list of global defined available robots
@@ -401,12 +408,13 @@ public class RootRepository extends Repository {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
 		
-		public ListBoxModel doFillPrioArchItems() {
-			ListBoxModel prioArchItems = new ListBoxModel();
-			prioArchItems.add("64bit", "amd64");
-			prioArchItems.add("32bit", "i386");
+		public ListBoxModel doFillRobotItems() {
+			ListBoxModel robotItems = new ListBoxModel();
+			for (String robot: getRobots()){
+				robotItems.add(robot);
+			}
 			
-			return prioArchItems;
+			return robotItems;
 		}
 		        
         /**

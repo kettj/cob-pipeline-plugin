@@ -79,17 +79,11 @@
 		    	</table>
   				<table border="0" width="*">
 					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
-						<j:set var="robots" value="${descriptor.Robots}"/>
-						<td valign="top" width="150"></td>
-						<td width="200">${%robots}</td>
-						<j:forEach var="r" items="${robots}">
-							<td align="left" width="*">
-			                	<f:checkbox field="${r}__robot" title="${r}" checked="${instance.isRobotChecked(r)}"/>
-			              	</td>
-							<tr></tr>
-							<td width="*"></td>
-							<td width="*"></td>
-			            </j:forEach>
+						<td width="50"></td>
+			            <td style="padding-right:20px; vertical-align:middle">${%robot}:</td>
+			            <td width="*">
+			            	 <f:select field="robot" style="padding-right: 2px"/>
+			            </td>
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
