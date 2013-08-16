@@ -128,7 +128,7 @@
   				<table border="0" width="*">
 					<td valign="top" width="*">
 		    			<input type="checkbox" disabled="true"/> Release Job (not supported yet)
-		    			<!--f:optionalBlock field="release" title="${%release}" --/>
+		    			<!--f:optionalBlock field="release" title="${%release}" /-->
 		    		</td>
 		    	</table>
 		    </f:entry>
