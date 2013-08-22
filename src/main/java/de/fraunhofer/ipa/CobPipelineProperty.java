@@ -518,7 +518,7 @@ public class CobPipelineProperty extends UserProperty {
 				repo.put("prio_arch", rootRepo.getPrioArch());
 				repo.put("regular_matrix", rootRepo.getMatrixDistroArch());
 				repo.put("jobs", rootRepo.getJobs());
-				repo.put("robots", rootRepo.getRobots());
+				repo.put("robots", rootRepo.robot);
 
 				Map<String, Object> deps = new HashMap<String, Object>();
 				for (Repository repoDep : rootRepo.getRepoDeps()) {

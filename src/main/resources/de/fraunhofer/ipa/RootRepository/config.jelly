@@ -78,52 +78,13 @@
 		    		</f:optionalBlock>
 		    	</table>
   				<table border="0" width="*">
-					<f:optionalBlock title="${%hardwareBuild} (not supported yet)">
-						<j:set var="robots" value="${descriptor.Robots}"/>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox title="${%automaticHwTest} (not supported yet)"/>
-						</td>
-						<tr></tr>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox title="${%interactiveHwTest} (not supported yet)"/>
-						</td>
-						<tr></tr>
-						<td width="*"></td>
-						<td width="200">${%robots}</td>
-						<j:forEach var="r" items="${robots}">
-							<td align="left" width="*">
-			                	<f:checkbox title="${r} (not supported yet)" checked="${instance.isRobotChecked(r)}"/>
-			              	</td>
-							<tr></tr>
-							<td width="*"></td>
-							<td width="*"></td>
-			            </j:forEach>
+					<f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
+						<td width="50"></td>
+			            <td style="padding-right:20px; vertical-align:middle">${%robot}:</td>
+			            <td width="*">
+			            	 <f:select field="robot" style="padding-right: 2px"/>
+			            </td>
 		    		</f:optionalBlock>
-					<!--f:optionalBlock field="hardwareBuild" title="${%hardwareBuild}">
-						<j:set var="robots" value="${descriptor.Robots}"/>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox field="automaticHwTest" title="${%automaticHwTest}"/>
-						</td>
-						<tr></tr>
-						<td valign="top" width="150"></td>
-						<td valign="top" width="200">
-							<f:checkbox field="interactiveHwTest" title="${%interactiveHwTest}"/>
-						</td>
-						<tr></tr>
-						<td width="*"></td>
-						<td width="200">${%robots}</td>
-						<j:forEach var="r" items="${robots}">
-							<td align="left" width="*">
-			                	<f:checkbox field="${r}__robot" title="${r}" checked="${instance.isRobotChecked(r)}"/>
-			              	</td>
-							<tr></tr>
-							<td width="*"></td>
-							<td width="*"></td>
-			            </j:forEach>
-		    		</f:optionalBlock-->
 		    	</table>
   				<table border="0" width="*">
 					<td valign="top" width="*">
