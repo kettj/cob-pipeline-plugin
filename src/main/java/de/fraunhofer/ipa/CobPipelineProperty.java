@@ -83,7 +83,8 @@ import org.eclipse.jgit.storage.file.FileRepository;
 import org.yaml.snakeyaml.*;
 
 /**
- * A UserProperty that can store a build pipeline
+ * A UserProperty that can store a build pipeline consisting of a defined
+ * order of dependent projects
  * 
  * @author Jannik Kett
  */
@@ -94,10 +95,13 @@ public class CobPipelineProperty extends UserProperty {
 	 */
 	private String email = null;
 	
+	/**
+	 * stores whether the committer of a change should be informed as well
+	 */
 	private boolean committerEmailEnabled;
 
 	/**
-	 * Build repositories
+	 * list of configured repositories to build and test
 	 */
 	private volatile RootRepositoryList rootRepos = new RootRepositoryList();
 
@@ -111,15 +115,10 @@ public class CobPipelineProperty extends UserProperty {
 	}
 	
 	public String getEmail() {
+		//TODO 'if' necessary?
 		if(!this.email.isEmpty()) {
 			return this.email;
 		}
-        /*if(this.user != null) {
-            Mailer.UserProperty mailProperty = this.user.getProperty(Mailer.UserProperty.class);
-            if (mailProperty != null) {
-                return mailProperty.getAddress();
-            }
-        }*/
         return "";
 	}
 	
