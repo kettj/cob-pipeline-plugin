@@ -34,6 +34,8 @@ Email Notification:
 
 Global Configurations:
 - Update button for jenkins_setup repository
+- Jenkins Admin Login: dropdown list of all configured users (with all
+  rights)
 - automatically generate supplementary jobs
 - validate if robots are nodes
 - validate jenkins_config: is given..
