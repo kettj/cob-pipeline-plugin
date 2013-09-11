@@ -77,6 +77,11 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected Boolean poll;
 	
 	/**
+	 * whether the repository should be tested
+	 */
+	protected Boolean test;
+	
+	/**
 	 * url address to repository
 	 */
 	protected String url;
@@ -87,7 +92,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	protected String type;
 	
 	@DataBoundConstructor
-	public Repository(String depName, String fork, String branch, Boolean poll) throws Exception {
+	public Repository(String depName, String fork, String branch, Boolean poll, Boolean test) throws Exception {
 		this.name = depName;
 		this.fork = fork;
 		this.branch = branch;
@@ -98,6 +103,7 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 			throw new Exception("Given VCS type '"+type+"' is not supported");
 		}
 		this.poll = poll;
+		this.test = test;
 	}
 	
 	public void setDepName(String depName){
@@ -131,10 +137,16 @@ public class Repository extends AbstractDescribableImpl<Repository> implements C
 	public Boolean getPoll() {
 		return this.poll;
 	}
+	
+	public void setTest(Boolean test) {
+		this.test = test;
+	}
+	
+	public Boolean getTest() {
+		return this.test;
+	}
 		
 	public void setUrl(String url) {
-		//TODO check if url is valid
-		// necessary? master url
 		this.url = url;
 	}
 		

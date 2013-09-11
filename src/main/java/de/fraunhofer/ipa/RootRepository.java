@@ -113,7 +113,7 @@ public class RootRepository extends Repository {
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, List<Repository> repoDeps) throws Exception {
-		super(repoName, fork, branch, true);
+		super(repoName, fork, branch, true, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {

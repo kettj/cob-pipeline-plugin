@@ -541,6 +541,7 @@ public class CobPipelineProperty extends UserProperty {
 					dep.put("url", repoDep.url);
 					dep.put("version", repoDep.branch);
 					dep.put("poll", repoDep.poll);
+					dep.put("test", repoDep.test);
 					deps.put(repoDep.name, dep);
 				}
 				repo.put("dependencies", deps);
