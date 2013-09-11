@@ -312,13 +312,17 @@ public class RootRepository extends Repository {
 		}
 	    
 	    /**
-	     * Returns list of global defined supported ROS releases
+	     * Get list of global defined supported ROS releases
 	     * @return
 	     */
 	    public List<String> getAllRosDistros() {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getAllRosDistros();
 	    }
 	    
+	    /**
+	     * Get a list of all Ubuntu releases defined in the global target.yaml file
+	     * @return
+	     */
 	    public List<String> getUbuntuReleases() {
 	    	List<String> ubuntuReleases = new ArrayList<String>();
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
@@ -337,6 +341,11 @@ public class RootRepository extends Repository {
 	    	return ubuntuReleases;
 	    }
 	    
+	    /**
+	     * Get a list of all Ubuntu releases which are supported by the given ROS version
+	     * @param rosDistroListString
+	     * @return
+	     */
 	    @JavaScriptMethod
 	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
@@ -356,6 +365,11 @@ public class RootRepository extends Repository {
 	    	return allUbuntuList;
 	    }
 	    
+	    /**
+	     * Get a list of all supported ROS version for a given Ubuntu release 
+	     * @param ubuntuDistro
+	     * @return
+	     */
 	    public String getSupportedROS(String ubuntuDistro) {
 	    	List<String> rosDistros = new ArrayList<String>();	    	
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
@@ -392,6 +406,10 @@ public class RootRepository extends Repository {
 	    	return super.doFillBranchItems(repoName, fork);
 	    }
 		
+	    /**
+	     * Fill architecture selection
+	     * @return
+	     */
 		public ListBoxModel doFillPrioArchItems() {
 			ListBoxModel prioArchItems = new ListBoxModel();
 			prioArchItems.add("64bit", "amd64");
@@ -408,6 +426,10 @@ public class RootRepository extends Repository {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
 		
+	    /**
+	     * Fill robot selection
+	     * @return
+	     */
 		public ListBoxModel doFillRobotItems() {
 			ListBoxModel robotItems = new ListBoxModel();
 			for (String robot: getRobots()){
@@ -419,6 +441,7 @@ public class RootRepository extends Repository {
 		        
         /**
          * All {@link RepositoryDescriptor}s
+         * @return
          */
         public List<RepositoryDescriptor> getRepositoryDescriptors() {
         	List<RepositoryDescriptor> r = new ArrayList<RepositoryDescriptor>();
