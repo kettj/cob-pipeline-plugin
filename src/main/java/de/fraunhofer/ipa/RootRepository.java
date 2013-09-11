@@ -350,19 +350,25 @@ public class RootRepository extends Repository {
 	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
 	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	Boolean rosFound = false;
 	    	
 	    	for (String rosDistro : rosDistroListString.split(",")) {
 	    		for (Map<String, List<String>> ros : targets) {
 	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				rosFound = true;
 	    				for (List<String> ubuntuList : ros.values()) {
 	    					allUbuntuSet.retainAll(ubuntuList);
 	    				}
 	    			}
 	    		}
 	    	}
-	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
-	    	Collections.sort(allUbuntuList);
-	    	return allUbuntuList;
+	    	if (rosFound.equals(true)) {
+	    		List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    		Collections.sort(allUbuntuList);
+	    		return allUbuntuList;
+	    	} else {
+	    		return Collections.<String>emptyList();
+	    	}
 	    }
 	    
 	    /**
@@ -371,7 +377,7 @@ public class RootRepository extends Repository {
 	     * @return
 	     */
 	    public String getSupportedROS(String ubuntuDistro) {
-	    	List<String> rosDistros = new ArrayList<String>();	    	
+	    	List<String> rosDistros = new ArrayList<String>();
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
 	    	
 	    	for (Map<String, List<String>> ros : targets) {
