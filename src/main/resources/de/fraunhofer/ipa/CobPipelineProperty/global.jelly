@@ -35,7 +35,7 @@
     		<f:expandableTextbox />
     	</f:entry>
     	<f:entry title="${%targetsURL}" field="targetsURL">
-    		<f:textbox default="https://raw.github.com/ros/rosdistro/master/releases/targets.yaml"/>
+    		<f:textbox default="https://raw.github.com/ipa320/jenkins_setup/master/releases/targets.yaml"/>
     	</f:entry>
   	</f:section>
 </j:jelly>
