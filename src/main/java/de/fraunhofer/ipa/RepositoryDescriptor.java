@@ -123,8 +123,6 @@ public abstract class RepositoryDescriptor extends Descriptor<Repository> {
     	this.githubLogin = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubLogin();
     	String githubPassword = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubPassword();
     	
-    	//this.githubOrg = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getGithubOrg();
-    	
     	this.githubClient.setCredentials(this.githubLogin, githubPassword);
     }
     
