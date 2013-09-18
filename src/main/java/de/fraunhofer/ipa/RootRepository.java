@@ -99,9 +99,9 @@ public class RootRepository extends Repository {
 	private final ArrayList<String> jobs;
 	
 	/**
-	 * Hardware/robots to build code and run tests on
+	 * Hardware/robot to build code and run tests on
 	 */
-	private final ArrayList<String> robots;
+	protected String robot;
 	
 	/**
 	 * Repository dependencies
@@ -113,7 +113,7 @@ public class RootRepository extends Repository {
 			String prioUbuntuDistro, String prioArch, String fork, String branch,
 			JSONObject regularBuild, JSONObject downstreamBuild, JSONObject hardwareBuild,
 			boolean release, List<Repository> repoDeps) throws Exception {
-		super(repoName, fork, branch, true);
+		super(repoName, fork, branch, true, true);
 		if (suffix.length() == 0) {
 			this.fullName = repoName;
 		} else {
@@ -135,7 +135,6 @@ public class RootRepository extends Repository {
 		this.prioArch = prioArch;
 		
 		this.matrixDistroArch = new HashMap<String, List<String>>();
-		this.robots = new ArrayList<String>();
 		this.jobs = new ArrayList<String>();
 		updateList(jobs, regularBuild, "regular_build");
 		updateList(jobs, downstreamBuild, "downstream_build");
@@ -161,10 +160,10 @@ public class RootRepository extends Repository {
 			while(iter.hasNext()){
 		        String key = (String)iter.next();
 		        String value = parent.getString(key);
-		        if (value.equals("true")) {
-		        	if (key.endsWith("__robot")) {
-		        		this.robots.add(key.replace("__robot", ""));
-		        	} else if (key.endsWith("__env")) {
+		        if (key.equals("robot")) {
+		        	this.robot = value;
+		        } else if (value.equals("true")) {
+		        	if (key.endsWith("__env")) {
 		        		List<String> archs = new ArrayList<String>();
 		        		String start = key.split("__")[0];
 		        		if (parent.getString(start+"__amd64__env").equals("true")) {
@@ -283,12 +282,12 @@ public class RootRepository extends Repository {
 		return this.jobs;
 	}
 	
-	public boolean isRobotChecked(String robot) {
-		return this.robots.contains(robot);
+	public void setRobot(String robot) {
+		this.robot = robot;
 	}
 	
-	public List<String> getRobots() {
-		return this.robots;
+	public String getRobot() {
+		return this.robot;
 	}
 	
 	public List<Repository> getRepoDeps() {
@@ -313,13 +312,17 @@ public class RootRepository extends Repository {
 		}
 	    
 	    /**
-	     * Returns list of global defined supported ROS releases
+	     * Get list of global defined supported ROS releases
 	     * @return
 	     */
 	    public List<String> getAllRosDistros() {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getAllRosDistros();
 	    }
 	    
+	    /**
+	     * Get a list of all Ubuntu releases defined in the global target.yaml file
+	     * @return
+	     */
 	    public List<String> getUbuntuReleases() {
 	    	List<String> ubuntuReleases = new ArrayList<String>();
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
@@ -338,27 +341,43 @@ public class RootRepository extends Repository {
 	    	return ubuntuReleases;
 	    }
 	    
+	    /**
+	     * Get a list of all Ubuntu releases which are supported by the given ROS version
+	     * @param rosDistroListString
+	     * @return
+	     */
 	    @JavaScriptMethod
 	    public List<String> getSupportedUbuntuReleases(String rosDistroListString) {
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
 	    	Set<String> allUbuntuSet = new HashSet<String>(getUbuntuReleases());
+	    	Boolean rosFound = false;
 	    	
 	    	for (String rosDistro : rosDistroListString.split(",")) {
 	    		for (Map<String, List<String>> ros : targets) {
 	    			if (ros.keySet().iterator().next().equals(rosDistro)) {
+	    				rosFound = true;
 	    				for (List<String> ubuntuList : ros.values()) {
 	    					allUbuntuSet.retainAll(ubuntuList);
 	    				}
 	    			}
 	    		}
 	    	}
-	    	List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
-	    	Collections.sort(allUbuntuList);
-	    	return allUbuntuList;
+	    	if (rosFound.equals(true)) {
+	    		List<String> allUbuntuList = new ArrayList<String>(allUbuntuSet);
+	    		Collections.sort(allUbuntuList);
+	    		return allUbuntuList;
+	    	} else {
+	    		return Collections.<String>emptyList();
+	    	}
 	    }
 	    
+	    /**
+	     * Get a list of all supported ROS version for a given Ubuntu release 
+	     * @param ubuntuDistro
+	     * @return
+	     */
 	    public String getSupportedROS(String ubuntuDistro) {
-	    	List<String> rosDistros = new ArrayList<String>();	    	
+	    	List<String> rosDistros = new ArrayList<String>();
 	    	List<Map<String, List<String>>> targets = Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getTargets();
 	    	
 	    	for (Map<String, List<String>> ros : targets) {
@@ -392,6 +411,18 @@ public class RootRepository extends Repository {
 	    public ComboBoxModel doFillBranchItems(@QueryParameter String repoName, @QueryParameter String fork) {
 	    	return super.doFillBranchItems(repoName, fork);
 	    }
+		
+	    /**
+	     * Fill architecture selection
+	     * @return
+	     */
+		public ListBoxModel doFillPrioArchItems() {
+			ListBoxModel prioArchItems = new ListBoxModel();
+			prioArchItems.add("64bit", "amd64");
+			prioArchItems.add("32bit", "i386");
+			
+			return prioArchItems;
+		}
 	    
 	    /**
 	     * Returns list of global defined available robots
@@ -401,16 +432,22 @@ public class RootRepository extends Repository {
 	    	return Hudson.getInstance().getDescriptorByType(CobPipelineProperty.DescriptorImpl.class).getRobots();
 	    }
 		
-		public ListBoxModel doFillPrioArchItems() {
-			ListBoxModel prioArchItems = new ListBoxModel();
-			prioArchItems.add("64bit", "amd64");
-			prioArchItems.add("32bit", "i386");
+	    /**
+	     * Fill robot selection
+	     * @return
+	     */
+		public ListBoxModel doFillRobotItems() {
+			ListBoxModel robotItems = new ListBoxModel();
+			for (String robot: getRobots()){
+				robotItems.add(robot);
+			}
 			
-			return prioArchItems;
+			return robotItems;
 		}
 		        
         /**
          * All {@link RepositoryDescriptor}s
+         * @return
          */
         public List<RepositoryDescriptor> getRepositoryDescriptors() {
         	List<RepositoryDescriptor> r = new ArrayList<RepositoryDescriptor>();

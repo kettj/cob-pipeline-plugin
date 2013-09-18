@@ -5,8 +5,8 @@
 Configuration:
 - enabled private repositories: merge
 - give opportunity to insert rosinstall file to define dependencies
-- only one robot can be selected: radion-buttons
-- Help messages for: Release, GenerationButton and all global configurations
+- Help messages for: GenerationButton and all global configurations
+- Check and update all help messages
 - Disable releas if no preceding job is selected
 - let user choose when email will be send
 
@@ -20,8 +20,8 @@ Validation:
   admin
 
 View:
-- automatically initialize MyView for each user with pipeline job list
-  and pipeline view
+- (automatically initialize MyView for each user with pipeline job list
+  and pipeline view)
 
 Generation:
 - only reconfigure changed repositories during generation
@@ -34,6 +34,8 @@ Email Notification:
 
 Global Configurations:
 - Update button for jenkins_setup repository
+- Jenkins Admin Login: dropdown list of all configured users (with all
+  rights)
 - automatically generate supplementary jobs
 - validate if robots are nodes
 - validate jenkins_config: is given..
